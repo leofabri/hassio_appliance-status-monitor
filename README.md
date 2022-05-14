@@ -1,7 +1,7 @@
 [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
 
 <p align="center">
-![automation-tree|243x500](upload://zvGCjTlqsvWqxNd4Jr2lF5fh5SK.png)
+  <img width="240" height="auto" alt="Monitor the status of an appliance - by leofabri" src="automation-tree.png">
 </p>
 
 This is my simple automation to control the most power-hungry appliances in my house. I use this for my dishwasher and washing machine.
