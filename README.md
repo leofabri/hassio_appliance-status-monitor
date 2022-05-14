@@ -38,14 +38,19 @@ This is what's different:
 
 ## ☑️ What is needed to run this:
 
+### Premise
+> <i>Please consider that this blueprint is shared "as it is", and even it fits my use-case, it might not be the same for you.</i>
+
+
 To achieve this level of control, the socket has to have some basic features, like: 
 - power monitoring (polling rate of a maximum of 60 sec for best results)
 - ON/OFF control over HASSIO
 - status reporting
 
-Mine is a [u]Meross MSS310EU[/u].
+Mine is a Meross MSS310EU.
 
-To get the pause state to work properly, you also need another automation that can detect an overload. I'm not the author of that automation (which you can find [here](https://github.com/andbad/HA_PowerControl)). I have not tested my blueprint without this value, maybe it would still work, but it'd represent a big constraint for the whole blueprint.
+To get the pause state to work properly, you also need another automation that can detect an overload. I'm not the author of that automation (which you can find [here](https://github.com/andbad/HA_PowerControl)). <br>
+I have not tested my blueprint without this value, so can't tell you if it would still work without it.
 
 ### 1. The State Machine entries (input_select)
 You need to create the input_select for our appliance.  
@@ -68,9 +73,9 @@ Please make sure to edit `<your_appliance_name>`, `<Your Appliance Name>` and `<
 
 For example, my appliance is a washing machine, so I'll do the following:
 
-`<your_appliance_name>` = washing_machine
-`<Your Appliance Name>` = Washing Machine
-`<your_appliance_icon>` = washing-machine (taken from here https://materialdesignicons.com/)
+`<your_appliance_name>` = washing_machine<br>
+`<Your Appliance Name>` = Washing Machine<br>
+`<your_appliance_icon>` = washing-machine (taken from here https://materialdesignicons.com/)<br>
 
 
 The result:
