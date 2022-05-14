@@ -1,0 +1,278 @@
+blueprint:
+  source_url: https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/appliance-status-monitor.yaml
+  name: Monitor the status of an appliance - by leofabri
+  description: 'This automation helps you to keep an eye on the status of an appliance
+    such as a dishwasher, a washing machine, etc.<br> By using this, you''ll be able
+    to tell if an appliance is performing a job (job_ongoing state) or if it''s done
+    (job_completed state).
+
+    It also incorporates a simple state machine that allows Home Assistant to know
+    if the appliance had a pending job that was suspended because it caused a power
+    overload on the line.'
+  domain: automation
+  # Define the inputs
+  input:
+    appliance_socket:
+      name: Smart appliance socket
+      description: 'The socket is used to control this appliance.
+
+        To exercise this level of control, the socket has to have some basic features,
+        like power monitoring (polling rate of a maximum of 60 sec for best results),
+        ON/OFF control over HASSIO, and status reporting. Mine is a Meross MSS310EU.'
+      default: []
+      selector:
+        entity:
+          domain: switch
+    appliance_power_sensor:
+      name: Power Sensor
+      description: The power entity can tell how much power is currently being absorbed
+        by the appliance.
+      default: []
+      selector:
+        entity:
+          domain: sensor
+    appliance_job_cycle:
+      name: Appliance Job Cycle
+      description: 'A sensor that stores whether the appliance is still in a job cycle
+        or not.<br> The Job Cycle variable will be able to tell if the machine has
+        gone through the entire process (like washing the dishes) or if it''s still
+        incomplete.
+
+        This variable has to be a boolean (so: 0 or 1).<br> 0 -> The appliance is
+        not performing any job, it has completed the previous one<br> 1 -> The appliance
+        has a job ongoing that has not been completed yet. It might also mean that
+        the appliance is in the pause state, which would still indicate that the job
+        is not over yet.<br>
+
+        <strong>Note that this entity does not provide any information about the status
+        of the machine (ex. overload status). For that, you need the state machine.</strong>
+        <br>      '
+      default: []
+      selector:
+        entity:
+          domain: input_boolean
+    appliance_state_machine:
+      name: Appliance States Sensor - State Machine
+      description: 'An entity like: input_select.your_appliance_name_state_machine.
+
+        <strong>Note that those options are mandatory! Do not change them.</strong>'
+      default: []
+      selector:
+        entity:
+          domain: input_select
+    appliance_suspended_sensor:
+      name: Appliance suspended sensor
+      description: An input_number variable that turns into a value > 0.0. That would
+        mean that the appliance was disconnected because of an overload situation.
+      default: []
+      selector:
+        entity:
+          domain: input_number
+    appliance_starting_power_threshold:
+      name: Starting power threshold
+      description: Power threshold above which we assume the appliance has started
+        a job (job_ongoing state).
+      default: 5
+      selector:
+        number:
+          min: 1.0
+          max: 100.0
+          unit_of_measurement: W
+          mode: slider
+          step: 1.0
+    appliance_fiishing_power_threshold:
+      name: Finishing power threshold
+      description: Power threshold below which we assume the appliance has finished
+        a job (job_completed state).
+      default: 3
+      selector:
+        number:
+          min: 1.0
+          max: 100.0
+          unit_of_measurement: W
+          mode: slider
+          step: 1.0
+    actions_unplugged_overload:
+      name: Action(s) on overload
+      description: Executed when the appliance was unplugged because of an overload
+        situation.
+      default: []
+      selector:
+        action: {}
+    actions_powered_again_after_overload:
+      name: Action(s) on overload solved, now powered (but not resuming the job).
+      description: Executed when the appliance was unplugged because of an overload
+        and now it's powered but NOT resuming the job yet.
+      default: []
+      selector:
+        action: {}
+    actions_resuming_after_overload:
+      name: Action(s) when the overload is solved, now resuming
+      description: Executed when the appliance was unplugged because of an overload
+        and it IS now resuming the previous job.
+      default: []
+      selector:
+        action: {}
+    actions_on:
+      name: Action(s) when starting
+      description: Executed when the appliance starts a new job/cycle (job_ongoing
+        state).
+      default: []
+      selector:
+        action: {}
+    actions_off:
+      name: Action(s) when finishing
+      description: Executed when the appliance finishes a job/cycle (job_completed
+        state).
+      default: []
+      selector:
+        action: {}
+variables:
+  appliance_socket: !input 'appliance_socket'
+  appliance_suspended_sensor: !input 'appliance_suspended_sensor'
+trigger:
+- platform: state
+  entity_id: !input 'appliance_power_sensor'
+  id: power_event
+- platform: state
+  entity_id: !input 'appliance_socket'
+  id: socket_state_change_event
+- platform: state
+  entity_id: !input 'appliance_state_machine'
+  from: paused
+  to: powered
+  id: powered_again_after_overload_event
+- platform: state
+  entity_id: !input 'appliance_state_machine'
+  from: paused
+  to: job_ongoing
+  id: resuming_after_overload_event
+condition:
+- condition: or
+  conditions:
+  - condition: trigger
+    id: power_event
+  - condition: trigger
+    id: socket_state_change_event
+  - condition: trigger
+    id: powered_again_after_overload_event
+  - condition: trigger
+    id: resuming_after_overload_event
+action:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ states(appliance_suspended_sensor) | float > 0.0 }}'
+    sequence:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: !input 'appliance_state_machine'
+        state: paused
+    - service: input_select.select_option
+      data:
+        option: paused
+      target:
+        entity_id: !input 'appliance_state_machine'
+    - choose: []
+      default: !input 'actions_unplugged_overload'
+  - conditions:
+    - condition: template
+      value_template: '{{ states(appliance_socket) == ''off'' }}'
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: !input 'appliance_state_machine'
+        state: unplugged
+      - condition: template
+        value_template: '{{ states(appliance_suspended_sensor) | float > 0.0 }}'
+      - condition: state
+        entity_id: !input 'appliance_state_machine'
+        state: paused
+    sequence:
+    - service: input_select.select_option
+      data:
+        option: unplugged
+      target:
+        entity_id: !input 'appliance_state_machine'
+  - conditions:
+    - condition: trigger
+      id: powered_again_after_overload_event
+    sequence:
+    - choose: []
+      default: !input 'actions_powered_again_after_overload'
+  - conditions:
+    - condition: trigger
+      id: resuming_after_overload_event
+    sequence:
+    - choose: []
+      default: !input 'actions_resuming_after_overload'
+  default:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input 'appliance_job_cycle'
+          state: 'off'
+        - condition: state
+          entity_id: !input 'appliance_state_machine'
+          state: paused
+      - condition: numeric_state
+        entity_id: !input 'appliance_power_sensor'
+        above: !input 'appliance_starting_power_threshold'
+      sequence:
+      - service: input_boolean.turn_on
+        data: {}
+        target:
+          entity_id: !input 'appliance_job_cycle'
+      - service: input_select.select_option
+        data:
+          option: job_ongoing
+        target:
+          entity_id: !input 'appliance_state_machine'
+      - choose: []
+        default: !input 'actions_on'
+    - conditions:
+      - condition: state
+        entity_id: !input 'appliance_job_cycle'
+        state: 'on'
+      - condition: numeric_state
+        entity_id: !input 'appliance_power_sensor'
+        below: !input 'appliance_fiishing_power_threshold'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: !input 'appliance_state_machine'
+          state: paused
+      sequence:
+      - service: input_boolean.turn_off
+        data: {}
+        target:
+          entity_id: !input 'appliance_job_cycle'
+      - service: input_select.select_option
+        data:
+          option: job_completed
+        target:
+          entity_id: !input 'appliance_state_machine'
+      - choose: []
+        default: !input 'actions_off'
+    default:
+      choose:
+      - conditions:
+        - condition: state
+          entity_id: !input 'appliance_job_cycle'
+          state: 'off'
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: !input 'appliance_state_machine'
+            state: powered
+        sequence:
+        - service: input_select.select_option
+          data:
+            option: powered
+          target:
+            entity_id: !input 'appliance_state_machine'
+mode: single
+max_exceeded: silent

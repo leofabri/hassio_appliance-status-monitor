@@ -1,0 +1,4 @@
+input_boolean:
+  <your_appliance_name>_job_cycle:
+    name: <Your Appliance Name> - Job Cycle
+    icon: mdi:<your_appliance_icon>
