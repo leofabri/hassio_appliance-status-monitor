@@ -6,6 +6,7 @@
   <img width="240" height="auto" alt="Monitor the status of an appliance - by leofabri" src="automation-tree.png">
 </p>
 
+
 This is my simple automation to control the most power-hungry appliances in my house. I use this for my dishwasher and washing machine.
 
 
@@ -111,3 +112,15 @@ Okay, done... but now, please reboot Home Assistant ([at this page](https://my.h
 3.  Configure the variables as indicated inside of the blueprint's UI
 
 Have fun!
+
+___
+# Important notice! 🚨
+### 🆕 The code has been updated
+
+1. **Version 1.0.1 of 05/16/2022** - [**FIX!**] *Fixes the error of the 'idle' state which was not working correctly.* :man_facepalming:
+     
+    > More details below (*if you are installing the blueprint for the first time, you can discard this message*)
+
+   **To update:** 
+   * open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magic) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the thrash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is.
+   * add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml) and reload home assistant.
