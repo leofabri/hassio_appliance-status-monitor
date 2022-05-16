@@ -1,5 +1,4 @@
 blueprint:
-  source_url: https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/appliance-status-monitor.yaml
   name: Monitor the status of an appliance - by leofabri
   description: 'This automation helps you to keep an eye on the status of an appliance
     such as a dishwasher, a washing machine, etc.<br> By using this, you''ll be able
@@ -10,7 +9,6 @@ blueprint:
     if the appliance had a pending job that was suspended because it caused a power
     overload on the line.'
   domain: automation
-  # Define the inputs
   input:
     appliance_socket:
       name: Smart appliance socket
@@ -23,6 +21,7 @@ blueprint:
       selector:
         entity:
           domain: switch
+          # multiple: false
     appliance_power_sensor:
       name: Power Sensor
       description: The power entity can tell how much power is currently being absorbed
@@ -31,6 +30,7 @@ blueprint:
       selector:
         entity:
           domain: sensor
+          # multiple: false
     appliance_job_cycle:
       name: Appliance Job Cycle
       description: 'A sensor that stores whether the appliance is still in a job cycle
@@ -51,6 +51,7 @@ blueprint:
       selector:
         entity:
           domain: input_boolean
+          # multiple: false
     appliance_state_machine:
       name: Appliance States Sensor - State Machine
       description: 'An entity like: input_select.your_appliance_name_state_machine.
@@ -60,6 +61,7 @@ blueprint:
       selector:
         entity:
           domain: input_select
+          # multiple: false
     appliance_suspended_sensor:
       name: Appliance suspended sensor
       description: An input_number variable that turns into a value > 0.0. That would
@@ -68,6 +70,7 @@ blueprint:
       selector:
         entity:
           domain: input_number
+          # multiple: false
     appliance_starting_power_threshold:
       name: Starting power threshold
       description: Power threshold above which we assume the appliance has started
@@ -100,9 +103,9 @@ blueprint:
       selector:
         action: {}
     actions_powered_again_after_overload:
-      name: Action(s) on overload solved, now powered (but not resuming the job).
+      name: Action(s) on overload solved, now idle (but not resuming the job).
       description: Executed when the appliance was unplugged because of an overload
-        and now it's powered but NOT resuming the job yet.
+        and now it's idle but NOT resuming the job yet.
       default: []
       selector:
         action: {}
@@ -127,6 +130,7 @@ blueprint:
       default: []
       selector:
         action: {}
+  source_url: https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/appliance-status-monitor.yaml
 variables:
   appliance_socket: !input 'appliance_socket'
   appliance_suspended_sensor: !input 'appliance_suspended_sensor'
@@ -140,7 +144,7 @@ trigger:
 - platform: state
   entity_id: !input 'appliance_state_machine'
   from: paused
-  to: powered
+  to: idle
   id: powered_again_after_overload_event
 - platform: state
   entity_id: !input 'appliance_state_machine'
@@ -267,11 +271,11 @@ action:
           conditions:
           - condition: state
             entity_id: !input 'appliance_state_machine'
-            state: powered
+            state: idle
         sequence:
         - service: input_select.select_option
           data:
-            option: powered
+            option: idle
           target:
             entity_id: !input 'appliance_state_machine'
 mode: single
