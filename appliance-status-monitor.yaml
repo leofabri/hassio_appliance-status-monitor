@@ -1,5 +1,5 @@
 # Earlier -> initial release.
-# Updated of 05/16/2022 - V 1.0.1 -> Fixed 'idle' state not entering
+# Update of 05/16/2022 - V 1.0.1 -> Fixed 'idle' state not entering
 
 blueprint:
   name: Monitor the status of an appliance - by leofabri
