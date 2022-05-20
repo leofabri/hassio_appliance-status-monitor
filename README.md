@@ -4,7 +4,7 @@
 <br>
 
 > ## Warning! This needs more testing, and could potentially break the existing automation!
-> It's a beta, it'll be merged once it's ready.
+> It's a beta, it'll be merged when it's ready.
 
 <br>
 
@@ -92,7 +92,7 @@ input_boolean:
   # ... <- Your other input_boolean(s) (if you have any)
 ```
 
-### 3. The timer delayer
+### 3. The timer delayer (🆕 <i>added in version V2.0.0</i>)
 
 ```yaml
 timer:
@@ -105,7 +105,7 @@ timer:
   # ... <- Your other timers (if you have any)
 ```
 
-### 4. The automation self-trigger
+### 4. The automation self-trigger (🆕 <i>added in version V2.0.0</i>)
 ```yaml
 input_boolean:
   <your_appliance_name>_automation_self_trig:
@@ -138,6 +138,7 @@ Important! Please make sure to edit all the fields `<your_appliance_name>`, `<Yo
 
 # # and so on ...
 ```
+If you need it, check out the [`config.yaml`](examples/configuration.yaml) example I prepared.
 
 # ➕ Download & Import
 If you have just created your helpers, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
