@@ -1,23 +1,24 @@
-## Automation Blueprint (HASSIO): 🧽 Detect and monitor the status of an appliance based on its power consumption
+# 🔌 Detect and monitor the status of an appliance based on its power consumption - V. 2.0.0 ✨
+### Automation Blueprint for Home Assistant
 
-[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
+<br>
 
 <p align="center">
   <img width="240" height="auto" alt="Monitor the status of an appliance - by leofabri" src="automation-tree.png">
 </p>
 
 
-This is my simple automation to control the most power-hungry appliances in my house. I use this for my dishwasher and washing machine.
+Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines, even without wasting money to buy them new. So, the cheap what I'm offering, is a simple solution that just works.
 
+I use this for my dishwasher and washing machine, and I must say that the results have been great! 
+My family ❤️s it! Even if they don't really get what's the fuss about this intricate thing. 
 
-So far the results have been great! And my family ❤️ it. I hope you'll find this useful as well.
+I'm sharing this with everyone, hoping that you'll implement it on your HA.
 
-
+Interested? Let's dive in!
 ## 📋 Features
 
-I took inspiration from this automation [here](https://community.home-assistant.io/t/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes/254841) and decided to make my version of it. 
-
-This is what's different:
+It's a summary folks, there's more inside.
 
 *   **Set your own custom actions** for each of the following states:
     *   On Start
@@ -31,31 +32,34 @@ This is what's different:
         *   paused
         *   job\_ongoing
         *   job\_completed
-    *   Note: Each state transition is handled automatically, you just have to provide the initial configuration!
-*   **More triggers: more control,** even after Home Assistant reboots
-    *   This automation is set to run on each power read, the starting/finishing thresholds comparison is done in the actions section. This allows more granular control over what's happening. There might be a better way of doing this. If you know one, feel free to share it!
-*   **Faster machine start-finish detection**: one of the problems that I always face is timing. What if you want to measure how long it took for your appliance to complete its job? The automation has to be very reactive. This logic should solve that problem for you.
+    *   <strong>Note:</strong> Each state transition is handled automatically, you just have to provide the initial configuration!
+*   **More triggers: more control,** even if Home Assistant reboots!
+    *   This automation is triggered on each power read. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own. 
+The objective of this automation is to permit a more granular control over what's happening. There might be better ways of doing this. If you know one, feel free to share it!
+*   **Faster machine start-to-finish detection**: one of the problems that I always face is timing. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
 
 
-## ☑️ What is needed to run this:
+## What do I need to run this? 🗸
 
 ### Premise
-> <i>Please consider that this blueprint is shared "as it is", and even it fits my use-case, it might not be the same for you.</i>
+> <i>Please consider that this blueprint is shared as-is, and even if it fits my use case, it might not be the same for you.</i>
 
 
-To achieve this level of control, the socket has to have some basic features, like: 
+To achieve this level of control the socket must have some basic features, like: 
 - power monitoring (polling rate of a maximum of 60 sec for best results)
 - ON/OFF control over HASSIO
 - status reporting
 
-Mine is a Meross MSS310EU.
+Mine is a <strong>Meross MSS310EU</strong>, but it shouldn't be that important.
 
-To get the pause state to work properly, you also need another automation that can detect an overload. I'm not the author of that automation (which you can find [here](https://github.com/andbad/HA_PowerControl)). <br>
-I have not tested my blueprint without this value, so can't tell you if it would still work without it.
+- To get the pause state to work properly, you also need another automation that can detect an overload. I'm not the author of any of that, but the one I'm using is [here](https://github.com/andbad/HA_PowerControl) (disclaimer: it's just in Italian 🍝). <br>
+I didn't test my blueprint without the overload value, so I can't tell if it would still work.
 
-### 1. The State Machine entries (input_select)
-You need to create the input_select for our appliance.  
-To do that, head over to `configuration.yaml` and edit it by creating this:
+...
+
+## Let's make some helper variables (<i style="text-color: red">mandatory</i>)
+To make those, head over to `configuration.yaml` and add the following pieces of code:
+### 1. The State Machine
 
 ```yaml
 input_select:
@@ -68,59 +72,111 @@ input_select:
       - job_ongoing
       - job_completed
     icon: mdi:<your_appliance_icon>
+  # ... <- Your other input_select(s) (if you have any)
 ```
 
-Please make sure to edit `<your_appliance_name>`, `<Your Appliance Name>` and `<your_appliance_icon>` accordingly.
 
-For example, my appliance is a washing machine, so I'll do the following:
-
-`<your_appliance_name>` = washing_machine<br>
-`<Your Appliance Name>` = Washing Machine<br>
-`<your_appliance_icon>` = washing-machine (taken from here https://materialdesignicons.com/)<br>
-
-
-The result:
-```yaml
-input_select:
-  washing_machine_state_machine:
-    name: Washing Machine - State Machine
-    options:
-      - unplugged
-      - idle
-      - paused
-      - job_ongoing
-      - job_completed
-    icon: mdi:washing-machine
-```
-
-### 2. The Job Cycle indicator (input_boolean)
+### 2. The Job Cycle indicator
 
 ```yaml
 input_boolean:
   <your_appliance_name>_job_cycle:
     name: <Your Appliance Name> - Job Cycle
     icon: mdi:<your_appliance_icon>
+
+  # ... <- Your other input_boolean(s) (if you have any)
 ```
 
-Please make sure to edit `<your_appliance_name>`, `<Your Appliance Name>` and `<your_appliance_icon>` accordingly. The variables are the same as before.
+### 3. The timer delayer
 
-# Congratulations! Your appliance is now smarter 🧠
-Okay, done... but now, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
+```yaml
+timer:
+  <your_appliance_name>_state_machine_over_delayer:
+    name: <Your Appliance Name> - State Machine Job Completed Delayer
+    duration: "00:15:00"
+    restore: true
+    icon: mdi:<your_appliance_icon>
 
-1.  Add the automation blueprint to your Home Assistant   [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
-2.  Create a new automation from that blueprint
-3.  Configure the variables as indicated inside of the blueprint's UI
+  # ... <- Your other timers (if you have any)
+```
+
+### 4. The automation self-trigger
+```yaml
+input_boolean:
+  <your_appliance_name>_automation_self_trig:
+    name: <Your Appliance Name> - Automation Self-trig
+    icon: mdi:<your_appliance_icon>
+
+  # ... <- Your other input_boolean(s) (if you have any)
+```
+
+Important! Please make sure to edit all the fields `<your_appliance_name>`, `<Your Appliance Name>` and `<your_appliance_icon>` accordingly.
+
+```yaml
+# Example (Washing Machine):
+#
+# <your_appliance_name> = washing_machine
+# <Your Appliance Name> = Washing Machine
+# <your_appliance_icon> = washing-machine (taken from here https://materialdesignicons.com/)
+
+# # # Result:
+# # input_select:
+# #   washing_machine_state_machine:
+# #     name: Washing Machine - State Machine
+# #     options:
+# #       - unplugged
+# #       - idle
+# #       - paused
+# #       - job_ongoing
+# #       - job_completed
+# #     icon: mdi:washing-machine
+
+# # and so on ...
+```
+
+# ➕ Download & Import
+If you have just created your helpers, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
+
+1.  Add this blueprint to your Home Assistant ➡️  [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
+2.  Create a New Automation from that blueprint
+3.  Configure the variables as indicated inside the blueprint's UI
 
 Have fun!
+### Congratulations! Your appliance is now smarter 🧠
+<br>
+<br>
 
 ___
-# Important notice! 🚨
-### 🆕 The code has been updated
+<br>
+<br>
 
-1. **Version 1.0.1 of 05/16/2022** - [**FIX!**] *Fixes the error of the 'idle' state which was not working correctly.* :man_facepalming:
-     
+
+# 📯Important notice! 🚨
+### 🆕 The code has been updated
+1. **Version 2.0.0 of 05/20/2022** - [**MAJOR**] Introduces some new features:
+
+
+   - **+ADDED+ Low Power Threshold wait and watch**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
+  
+      This version aims to fix this issue by waiting and checking if, during that period, the appliance's power consumption rises again. 
+      The only disadvantage here is that waiting for a long time means that the job length is less accurate because the state machine is less reactive.
+  
+    - **+ADDED+ Automation can now trigger itself**: This is very useful, because in a case like the above, when the appliance consumes 0 Watts steadily, there is no trigger as no change in power absorption is detected. The self-triggering solution will now prevent it from being 'stuck' in the same state because of this problem.
+
+    - **/CHANGED/** The automation now runs in restart mode, not in single-mode anymore. I did this because I am prioritizing the trigger over the internal checks.
+  
     > More details below (*if you are installing the blueprint for the first time, you can discard this message*)
 
    **To update:** 
-   * open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magic) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the thrash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is.
+   * open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is for now.
+   * Create the missing helpers (entities) as shown in the instructions
    * add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml) and reload home assistant.
+   * Open your automation and add the previously created helpers (entities)
+  
+  <br>
+
+  
+                            -- older versions below ---
+
+2. **[Version 1.0.1 of 05/16/2022](https://github.com/leofabri/hassio_appliance-status-monitor/tree/V1.0.1)** - [**FIX!**] *Fixes the error of the 'idle' state which was not working correctly.*
+    

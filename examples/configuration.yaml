@@ -1,0 +1,26 @@
+timer:
+  <your_appliance_name>_state_machine_over_delayer:
+    name: <Your Appliance Name> - State Machine Job Completed Delayer
+    duration: "00:15:00"
+    restore: true
+    icon: mdi:<your_appliance_icon>
+
+input_boolean:
+  <your_appliance_name>_job_cycle:
+    name: <Your Appliance Name> - Job Cycle
+    icon: mdi:<your_appliance_icon>
+
+  <your_appliance_name>_automation_self_trig:
+    name: <Your Appliance Name> - Automation Self-trig
+    icon: mdi:<your_appliance_icon>
+
+input_select:
+  <your_appliance_name>_state_machine:
+    name: <Your Appliance Name> - State Machine
+    options:
+      - unplugged
+      - powered
+      - paused
+      - job_ongoing
+      - job_completed
+    icon: mdi:<your_appliance_icon>
