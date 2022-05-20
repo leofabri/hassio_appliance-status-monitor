@@ -1,4 +1,4 @@
-# 🔌 Detect and monitor the status of an appliance based on its power consumption - V. 2.0.0 ✨
+# 🔌 Detect and monitor the status of an appliance based on its power consumption - V. 2.0.0-beta ✨
 ### Automation Blueprint for Home Assistant
 
 <br>
