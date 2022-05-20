@@ -3,6 +3,11 @@
 
 <br>
 
+> ## Warning! This needs more testing, and could potentially break the existing automation!
+> It's a beta, it'll be merged once it's ready.
+
+<br>
+
 <p align="center">
   <img width="240" height="auto" alt="Monitor the status of an appliance - by leofabri" src="automation-tree.png">
 </p>
