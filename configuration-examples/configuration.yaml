@@ -23,8 +23,10 @@ input_select:
     name: <Your Appliance Name> - State Machine
     options:
       - unplugged
-      - powered
+      - idle
       - paused
+      - paused_manually
+      - paused_overload
       - job_ongoing
       - job_completed
     icon: mdi:<your_appliance_icon>
