@@ -8,10 +8,9 @@
 
 <br>
 
-<figure align="center">
+<p align="center">
   <img width="240" height="auto" src="assets/automation-tree.jpg" alt="Monitor the status of an appliance - by leofabri"/>
-  <figcaption>Visual structure of the automation</figcaption>
-</figure>
+</p>
 
 
 Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines without wasting money to buy them new. Here I'm offering a cheap and simple solution that just works.
@@ -157,20 +156,20 @@ If you have just created your helpers, please reboot Home Assistant ([at this pa
 
 <figure align="center">
   <img src="assets/washing_machine-entities-example.jpg" alt="my alt text"/>
-  <figcaption>Washing Machine entities</figcaption>
+  <figcaption><p align="center">Washing Machine entities</p></figcaption>
 </figure>
 
 ### During a job cycle:
 
 <figure align="center">
   <img src="assets/washing_machine-power-example.jpg" alt="power usage example"/>
-  <figcaption>Power usage example
+  <figcaption><p align="center">Power usage example</p>
 </figcaption>
 </figure>
 
 <figure align="center">
   <img src="assets/appliance-history.jpg" alt="appliance history image"/>
-  <figcaption>State machine. The one in light blue is a simulated overload situation.
+  <figcaption><p align="center">State machine. The one in light blue is a simulated overload situation.</p>
 </figcaption>
 </figure>
 
