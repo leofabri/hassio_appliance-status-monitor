@@ -20,7 +20,7 @@ blueprint:
     appliance_power_sensor:
       name: Power Sensor
       description:
-        The power entity that provides the power absorbption readings.
+        The power entity that provides the power absorption readings.
       default: []
       selector:
         entity:
