@@ -117,6 +117,19 @@ blueprint:
           step: 1.0
           unit_of_measurement: seconds
           mode: slider
+
+    paused_waiting_user_action_triggers_after_minutes:
+      name: Paused Waiting User Action Triggers After
+      description: >-
+        <i>(Suggested: 15, Default: 15)</i>
+      default: 15
+      selector:
+        number:
+          min: 1.0
+          max: 60.0
+          step: 1.0
+          unit_of_measurement: minutes
+          mode: slider
     automation_self_trigger:
       name: Automation Self-triggering entity
       description:
@@ -135,29 +148,49 @@ blueprint:
       description:
         Executed when the appliance is detected as unplugged (because of an overload
         situation).
+
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
       default: []
       selector:
         action:
     actions_powered_again_after_overload:
       name: Action(s) when the overload situaton is solved, now idle
       description:
-        Executed when the state changes from <strong>paused -> idle</strong> (NOT resuming the job).
+        Executed when the state changes from <strong>detached_overload -> idle</strong> (NOT resuming the job).
+
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
       default: []
       selector:
         action:
     actions_resuming_after_overload:
       name: Action(s) when the overload situaton is solved, now resuming
       description:
-        Executed when the state changes from <strong>paused
+        Executed when the state changes from <strong>detached_overload
         -> job_ongoing</strong> (resuming the previous job).
+
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
       default: []
       selector:
         action:
+
+    actions_paused_waiting_user_action_event:
+      name: Action(s) when the appliance is still in pause, after a long time
+      description:
+        Executed when the state changes from <strong>detached_overload
+        -> paused_waiting_user_action</strong> (the previous job is not starting after the defined amound of time).
+
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
+      default: []
+      selector:
+        action:
+
     actions_on:
       name: Action(s) when starting a new job cycle
       description:
         Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
+
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
       default: []
       selector:
         action:
@@ -166,6 +199,8 @@ blueprint:
       description:
         Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
+
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
       default: []
       selector:
         action:
@@ -175,6 +210,7 @@ variables:
   appliance_suspended_sensor: !input "appliance_suspended_sensor"
   delayed_job_completion_duration: !input "delayed_job_completion_duration"
   delayed_job_completion_timer: !input "delayed_job_completion_timer"
+  paused_waiting_user_action_triggers_after_minutes: !input "paused_waiting_user_action_triggers_after_minutes"
 trigger:
   - platform: state
     entity_id: !input "appliance_power_sensor"
@@ -185,25 +221,21 @@ trigger:
 
   - platform: state
     entity_id: !input "appliance_state_machine"
-    from: paused_overload
-    to: idle
+    from: detached_overload
+    to: paused
     id: powered_again_after_paused_overload_event
   - platform: state
     entity_id: !input "appliance_state_machine"
-    from: paused_overload
+    from: detached_overload
     to: job_ongoing
     id: resuming_after_paused_overload_event
 
   - platform: state
     entity_id: !input "appliance_state_machine"
-    from: paused
-    to: idle
-    id: powered_again_after_pause_event
-  - platform: state
-    entity_id: !input "appliance_state_machine"
-    from: paused
-    to: job_ongoing
-    id: resuming_after_pause_event
+    to: paused
+    id: paused_waiting_user_action_event
+    for: >-
+      00:{{ paused_waiting_user_action_triggers_after_minutes | int }}:00
 
   - platform: state
     entity_id: !input "automation_self_trigger"
@@ -215,6 +247,7 @@ trigger:
     event_data:
       entity_id: !input "delayed_job_completion_timer"
     id: job_completed_timer_finished
+
 condition:
   - condition: or
     conditions:
@@ -229,9 +262,7 @@ condition:
         id: resuming_after_paused_overload_event
 
       - condition: trigger
-        id: powered_again_after_pause_event
-      - condition: trigger
-        id: resuming_after_pause_event
+        id: paused_waiting_user_action_event
 
       - condition: trigger
         id: automation_self_triggered
@@ -267,14 +298,43 @@ action:
             conditions:
               - condition: state
                 entity_id: !input "appliance_state_machine"
+                state: detached_overload
+          - service: input_select.select_option
+            data:
+              option: detached_overload
+            target:
+              entity_id: !input "appliance_state_machine"
+          - choose: []
+            default: !input "actions_unplugged_overload"
+
+  - choose:
+      - conditions:
+          - condition: and
+            conditions:
+              - condition: state
+                entity_id: !input "appliance_job_cycle"
+                state: "on"
+              - condition: template
+                value_template: "{{ states(appliance_suspended_sensor) | float <= 0.0 }}"
+              - condition: template
+                value_template: "{{ states(appliance_socket) == 'on' }}"
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: unplugged
+        sequence:
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: !input "appliance_state_machine"
                 state: paused
           - service: input_select.select_option
             data:
               option: paused
             target:
               entity_id: !input "appliance_state_machine"
-          - choose: []
-            default: !input "actions_unplugged_overload"
+          
       - conditions:
           - condition: or
             conditions:
@@ -290,7 +350,7 @@ action:
                     value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
                   - condition: state
                     entity_id: !input "appliance_state_machine"
-                    state: paused
+                    state: detached_overload
         sequence:
           - condition: not
             conditions:
@@ -317,6 +377,14 @@ action:
         sequence:
           - choose: []
             default: !input "actions_powered_again_after_overload"
+
+      - conditions:
+          - condition: trigger
+            id: paused_waiting_user_action_event
+        sequence:
+          - choose: []
+            default: !input "actions_paused_waiting_user_action_event"
+
       - conditions:
           - condition: trigger
             id: resuming_after_paused_overload_event
@@ -334,7 +402,7 @@ action:
                     state: "off"
                   - condition: state
                     entity_id: !input "appliance_state_machine"
-                    state: paused
+                    state: detached_overload
                   - condition: and
                     conditions:
                       - condition: template

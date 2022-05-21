@@ -25,7 +25,8 @@ input_select:
       - unplugged
       - idle
       - paused
-      - paused_overload
+      - paused_waiting_user_action
+      - detached_overload
       - job_ongoing
       - job_completed
     icon: mdi:washing-machine
