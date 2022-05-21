@@ -2,9 +2,10 @@ blueprint:
   name: Monitor the status of an appliance - by leofabri
   description:
     "This automation helps you to detect and control the status of an appliance
-    such as a dishwasher, a washing machine, etc.<br> You'll be able
-    to tell if the appliance is currently performing a job (job_ongoing state) or if it's done
-    (job_completed state).
+    such as a dishwasher, a washing machine, etc.
+    <br> 
+    You'll be able to tell if the appliance is currently performing a job (job_ongoing) or if it's done
+    (job_completed).
 
     To do that, it incorporates a simple state machine which allows Home Assistant to know
     if the appliance has a pending job that is waiting to be finished."
@@ -144,8 +145,8 @@ blueprint:
     actions_resuming_after_overload:
       name: Action(s) on overload solved, now resuming
       description:
-        Executed when the state changes from paused
-        -> job_ongoing (resuming the previous job).
+        Executed when the state changes from <strong>paused
+        -> job_ongoing</strong> (resuming the previous job).
       default: []
       selector:
         action:
