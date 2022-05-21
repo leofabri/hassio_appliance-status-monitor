@@ -1,0 +1,32 @@
+timer:
+  dryer_delayed_job_completion_timer:
+    name: Dryer - Delayed Job Completion Timer
+    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:tumble-dryer
+
+  # ...
+
+input_boolean:
+  dryer_job_cycle:
+    name: Dryer - Job Cycle
+    icon: mdi:tumble-dryer
+
+  dryer_automation_self_trigger:
+    name: Dryer - Automation Self-trigger
+    icon: mdi:tumble-dryer
+
+  # ...
+
+input_select:
+  dryer_state_machine:
+    name: Dryer - State Machine
+    options:
+      - unplugged
+      - powered
+      - paused
+      - job_ongoing
+      - job_completed
+    icon: mdi:tumble-dryer
+  
+  # ...

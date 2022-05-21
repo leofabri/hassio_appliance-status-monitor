@@ -4,6 +4,8 @@ timer:
     duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
     restore: true
     icon: mdi:<your_appliance_icon>
+  
+  # ...
 
 input_boolean:
   <your_appliance_name>_job_cycle:
@@ -13,6 +15,8 @@ input_boolean:
   <your_appliance_name>_automation_self_trigger:
     name: <Your Appliance Name> - Automation Self-trigger
     icon: mdi:<your_appliance_icon>
+
+  # ...
 
 input_select:
   <your_appliance_name>_state_machine:
@@ -24,3 +28,5 @@ input_select:
       - job_ongoing
       - job_completed
     icon: mdi:<your_appliance_icon>
+
+  # ...

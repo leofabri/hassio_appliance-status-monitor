@@ -65,6 +65,8 @@ Mine is a <strong>Meross MSS310EU</strong>, but it shouldn't be that important.
 
 ## Let's make some helper variables (<i style="text-color: red">mandatory</i>)
 To make those, head over to `configuration.yaml` and add the following pieces of code:
+
+>If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
 ### 1. The State Machine
 
 ```yaml
@@ -139,7 +141,7 @@ Important! Please make sure to edit all the fields `<your_appliance_name>`, `<Yo
 
 # # and so on ...
 ```
-If you need it, check out the [`config.yaml`](examples/configuration.yaml) example I prepared.
+> If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
 
 # ➕ Download & Import
 If you have just created your helpers, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)

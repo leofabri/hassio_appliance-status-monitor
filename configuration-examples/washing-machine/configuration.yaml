@@ -1,0 +1,32 @@
+timer:
+  washing_machine_delayed_job_completion_timer:
+    name: Washing Machine - Delayed Job Completion Timer
+    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:washing-machine
+
+  # ...
+
+input_boolean:
+  washing_machine_job_cycle:
+    name: Washing Machine - Job Cycle
+    icon: mdi:washing-machine
+
+  washing_machine_automation_self_trigger:
+    name: Washing Machine - Automation Self-trigger
+    icon: mdi:washing-machine
+
+  # ...
+
+input_select:
+  washing_machine_state_machine:
+    name: Washing Machine - State Machine
+    options:
+      - unplugged
+      - powered
+      - paused
+      - job_ongoing
+      - job_completed
+    icon: mdi:washing-machine
+
+  # ...

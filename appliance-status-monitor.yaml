@@ -3,9 +3,7 @@ blueprint:
   description:
     "This automation helps you to detect and control the status of an appliance
     such as a dishwasher, a washing machine, etc.
-
     <br> 
-
     You'll be able to tell if the appliance is currently performing a job (job_ongoing) or if it's done
     (job_completed).
 
