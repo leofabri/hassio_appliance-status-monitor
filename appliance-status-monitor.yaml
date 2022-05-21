@@ -224,8 +224,24 @@ action:
       entity_id: !input "automation_self_trigger"
   - choose:
       - conditions:
-          - condition: template
-            value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
+          - condition: or
+            conditions:
+            - condition: template
+              value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
+            - condition: or
+              conditions:
+              - condition: template
+                value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
+              - condition: and
+                conditions:
+                  - condition: state
+                    entity_id: !input "appliance_job_cycle"
+                    state: "on"
+                  - condition: template
+                    value_template: "{{ states(appliance_socket) == 'on' }}"
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: unplugged
         sequence:
           - condition: not
             conditions:
@@ -240,24 +256,41 @@ action:
           - choose: []
             default: !input "actions_unplugged_overload"
       - conditions:
-          - condition: template
-            value_template: "{{ states(appliance_socket) == 'off' }}"
+          - condition: or
+            conditions:
+            - condition: template
+              value_template: "{{ states(appliance_socket) == 'off' }}"
+            - condition: and
+              conditions:
+              - condition: template
+                value_template: "{{ states(appliance_socket) == 'off' }}"
+              - condition: not
+                conditions:
+                  - condition: template
+                    value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: paused
+        sequence:
           - condition: not
             conditions:
-              - condition: state
-                entity_id: !input "appliance_state_machine"
-                state: unplugged
-              - condition: template
-                value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
-              - condition: state
-                entity_id: !input "appliance_state_machine"
-                state: paused
-        sequence:
+            - condition: state
+              entity_id: !input "appliance_state_machine"
+              state: unplugged
           - service: input_select.select_option
             data:
               option: unplugged
             target:
               entity_id: !input "appliance_state_machine"
+          - choose:
+            - conditions:
+                - condition: template
+                  value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
+              sequence:
+                - service: timer.cancel
+                  data: {}
+                  target:
+                    entity_id: !input "delayed_job_completion_timer"
       - conditions:
           - condition: trigger
             id: powered_again_after_overload_event
@@ -282,6 +315,13 @@ action:
                   - condition: state
                     entity_id: !input "appliance_state_machine"
                     state: paused
+                  - condition: and
+                    conditions:
+                      - condition: template
+                        value_template: "{{ states(appliance_socket) == 'on' }}"
+                      - condition: state
+                        entity_id: !input "appliance_state_machine"
+                        state: unplugged
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
@@ -295,18 +335,27 @@ action:
                   option: job_ongoing
                 target:
                   entity_id: !input "appliance_state_machine"
+              - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
+                  sequence:
+                    - service: timer.cancel
+                      data: {}
+                      target:
+                        entity_id: !input "delayed_job_completion_timer"
               - choose: []
                 default: !input "actions_on"
 
           - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: !input "appliance_state_machine"
-                    state: paused
+              - condition: state
+                entity_id: !input "appliance_state_machine"
+                state: job_ongoing
               - condition: state
                 entity_id: !input "appliance_job_cycle"
                 state: "on"
+              - condition: template
+                value_template: "{{ states(appliance_socket) == 'on' }}"
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 below: !input "appliance_finishing_power_threshold"
@@ -323,7 +372,7 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ (delayed_job_completion_duration) > 0 }}"
+                        value_template: "{{ delayed_job_completion_duration > 0 }}"
                     sequence:
                       - choose:
                           - conditions:
