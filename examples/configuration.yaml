@@ -1,7 +1,7 @@
 timer:
-  <your_appliance_name>_state_machine_over_delayer:
-    name: <Your Appliance Name> - State Machine Job Completed Delayer
-    duration: "00:15:00"
+  <your_appliance_name>_delayed_job_completion_timer:
+    name: <Your Appliance Name> - Delayed Job Completion Timer
+    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
     restore: true
     icon: mdi:<your_appliance_icon>
 
@@ -10,8 +10,8 @@ input_boolean:
     name: <Your Appliance Name> - Job Cycle
     icon: mdi:<your_appliance_icon>
 
-  <your_appliance_name>_automation_self_trig:
-    name: <Your Appliance Name> - Automation Self-trig
+  <your_appliance_name>_automation_self_trigger:
+    name: <Your Appliance Name> - Automation Self-trigger
     icon: mdi:<your_appliance_icon>
 
 input_select:

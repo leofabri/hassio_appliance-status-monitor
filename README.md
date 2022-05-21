@@ -60,7 +60,6 @@ To achieve this level of control the socket must have some basic features, like:
 Mine is a <strong>Meross MSS310EU</strong>, but it shouldn't be that important.
 
 - To get the pause state to work properly, you also need another automation that can detect an overload. I'm not the author of any of that, but the one I'm using is [here](https://github.com/andbad/HA_PowerControl) (disclaimer: it's just in Italian 🍝). <br>
-I didn't test my blueprint without the overload value, so I can't tell if it still works without.
 
 ...
 
@@ -94,13 +93,13 @@ input_boolean:
   # ... <- Your other input_boolean(s) (if you have any)
 ```
 
-### 3. The timer delayer (🆕 <i>added in version V2.0.0</i>)
+### 3. The delay timer (🆕 <i>added in version V2.0.0</i>)
 
 ```yaml
 timer:
-  <your_appliance_name>_state_machine_over_delayer:
-    name: <Your Appliance Name> - State Machine Job Completed Delayer
-    duration: "00:15:00"
+  <your_appliance_name>_delayed_job_completion_timer:
+    name: <Your Appliance Name> - Delayed Job Completion Timer
+    duration: "00:15:00" # <- Note that the time here. Leave it 15 min
     restore: true
     icon: mdi:<your_appliance_icon>
 
@@ -110,8 +109,8 @@ timer:
 ### 4. The automation self-trigger (🆕 <i>added in version V2.0.0</i>)
 ```yaml
 input_boolean:
-  <your_appliance_name>_automation_self_trig:
-    name: <Your Appliance Name> - Automation Self-trig
+  <your_appliance_name>_automation_self_trigger:
+    name: <Your Appliance Name> - Automation Self-trigger
     icon: mdi:<your_appliance_icon>
 
   # ... <- Your other input_boolean(s) (if you have any)
