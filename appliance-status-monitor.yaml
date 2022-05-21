@@ -30,7 +30,7 @@ blueprint:
       description:
         "A sensor that stores whether the appliance is still in a job cycle
         or not.<br> The variable will indicate whether the machine has
-        gone through the entire process (like washing the dishes) or it's still
+        gone through the entire process cycle or it's still
         incomplete.
 
         This has to be a boolean (so: 0 or 1).<br> off -> When the appliance is
@@ -87,14 +87,14 @@ blueprint:
           unit_of_measurement: W
           mode: slider
           step: 1.0
-    job_completed_delayer_timer:
+    delayed_job_completion_timer:
       name: Delayed Job Completion timer
       description: The timer that will allow to 'wait' & 'see' before assuming that a job has been completed
       default: []
       selector:
         entity:
           domain: timer
-    consider_job_completed_after_seconds:
+    delayed_job_completion_duration:
       name: Delayed Job Completion duration
       description: >-
         During a job cycle, some appliances may intermittently absorb less than the finishing power threshold, 
@@ -115,7 +115,7 @@ blueprint:
           step: 1.0
           unit_of_measurement: seconds
           mode: slider
-    automation_self_trig_var:
+    automation_self_trigger:
       name: Automation Self-triggering entity
       description:
         "The entity that's in charge of triggering the execution of this automation when it changes from off -> on.
@@ -171,8 +171,8 @@ blueprint:
 variables:
   appliance_socket: !input "appliance_socket"
   appliance_suspended_sensor: !input "appliance_suspended_sensor"
-  consider_job_completed_after_seconds: !input "consider_job_completed_after_seconds"
-  job_completed_delayer_timer: !input "job_completed_delayer_timer"
+  delayed_job_completion_duration: !input "delayed_job_completion_duration"
+  delayed_job_completion_timer: !input "delayed_job_completion_timer"
 trigger:
   - platform: state
     entity_id: !input "appliance_power_sensor"
@@ -191,14 +191,14 @@ trigger:
     to: job_ongoing
     id: resuming_after_overload_event
   - platform: state
-    entity_id: !input "automation_self_trig_var"
+    entity_id: !input "automation_self_trigger"
     from: "off"
     to: "on"
     id: automation_self_triggered
   - platform: event
     event_type: timer.finished
     event_data:
-      entity_id: !input "job_completed_delayer_timer"
+      entity_id: !input "delayed_job_completion_timer"
     id: job_completed_timer_finished
 condition:
   - condition: or
@@ -219,7 +219,7 @@ action:
   - service: input_boolean.turn_off
     data: {}
     target:
-      entity_id: !input "automation_self_trig_var"
+      entity_id: !input "automation_self_trigger"
   - choose:
       - conditions:
           - condition: template
@@ -312,29 +312,29 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ states(job_completed_delayer_timer) != 'active' }}"
+                        value_template: "{{ states(delayed_job_completion_timer) != 'active' }}"
                     sequence:
                       - service: timer.start
                         data: {}
                         target:
-                          entity_id: !input "job_completed_delayer_timer"
+                          entity_id: !input "delayed_job_completion_timer"
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ (consider_job_completed_after_seconds) > 0 }}"
+                        value_template: "{{ (delayed_job_completion_duration) > 0 }}"
                     sequence:
                       - choose:
                           - conditions:
                               - condition: template
                                 value_template: >-
-                                  {% if states(job_completed_delayer_timer) == 'active' %}
-                                  {% set t_expiring_date = state_attr(job_completed_delayer_timer, 'finishes_at') %}
+                                  {% if states(delayed_job_completion_timer) == 'active' %}
+                                  {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
                                   {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
-                                  {% set t_total_duration = state_attr(job_completed_delayer_timer, 'duration') %}
+                                  {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
                                   {% set duration_split = t_total_duration.split(':') %}
                                   {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
                                   {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
-                                  {{ t_elapsed_sec < (consider_job_completed_after_seconds) | int }}
+                                  {{ t_elapsed_sec < (delayed_job_completion_duration) | int }}
                                   {% else %}
                                   {{0}}
                                   {% endif %}
@@ -342,20 +342,20 @@ action:
                               - service: timer.cancel
                                 data: {}
                                 target:
-                                  entity_id: !input "job_completed_delayer_timer"
+                                  entity_id: !input "delayed_job_completion_timer"
                               - service: timer.start
                                 data: {}
                                 target:
-                                  entity_id: !input "job_completed_delayer_timer"
+                                  entity_id: !input "delayed_job_completion_timer"
 
                               - delay:
                                   seconds: >-
-                                    {{ 1 + (consider_job_completed_after_seconds) | int }}
+                                    {{ 1 + (delayed_job_completion_duration) | int }}
 
                               - service: input_boolean.turn_on
                                 data: {}
                                 target:
-                                  entity_id: !input "automation_self_trig_var"
+                                  entity_id: !input "automation_self_trigger"
 
                               - condition: template
                                 value_template: >-
@@ -373,12 +373,12 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ states(job_completed_delayer_timer) == 'active' }}"
+                        value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
                     sequence:
                       - service: timer.cancel
                         data: {}
                         target:
-                          entity_id: !input "job_completed_delayer_timer"
+                          entity_id: !input "delayed_job_completion_timer"
               - choose: []
                 default: !input "actions_off"
               - choose:
@@ -391,7 +391,7 @@ action:
                       - service: input_boolean.turn_on
                         data: {}
                         target:
-                          entity_id: !input "automation_self_trig_var"
+                          entity_id: !input "automation_self_trigger"
         default:
           choose:
             - conditions:
