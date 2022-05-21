@@ -32,7 +32,7 @@ blueprint:
         or not.<br>
 
         This has to be a boolean (so: 0 or 1).<br> off -> When the appliance is
-        not performing any job<br> on -> When the job is still incomplete. 
+        not performing any job<br> on -> When the job is incomplete. 
         <br>
 
         <strong>Note that this entity does not provide any information about the detailed status
@@ -102,7 +102,7 @@ blueprint:
         With this value set, the automation will wait for x seconds and see if in the defined timespan power consumption rises.
 
         <strong><i>Warning! Setting a duration introduces a delay on the transition to the 'job_completed' state. 
-        Please make sure that you need this, or leave it off if unsure.</i></strong>  
+        Please make sure that you need this, or leave it 0 if unsure.</i></strong>  
 
         <i>(Suggested: 0, Default: 0 | DISABLED)</i>
       default: 0.0
@@ -116,7 +116,7 @@ blueprint:
     automation_self_trigger:
       name: Automation Self-triggering entity
       description:
-        "The entity that's in charge of triggering the execution of this automation when it changes from off -> on.
+        "This entity is in charge of triggering the execution of this automation when it changes from off -> on.
         
         Sometimes, if the power consumption of the appliance is perfectly steady, no other trigger will work, but this will.
 
@@ -137,7 +137,7 @@ blueprint:
     actions_powered_again_after_overload:
       name: Action(s) on overload solved, now idle
       description:
-        Executed when the state changes from paused -> idle (NOT resuming the job).
+        Executed when the state changes from <strong>paused -> idle</strong> (NOT resuming the job).
       default: []
       selector:
         action:
@@ -152,7 +152,7 @@ blueprint:
     actions_on:
       name: Action(s) when starting a job cycle
       description:
-        Executed when the appliance starts a new job cycle (idle -> job_ongoing
+        Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
       default: []
       selector:
@@ -160,7 +160,7 @@ blueprint:
     actions_off:
       name: Action(s) when finishes a job cycle
       description:
-        Executed when the appliance finishes a job cycle (job_ongoing -> job_completed
+        Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
       default: []
       selector:
