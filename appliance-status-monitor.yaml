@@ -10,7 +10,7 @@ blueprint:
     To do that, it incorporates a simple state machine which allows Home Assistant to know
     if the appliance has a pending job that is waiting to be finished.
     
-    
+
     <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>"
   domain: automation
   input:
@@ -131,7 +131,7 @@ blueprint:
           domain: input_boolean
 
     actions_unplugged_overload:
-      name: Action(s) on overload
+      name: Action(s) when an overload occurs
       description:
         Executed when the appliance is detected as unplugged (because of an overload
         situation).
@@ -139,14 +139,14 @@ blueprint:
       selector:
         action:
     actions_powered_again_after_overload:
-      name: Action(s) on overload solved, now idle
+      name: Action(s) when the overload situaton is solved, now idle
       description:
         Executed when the state changes from <strong>paused -> idle</strong> (NOT resuming the job).
       default: []
       selector:
         action:
     actions_resuming_after_overload:
-      name: Action(s) on overload solved, now resuming
+      name: Action(s) when the overload situaton is solved, now resuming
       description:
         Executed when the state changes from <strong>paused
         -> job_ongoing</strong> (resuming the previous job).
@@ -154,7 +154,7 @@ blueprint:
       selector:
         action:
     actions_on:
-      name: Action(s) when starting a job cycle
+      name: Action(s) when starting a new job cycle
       description:
         Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
@@ -162,7 +162,7 @@ blueprint:
       selector:
         action:
     actions_off:
-      name: Action(s) when finishes a job cycle
+      name: Action(s) when a job cycle is finished
       description:
         Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
