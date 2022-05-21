@@ -13,17 +13,16 @@
 </p>
 
 
-Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines, even without wasting money to buy them new. So, I'm offering a cheap and simple solution that just works.
+Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines without wasting money to buy them new. Here I'm offering a cheap and simple solution that just works.
 
-I use this for my dishwasher and washing machine, and I must say that the results have been great! 
+I use this for my dishwasher and washing machine, and so far the results have been great! 
 My family ❤️s it! Even if they don't really get what's the fuss about this intricate thing. 
 
 I'm sharing this with everyone, hoping that you'll find it useful.
 
-Interested? Let's dive in!
 ## 📋 Features
 
-It's a summary folks, there's more inside.
+For the record: there is more inside. Anyways, here's a summary:
 
 *   **Set your own custom actions** for each of the following states:
     *   On Start
@@ -37,13 +36,16 @@ It's a summary folks, there's more inside.
         *   paused
         *   job\_ongoing
         *   job\_completed
-    *   <strong>Note:</strong> Each state transition is handled automatically, you just have to provide the initial configuration!
+    *   <strong>Note:</strong> Each state transition is handled automatically, you just have to provide the initial configuration.
 *   **More triggers: more control,** even if Home Assistant reboots!
     *   This automation is triggered on each power read. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own. 
 The objective of this automation is to permit a more granular control over what's happening. There might be better ways of doing this. If you know one, feel free to share it!
 *   **Faster machine start-to-finish detection**: one of the problems that I always face is timing. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
+*   **Unreliable power absorption filtering and inhibition**: prevents the blueprint from thinking that a job was completed as soon as the power falls below the finishing power threshold.
+  
+<br>
 
-
+Interested? Let's dive in!
 ## What do I need to run this blueprint? 🗸
 
 ### Premise
@@ -58,7 +60,7 @@ To achieve this level of control the socket must have some basic features, like:
 Mine is a <strong>Meross MSS310EU</strong>, but it shouldn't be that important.
 
 - To get the pause state to work properly, you also need another automation that can detect an overload. I'm not the author of any of that, but the one I'm using is [here](https://github.com/andbad/HA_PowerControl) (disclaimer: it's just in Italian 🍝). <br>
-I didn't test my blueprint without the overload value, so I can't tell if it would still work.
+I didn't test my blueprint without the overload value, so I can't tell if it still works without.
 
 ...
 
@@ -162,7 +164,7 @@ ___
 1. **Version 2.0.0 of 05/20/2022** - [**MAJOR**] Introduces some new features:
 
 
-   - **+ADDED+ Low Power Threshold wait and watch**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
+   - **+ADDED+ Low Power Threshold -> job_completed inhibition**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
   
       This version aims to fix this issue by waiting and checking if, during that period, the appliance's power consumption rises again. 
       The only disadvantage here is that waiting for a long time means that a possible job length estimate is less accurate, because the state machine is not as reactive.
