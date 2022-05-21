@@ -10,6 +10,7 @@ blueprint:
     To do that, it incorporates a simple state machine which allows Home Assistant to know
     if the appliance has a pending job that is waiting to be finished.
     
+    
     <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>"
   domain: automation
   input:

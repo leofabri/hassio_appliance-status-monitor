@@ -8,9 +8,10 @@
 
 <br>
 
-<p align="center">
-  <img width="240" height="auto" alt="Monitor the status of an appliance - by leofabri" src="automation-tree.png">
-</p>
+<figure align="center">
+  <img width="240" height="auto" src="assets/automation-tree.jpg" alt="Monitor the status of an appliance - by leofabri"/>
+  <figcaption>Visual structure of the automation</figcaption>
+</figure>
 
 
 Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines without wasting money to buy them new. Here I'm offering a cheap and simple solution that just works.
@@ -150,8 +151,31 @@ If you have just created your helpers, please reboot Home Assistant ([at this pa
 2.  Create a New Automation from that blueprint
 3.  Configure the variables as indicated inside the blueprint's UI
 
-Have fun!
-### Congratulations! Your appliance is now smarter 🧠
+### You should see the 4 new entities available:
+
+> <strong>Warning |</strong> always use those entities as indicators, do not change their values manually! Leave that to your automation
+
+<figure align="center">
+  <img src="assets/washing_machine-entities-example.jpg" alt="my alt text"/>
+  <figcaption>Washing Machine entities</figcaption>
+</figure>
+
+### During a job cycle:
+
+<figure align="center">
+  <img src="assets/washing_machine-power-example.jpg" alt="power usage example"/>
+  <figcaption>Power usage example
+</figcaption>
+</figure>
+
+<figure align="center">
+  <img src="assets/appliance-history.jpg" alt="appliance history image"/>
+  <figcaption>State machine. The one in light blue is a simulated overload situation.
+</figcaption>
+</figure>
+
+
+## Congratulations! Your appliance is now smarter 🧠
 <br>
 <br>
 
