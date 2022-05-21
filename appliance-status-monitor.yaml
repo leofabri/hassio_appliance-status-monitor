@@ -182,16 +182,29 @@ trigger:
   - platform: state
     entity_id: !input "appliance_socket"
     id: socket_state_change_event
+
+  - platform: state
+    entity_id: !input "appliance_state_machine"
+    from: paused_overload
+    to: idle
+    id: powered_again_after_paused_overload_event
+  - platform: state
+    entity_id: !input "appliance_state_machine"
+    from: paused_overload
+    to: job_ongoing
+    id: resuming_after_paused_overload_event
+
   - platform: state
     entity_id: !input "appliance_state_machine"
     from: paused
     to: idle
-    id: powered_again_after_overload_event
+    id: powered_again_after_pause_event
   - platform: state
     entity_id: !input "appliance_state_machine"
     from: paused
     to: job_ongoing
-    id: resuming_after_overload_event
+    id: resuming_after_pause_event
+
   - platform: state
     entity_id: !input "automation_self_trigger"
     from: "off"
@@ -209,10 +222,17 @@ condition:
         id: power_event
       - condition: trigger
         id: socket_state_change_event
+
       - condition: trigger
-        id: powered_again_after_overload_event
+        id: powered_again_after_paused_overload_event
       - condition: trigger
-        id: resuming_after_overload_event
+        id: resuming_after_paused_overload_event
+
+      - condition: trigger
+        id: powered_again_after_pause_event
+      - condition: trigger
+        id: resuming_after_pause_event
+
       - condition: trigger
         id: automation_self_triggered
       - condition: trigger
@@ -293,13 +313,13 @@ action:
                     entity_id: !input "delayed_job_completion_timer"
       - conditions:
           - condition: trigger
-            id: powered_again_after_overload_event
+            id: powered_again_after_paused_overload_event
         sequence:
           - choose: []
             default: !input "actions_powered_again_after_overload"
       - conditions:
           - condition: trigger
-            id: resuming_after_overload_event
+            id: resuming_after_paused_overload_event
         sequence:
           - choose: []
             default: !input "actions_resuming_after_overload"
