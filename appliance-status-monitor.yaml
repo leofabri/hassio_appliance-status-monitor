@@ -29,9 +29,7 @@ blueprint:
       name: Appliance Job Cycle Indicator
       description:
         "A sensor that stores whether the appliance is still in a job cycle
-        or not.<br> The variable will indicate whether the machine has
-        gone through the entire process cycle or it's still
-        incomplete.
+        or not.<br>
 
         This has to be a boolean (so: 0 or 1).<br> off -> When the appliance is
         not performing any job<br> on -> When the job is still incomplete. 
