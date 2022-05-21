@@ -4,7 +4,7 @@
 <br>
 
 > ## Warning! This needs more testing, and could potentially break the existing automation!
-> It's a beta, it'll be merged when it's ready.
+> It's a beta, it'll be merged when ready.
 
 <br>
 
@@ -13,12 +13,12 @@
 </p>
 
 
-Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines, even without wasting money to buy them new. So, the cheap what I'm offering, is a simple solution that just works.
+Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines, even without wasting money to buy them new. So, I'm offering a cheap and simple solution that just works.
 
 I use this for my dishwasher and washing machine, and I must say that the results have been great! 
 My family ❤️s it! Even if they don't really get what's the fuss about this intricate thing. 
 
-I'm sharing this with everyone, hoping that you'll implement it on your HA.
+I'm sharing this with everyone, hoping that you'll find it useful.
 
 Interested? Let's dive in!
 ## 📋 Features
@@ -44,7 +44,7 @@ The objective of this automation is to permit a more granular control over what'
 *   **Faster machine start-to-finish detection**: one of the problems that I always face is timing. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
 
 
-## What do I need to run this? 🗸
+## What do I need to run this blueprint? 🗸
 
 ### Premise
 > <i>Please consider that this blueprint is shared as-is, and even if it fits my use case, it might not be the same for you.</i>
@@ -165,7 +165,7 @@ ___
    - **+ADDED+ Low Power Threshold wait and watch**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
   
       This version aims to fix this issue by waiting and checking if, during that period, the appliance's power consumption rises again. 
-      The only disadvantage here is that waiting for a long time means that the job length is less accurate because the state machine is less reactive.
+      The only disadvantage here is that waiting for a long time means that a possible job length estimate is less accurate, because the state machine is not as reactive.
   
     - **+ADDED+ Automation can now trigger itself**: This is very useful, because in a case like the above, when the appliance consumes 0 Watts steadily, there is no trigger as no change in power absorption is detected. The self-triggering solution will now prevent it from being 'stuck' in the same state because of this problem.
 
