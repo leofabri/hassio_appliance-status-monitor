@@ -3,7 +3,9 @@ blueprint:
   description:
     "This automation helps you to detect and control the status of an appliance
     such as a dishwasher, a washing machine, etc.
+
     <br> 
+
     You'll be able to tell if the appliance is currently performing a job (job_ongoing) or if it's done
     (job_completed).
 
@@ -32,8 +34,8 @@ blueprint:
         "A sensor that stores whether the appliance is still in a job cycle
         or not.<br>
 
-        This has to be a boolean (so: 0 or 1).<br> off -> When the appliance is
-        not performing any job<br> on -> When the job is incomplete. 
+        This has to be a boolean (so: 0 or 1).<br> <strong>off</strong> -> the appliance is
+        not performing any job<br> <strong>on</strong> -> the job is incomplete. 
         <br>
 
         <strong>Note that this entity does not provide any information about the detailed status
@@ -104,7 +106,7 @@ blueprint:
 
         <strong><i>Warning! Setting a duration introduces a delay on the transition to the 'job_completed' state. 
         Please make sure that you need this, or leave it 0 if unsure.</i></strong>  
-
+        <br>
         <i>(Suggested: 0, Default: 0 | DISABLED)</i>
       default: 0.0
       selector:
@@ -117,7 +119,7 @@ blueprint:
     automation_self_trigger:
       name: Automation Self-triggering entity
       description:
-        "This entity is in charge of triggering the execution of this automation when it changes from off -> on.
+        "This entity is in charge of triggering the execution of the automation when it changes from off -> on.
         
         Sometimes, if the power consumption of the appliance is perfectly steady, no other trigger will work, but this will.
 
