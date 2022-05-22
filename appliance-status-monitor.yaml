@@ -1,20 +1,24 @@
 blueprint:
   name: Monitor the status of an appliance - by leofabri
-  description:
-    "This automation helps you to detect and control the status of an appliance
+  description: >-
+    This automation helps you to detect and control the status of an appliance
     such as a dishwasher, a washing machine, etc.
-    <br> 
-    I want this to be as universal and versatile as possible! In the blueprint, I keep referring to actions with the generic word: "job", because the job here could be anything.
     
+
+    I want this to be as universal and versatile as possible! In the blueprint, I keep referring to actions with the generic word: 'job', because the job here could be anything.
+    
+
     You'll be able to tell the status of the appliance step-by-step. You can pair this with other automations and services. Maybe one that 
     sends alerts if the washing machine is not resuming a job, if you want to send TTS notifications, if 
-    your fridge is somehow not turning on, and de-icing. There are so many possible use cases! All it's needed from your side is just a little bit of creativity, and you could
+    your fridge is somehow not turning on, and de-icing. There are so many possible use cases! All it's needed from your side is just a little bit of creativity. You could
     use the states of the State Machine and the custom actions to extend it even further.
+
 
     To do that, it incorporates a simple state machine that allows Home Assistant to know
     if the appliance has a pending job that is waiting to be finished.
 
-    <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>"
+
+    <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>
   domain: automation
   input:
     appliance_socket:
@@ -121,18 +125,6 @@ blueprint:
           unit_of_measurement: seconds
           mode: slider
 
-    paused_waiting_user_action_triggers_after_minutes:
-      name: Paused Waiting User Action Triggers After
-      description: >-
-        <i>(Suggested: 15, Default: 15)</i>
-      default: 15
-      selector:
-        number:
-          min: 1.0
-          max: 60.0
-          step: 1.0
-          unit_of_measurement: minutes
-          mode: slider
     automation_self_trigger:
       name: Automation Self-triggering entity
       description:
@@ -160,8 +152,14 @@ blueprint:
       name: Action(s) when the overload situaton is solved, now idle
       description:
         Executed when the state changes from <strong>detached_overload -> idle</strong> (NOT resuming the job).
-
+        
+        ...
+        
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
+                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
+                     This section is meant to be used to trigger other things.
+
+                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
       default: []
       selector:
         action:
@@ -170,19 +168,14 @@ blueprint:
       description:
         Executed when the state changes from <strong>detached_overload
         -> job_ongoing</strong> (resuming the previous job).
-
+        
+        ...
+        
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
-      default: []
-      selector:
-        action:
+                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
+                     This section is meant to be used to trigger other things.
 
-    actions_paused_waiting_user_action_event:
-      name: Action(s) when the appliance is still in pause, after a long time
-      description:
-        Executed when the state changes from <strong>detached_overload
-        -> paused_waiting_user_action</strong> (the previous job is not starting after the defined amound of time).
-
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
+                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
       default: []
       selector:
         action:
@@ -192,8 +185,14 @@ blueprint:
       description:
         Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
-
+        
+        ...
+        
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
+                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
+                     This section is meant to be used to trigger other things.
+
+                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
       default: []
       selector:
         action:
@@ -202,8 +201,14 @@ blueprint:
       description:
         Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
-
+        
+        ...
+        
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
+                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
+                     This section is meant to be used to trigger other things.
+
+                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
       default: []
       selector:
         action:
@@ -213,7 +218,6 @@ variables:
   appliance_suspended_sensor: !input "appliance_suspended_sensor"
   delayed_job_completion_duration: !input "delayed_job_completion_duration"
   delayed_job_completion_timer: !input "delayed_job_completion_timer"
-  paused_waiting_user_action_triggers_after_minutes: !input "paused_waiting_user_action_triggers_after_minutes"
 trigger:
   - platform: state
     entity_id: !input "appliance_power_sensor"
@@ -232,14 +236,6 @@ trigger:
     from: detached_overload
     to: job_ongoing
     id: resuming_after_paused_overload_event
-
-  - platform: state
-    entity_id: !input "appliance_state_machine"
-    to: paused
-    id: paused_waiting_user_action_event
-    for: 
-      minutes: >-
-        {{ paused_waiting_user_action_triggers_after_minutes | int }}
 
   - platform: state
     entity_id: !input "automation_self_trigger"
@@ -266,9 +262,6 @@ condition:
         id: resuming_after_paused_overload_event
 
       - condition: trigger
-        id: paused_waiting_user_action_event
-
-      - condition: trigger
         id: automation_self_triggered
       - condition: trigger
         id: job_completed_timer_finished
@@ -287,17 +280,6 @@ action:
               entity_id: !input "appliance_job_cycle"
               state: "on"
 
-            # - condition: or
-            #   conditions:
-            #   - condition: template
-            #     value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
-            #   - condition: and
-            #     conditions:
-            #       - condition: template
-            #         value_template: "{{ states(appliance_socket) == 'on' }}"
-            #       - condition: state
-            #         entity_id: !input "appliance_state_machine"
-            #         state: unplugged
         sequence:
           - condition: not
             conditions:
@@ -389,13 +371,6 @@ action:
 
       - conditions:
           - condition: trigger
-            id: paused_waiting_user_action_event
-        sequence:
-          - choose: []
-            default: !input "actions_paused_waiting_user_action_event"
-
-      - conditions:
-          - condition: trigger
             id: resuming_after_paused_overload_event
         sequence:
           - choose: []
@@ -419,9 +394,6 @@ action:
                         - condition: state
                           entity_id: !input "appliance_state_machine"
                           state: detached_overload
-                      # - condition: state
-                      #   entity_id: !input "appliance_state_machine"
-                      #   state: unplugged
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
