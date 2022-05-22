@@ -198,6 +198,8 @@ ___
       The only disadvantage here is that waiting for a long time means that a possible job length estimate is less accurate, because the state machine is not as reactive.
   
     - **+ADDED+ Automation can now trigger itself**: This is very useful, because in a case like the above, when the appliance consumes 0 Watts steadily, there is no trigger as no change in power absorption is detected. The self-triggering solution will now prevent it from being 'stuck' in the same state because of this problem.
+  
+    - **+ADDED+ detached_overload state**: The new detached_overload state was introduced to make things tidier and clearer to understand. The pause state indicates that the appliance is not resuming the previous job.
 
     - **/CHANGED/** The automation now runs in restart mode, not in single-mode anymore. I did this because I am prioritizing the trigger over the internal checks.
   

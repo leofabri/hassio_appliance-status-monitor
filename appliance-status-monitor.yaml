@@ -163,10 +163,25 @@ blueprint:
       default: []
       selector:
         action:
-    actions_powered_again_after_overload:
-      name: Action(s) when the overload situaton is solved, now idle
+    actions_paused_after_overload:
+      name: Action(s) when the overload situaton is solved, now paused
       description: >-
-        Executed when the state changes from <strong>detached_overload -> idle</strong> (NOT resuming the job).
+        Executed when the state changes from <strong>detached_overload -> paused</strong> (NOT resuming the job).
+        
+        ...
+        
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
+        Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
+        This section is meant to be used to trigger other things.
+        
+        A clean solution is to call other services or use the State Machine to wake up other external automations.
+      default: []
+      selector:
+        action:
+    actions_paused_after_unplugged:
+      name: Action(s) when the appliance changes fom unplugged -> paused
+      description: >-
+        Executed when the state changes from <strong>unplugged -> paused</strong> (NOT resuming the job).
         
         ...
         
@@ -245,7 +260,12 @@ trigger:
     entity_id: !input "appliance_state_machine"
     from: detached_overload
     to: paused
-    id: powered_again_after_paused_overload_event
+    id: paused_after_overload_event
+  - platform: state
+    entity_id: !input "appliance_state_machine"
+    from: unplugged
+    to: paused
+    id: paused_after_unplugged_event
   - platform: state
     entity_id: !input "appliance_state_machine"
     from: detached_overload
@@ -257,6 +277,7 @@ trigger:
     from: "off"
     to: "on"
     id: automation_self_triggered
+
   - platform: event
     event_type: timer.finished
     event_data:
@@ -272,7 +293,9 @@ condition:
         id: socket_state_change_event
 
       - condition: trigger
-        id: powered_again_after_paused_overload_event
+        id: paused_after_overload_event
+      - condition: trigger
+        id: paused_after_unplugged_event
       - condition: trigger
         id: resuming_after_paused_overload_event
 
@@ -379,10 +402,17 @@ action:
                     entity_id: !input "delayed_job_completion_timer"
       - conditions:
           - condition: trigger
-            id: powered_again_after_paused_overload_event
+            id: paused_after_overload_event
         sequence:
           - choose: []
-            default: !input "actions_powered_again_after_overload"
+            default: !input "actions_paused_after_overload"
+
+      - conditions:
+          - condition: trigger
+            id: paused_after_unplugged_event
+        sequence:
+          - choose: []
+            default: !input "actions_paused_after_unplugged"
 
       - conditions:
           - condition: trigger
