@@ -4,12 +4,15 @@ blueprint:
     "This automation helps you to detect and control the status of an appliance
     such as a dishwasher, a washing machine, etc.
     <br> 
-    You'll be able to tell if the appliance is currently performing a job (job_ongoing) or if it's done
-    (job_completed).
-
-    To do that, it incorporates a simple state machine which allows Home Assistant to know
-    if the appliance has a pending job that is waiting to be finished.
+    I want this to be as universal and versatile as possible! In the blueprint, I keep referring to actions with the generic word: "job", because the job here could be anything.
     
+    You'll be able to tell the status of the appliance step-by-step. You can pair this with other automations and services. Maybe one that 
+    sends alerts if the washing machine is not resuming a job, if you want to send TTS notifications, if 
+    your fridge is somehow not turning on, and de-icing. There are so many possible use cases! All it's needed from your side is just a little bit of creativity, and you could
+    use the states of the State Machine and the custom actions to extend it even further.
+
+    To do that, it incorporates a simple state machine that allows Home Assistant to know
+    if the appliance has a pending job that is waiting to be finished.
 
     <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>"
   domain: automation
@@ -234,8 +237,9 @@ trigger:
     entity_id: !input "appliance_state_machine"
     to: paused
     id: paused_waiting_user_action_event
-    for: >-
-      00:{{ paused_waiting_user_action_triggers_after_minutes | int }}:00
+    for: 
+      minutes: >-
+        {{ paused_waiting_user_action_triggers_after_minutes | int }}
 
   - platform: state
     entity_id: !input "automation_self_trigger"
