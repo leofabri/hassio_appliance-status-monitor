@@ -14,11 +14,17 @@ blueprint:
     use the states of the State Machine and the custom actions to extend it even further.
 
 
-    To do that, it incorporates a simple state machine that allows Home Assistant to know
-    if the appliance has a pending job that is waiting to be finished.
+    The State Machine:
+      - <strong><u>unplugged</u></strong> - The appliance is no longer powered. Happens when the user manually turns off the smart socket (from HA or the socket itself).
+      - <strong><u>idle</u></strong> - There is no pending job, the machine is idling.
+      - <strong><u>paused</u></strong> - Indicates that the appliance was either in the <strong><i>datached_overload</i></strong> state or <strong><i>unplugged</i></strong> when there's a job pending (an incomplete cycle). Now the blueprint is waiting for the appliance to resume. 
+        <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
+      - <strong><u>detached_overload</u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
+      - <strong><u>job_ongoing</u></strong> - Triggered when the previous job cycle is completed and the Starting Power threshold is surpassed.
+      - <strong><u>job_completed</u></strong> - Triggered when the current job cycle is incomplete, and the appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
 
 
-    <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>
+    <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>.
   domain: automation
   input:
     appliance_socket:
@@ -55,8 +61,8 @@ blueprint:
           domain: input_boolean
     appliance_state_machine:
       name: Appliance States Sensor - State Machine
-      description:
-        "An entity such as: input_select.your_appliance_name_state_machine."
+      description: >-
+        The State Machine entity of this appliance. Should be something like: <i><strong>input_select.your_appliance_name_state_machine.</strong></i>
       default: []
       selector:
         entity:
@@ -65,7 +71,7 @@ blueprint:
       name: Appliance Suspended entity
       description:
         An input_number variable that turns into a value > 0. That would
-        mean that the machine was disconnected because of an overload situation.
+        indicate that the machine was disconnected because of an overload situation.
       default: []
       selector:
         entity:
@@ -112,9 +118,12 @@ blueprint:
         Despite it being a rare occurrence, it might happen. 
         With this value set, the automation will wait for x seconds and see if in the defined timespan power consumption rises.
 
-        <strong><i>Warning! Setting a duration introduces a delay on the transition to the 'job_completed' state. 
-        Please make sure that you need this, or leave it 0 if unsure.</i></strong>  
-        <br>
+        ...
+
+        <strong>WARNING:</strong> Setting a duration introduces a delay on the transition to the 'job_completed' state.
+        Please make sure that you need this, or leave it 0 if unsure.
+        
+
         <i>(Suggested: 0, Default: 0 | DISABLED)</i>
       default: 0.0
       selector:
@@ -127,12 +136,12 @@ blueprint:
 
     automation_self_trigger:
       name: Automation Self-triggering entity
-      description:
-        "This entity is in charge of triggering the execution of the automation when it changes from off -> on.
+      description: >-
+        This entity is in charge of triggering the execution of the automation when it changes from off -> on.
         
         Sometimes, if the power consumption of the appliance is perfectly steady, no other trigger will work, but this will.
 
-        This variable allows the automation to call itself when some conditions are met."
+        This variable allows the automation to call itself when some conditions are met.
       default: []
       selector:
         entity:
@@ -140,75 +149,81 @@ blueprint:
 
     actions_unplugged_overload:
       name: Action(s) when an overload occurs
-      description:
+      description: >-
         Executed when the appliance is detected as unplugged (because of an overload
         situation).
-
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
+        
+        ...
+        
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
+        Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
+        This section is meant to be used to trigger other things.
+        
+        A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
     actions_powered_again_after_overload:
       name: Action(s) when the overload situaton is solved, now idle
-      description:
+      description: >-
         Executed when the state changes from <strong>detached_overload -> idle</strong> (NOT resuming the job).
         
         ...
         
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
-                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
-                     This section is meant to be used to trigger other things.
-
-                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
+        Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
+        This section is meant to be used to trigger other things.
+        
+        A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
     actions_resuming_after_overload:
       name: Action(s) when the overload situaton is solved, now resuming
-      description:
+      description: >-
         Executed when the state changes from <strong>detached_overload
         -> job_ongoing</strong> (resuming the previous job).
         
         ...
         
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
-                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
-                     This section is meant to be used to trigger other things.
-
-                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
+        Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
+        This section is meant to be used to trigger other things.
+        
+        A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
 
     actions_on:
-      name: Action(s) when starting a new job cycle
-      description:
+      name: Action(s) when a new job cycle starts
+      description: >-
         Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
         
         ...
         
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
-                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
-                     This section is meant to be used to trigger other things.
-
-                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
+        Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
+        This section is meant to be used to trigger other things.
+        
+        A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
     actions_off:
       name: Action(s) when a job cycle is finished
-      description:
+      description: >-
         Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
         
         ...
         
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits or anything that could slow down the automation.
-                     Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!).
-                     This section is meant to be used to trigger other things.
-
-                     A nice and clean solution is to call other services or using the State Machine to wake up other external automations.
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
+        Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
+        This section is meant to be used to trigger other things.
+        
+        A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
