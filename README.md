@@ -31,27 +31,29 @@ For the record: there is more inside. Anyways, here's a summary:
     *   On Powered Again After Overload
 *   **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
     *   You can tell if it's in one of the following states:
-        *   unplugged
-        *   idle
-        *   paused
-        *   job\_ongoing
-        *   job\_completed
-    *   <strong>Note:</strong> Each state transition is handled automatically, you just have to provide the initial configuration.
+          - <strong><u>unplugged</u></strong> - The appliance is no longer powered. Happens when the user manually turns off the smart socket (from HA or the socket itself).
+          - <strong><u>idle</u></strong> - There is no pending job, the machine is idling.
+          - <strong><u>paused</u></strong> - Indicates that the appliance was either in the <strong><i>datached_overload</i></strong> state or <strong><i>unplugged</i></strong> when there's a job pending (an incomplete cycle). Now the blueprint is waiting for the appliance to resume. 
+            <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
+          - <strong><u>detached_overload</u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
+          - <strong><u>job_ongoing</u></strong> - Triggered when the previous job cycle is completed and the Starting Power threshold is surpassed.
+          - <strong><u>job_completed</u></strong> - Triggered when the current job cycle is incomplete, and the appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
+
+        <br>
+
+        <strong>Note:</strong> Each state transition is handled automatically, you just have to provide the initial configuration.
 *   **More triggers: more control,** even if Home Assistant reboots!
     *   This automation is triggered on each power read. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own. 
-The objective of this automation is to permit a more granular control over what's happening. There might be better ways of doing this. If you know one, feel free to share it!
+The objective of this automation is to permit a more granular control over what's happening.
 *   **Faster machine start-to-finish detection**: one of the problems that I always face is timing. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
-*   **Unreliable power absorption filtering and inhibition**: prevents the blueprint from thinking that a job was completed as soon as the power falls below the finishing power threshold.
+*   **Unreliable power absorption filtering and inhibition**: prevents the blueprint from thinking that a job was completed as soon as the power falls below the finishing power threshold. You can set your own timing here.
   
 <br>
 
-Interested? Let's dive in!
+Interested? Great! Let's install it!
 ## What do I need to run this blueprint? 🗸
 
 ### Premise
-> <i>Please consider that this blueprint is shared as-is, and even if it fits my use case, it might not be the same for you.</i>
-
-
 To achieve this level of control the socket must have some basic features, like: 
 - power monitoring (polling rate of a maximum of 60 sec for best results)
 - ON/OFF control over HASSIO
@@ -77,6 +79,7 @@ input_select:
       - unplugged
       - idle
       - paused
+      - detached_overload
       - job_ongoing
       - job_completed
     icon: mdi:<your_appliance_icon>
@@ -141,16 +144,17 @@ Important! Please make sure to edit all the fields `<your_appliance_name>`, `<Yo
 
 # # and so on ...
 ```
-> If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
+> If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I made for you.
 
 # ➕ Download & Import
 If you have just created your helpers, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
 
-1.  Add this blueprint to your Home Assistant ➡️  [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
+1.  Add this blueprint to your Home Assistant  [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
 2.  Create a New Automation from that blueprint
 3.  Configure the variables as indicated inside the blueprint's UI
 
-### You should see the 4 new entities available:
+## Results 🎉
+### You should see the 4 new entities:
 
 > <strong>Warning |</strong> always use those entities as indicators, do not change their values manually! Leave that to your automation
 
@@ -163,13 +167,13 @@ If you have just created your helpers, please reboot Home Assistant ([at this pa
 
 <figure align="center">
   <img src="assets/washing_machine-power-example.jpg" alt="power usage example"/>
-  <figcaption><p align="center">Power usage example</p>
+  <figcaption><p align="center">This is my washing machine. Power usage example</p>
 </figcaption>
 </figure>
 
 <figure align="center">
   <img src="assets/appliance-history.jpg" alt="appliance history image"/>
-  <figcaption><p align="center">State machine. The one in light blue is a simulated overload situation.</p>
+  <figcaption><p align="center">The State machine. The one in light blue is a simulated overload situation.</p>
 </figcaption>
 </figure>
 
