@@ -179,7 +179,7 @@ blueprint:
       selector:
         action:
     actions_paused_after_unplugged:
-      name: Action(s) when the appliance changes fom unplugged -> paused
+      name: Action(s) when the appliance is pugged back in, now paused
       description: >-
         Executed when the state changes from <strong>unplugged -> paused</strong> (NOT resuming the job).
         
