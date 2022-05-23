@@ -1,4 +1,4 @@
-# 🔌 Detect and monitor the status of an appliance based on its power consumption - V. 2.0.0-beta ✨
+# 🔌 Detect and monitor the status of an appliance based on its power consumption - V2.0.0-beta ✨
 ### Automation Blueprint for Home Assistant
 
 <br>
@@ -206,14 +206,14 @@ ___
 ### 🆕 The code has been updated
 1. **Version 2.0.0 of 05/20/2022** - [**MAJOR UPDATE**] Introduces a ton of new features:
 
-   - **+-FIXED+- some subtle 🐛🐛🐛**: I hate bugs (the coded ones ofc)! I did notice some strange and unwanted behaviour during some state state transitions. V1.0.1 seems to become unreliable when the user manually turns on and off the smart socket. This fixes that and more.
+   - **+-FIXED+- some subtle 🐛🐛🐛**: I hate bugs (the coded ones ofc)! I did notice some strange and unwanted behaviour during some state state transitions. V1.0.1 seems to become unreliable when the user manually turns on and off the smart socket. This is a fix to that and to other smaller things.
 
    - **+ADDED+ Low Power Threshold -> job_completed inhibition**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
   
       This version aims to fix this issue by waiting and checking if, during that period, the appliance's power consumption rises again. 
-      The only disadvantage here is that waiting for a long time means that a possible job length estimate is less accurate, because the state machine is not as reactive.
+      The only disadvantage is that waiting for a long time also means that a possible job length estimate is less accurate because the state machine is not as reactive.
   
-    - **+ADDED+ Automation can now trigger itself**: This is very useful, because in a case like the above, when the appliance consumes 0 Watts steadily, there is no trigger as no change in power absorption is detected. The self-triggering solution will now prevent it from being 'stuck' in the same state because of this problem.
+    - **+ADDED+ Automation can now trigger itself**: This is very useful, because in a case like the above, when the appliance consumes 0 Watts steadily, there would be no trigger, as no change in power absorption is detected. The self-triggering solution will now prevent it from being 'stuck' in the same state because of this problem.
   
     - **+ADDED+ detached_overload state**: The new detached_overload state was introduced to make things tidier and clearer to understand. The pause state indicates that the appliance is not resuming the previous job.
 
@@ -221,7 +221,7 @@ ___
 
 ##  <p id="update">**To update:**</p>
 
-  > HEY, READ ME! You'll lose some of your custom Actions if you don't save them! 
+  > <strong>HEY, READ ME!</strong> You'll lose some of your custom Actions if you don't save them! 
   >
   > Some naming has changed in V2. If you have some custom code configured (Actions(s) ...), please copy that outside of the automation before upgrading.
 
