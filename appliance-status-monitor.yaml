@@ -188,7 +188,7 @@ blueprint:
       selector:
         action:
     actions_paused_after_unplugged:
-      name: Action(s) when the appliance is pugged back in, now paused
+      name: Action(s) when the appliance is plugged back in, now paused
       description: >-
         Executed when the state changes from <strong>unplugged -> paused</strong> (NOT resuming the job).
 
@@ -203,7 +203,7 @@ blueprint:
       selector:
         action:
     actions_resuming_after_overload:
-      name: Action(s) when the overload situaton is solved, now resuming
+      name: Action(s) when the overload situation is solved, now resuming
       description: >-
         Executed when the state changes from <strong>detached_overload
         -> job_ongoing</strong> (resuming the previous job).

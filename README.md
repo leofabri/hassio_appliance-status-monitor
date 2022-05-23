@@ -23,10 +23,16 @@ As I said, I'm sharing this with everyone. I'm sure that you'll find it useful!
 For the record: there is more inside. Anyways, here's a summary:
 
 *   **Set your own custom actions** for each of the following states:
-    *   On Start
-    *   On Finish
-    *   On Resume After Overload
-    *   On Powered Again After Overload
+      * when an overload occurs
+      * when the overload situation is solved, now paused
+      * when the appliance is plugged back in, now paused
+      * when the overload situation is solved, now resuming
+      * when a new job cycle begins
+      * when a job cycle resumes
+      * when a job cycle is finished
+
+<br>
+  
 *   **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
     *   You can tell if it's in one of the following states:
           - <strong><u><ins>unplugged</ins></u></strong> - The appliance is no longer powered. 
