@@ -161,7 +161,7 @@ Important! Please make sure to edit all the fields `<your_appliance_name>`, `<Yo
 ><strong>PRESETS</strong> - If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
 
 # ➕ Download & Import
->Are you tryingt to update? You should follow [this]().
+>Are you tryingt to update? You should follow [this instead](#to-update).
 
 If you have just created your helpers, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
 
