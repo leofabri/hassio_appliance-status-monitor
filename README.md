@@ -203,8 +203,9 @@ ___
 
 # 📯Important notice! 🚨
 ### 🆕 The code has been updated
-1. **Version 2.0.0 of 05/20/2022** - [**MAJOR**] Introduces some new features:
+1. **Version 2.0.0 of 05/20/2022** - [**MAJOR UPDATE**] Introduces a ton of new features:
 
+   - **+-FIXED+- some subtle 🐛🐛🐛**: I hate bugs (the coded ones ofc)! I did notice some strange and unwanted behaviour when        transitioning from some state to another. V1.0.1 seems to become unreliable when the user manually turns on and off the smart socket.
 
    - **+ADDED+ Low Power Threshold -> job_completed inhibition**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
   
