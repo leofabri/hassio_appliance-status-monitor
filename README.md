@@ -82,7 +82,7 @@ Mine is a <strong>Meross MSS310EU</strong>, but it shouldn't be that important.
 ## Let's make some helper variables (<i style="text-color: red">mandatory</i>)
 To make those, head over to `configuration.yaml` and add the following pieces of code:
 
->If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
+><strong>PRESETS</strong> - If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
 ### 1. The State Machine
 
 ```yaml
@@ -158,9 +158,11 @@ Important! Please make sure to edit all the fields `<your_appliance_name>`, `<Yo
 
 # # and so on ...
 ```
-> If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I made for you.
+><strong>PRESETS</strong> - If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
 
 # ➕ Download & Import
+>Are you tryingt to update? You should follow [this]().
+
 If you have just created your helpers, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
 
 1.  Add this blueprint to your Home Assistant  [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
@@ -220,7 +222,7 @@ ___
   
     > More details below (*if you are installing the blueprint for the first time, you can discard this message*)
 
-   **To update:**
+   > **To update:**
     > <strong>HEY, READ ME! You'll lose some of your custom Actions if you don't save them!</strong> - Some naming has changed in V2. If you have some custom code configured (Actions(s) ...), please copy that outside of the automation before upgrading.
    * Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is for now.
    * Create the missing helpers (entities) as shown in the instructions
