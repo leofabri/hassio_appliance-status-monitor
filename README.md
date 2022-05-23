@@ -31,13 +31,24 @@ For the record: there is more inside. Anyways, here's a summary:
     *   On Powered Again After Overload
 *   **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
     *   You can tell if it's in one of the following states:
-          - <strong><u><ins>unplugged</ins></u></strong> - The appliance is no longer powered. Happens when the user manually turns off the smart socket (from HA or the socket itself).
-          - <strong><u><ins>idle</ins></u></strong> - There is no pending job, the machine is idling.
-          - <strong><u><ins>paused</ins></u></strong> - Indicates that the appliance was either in the <strong><i><ins>datached_overload</ins></i></strong> state or <strong><i>unplugged</i></strong> when there's a job pending (an incomplete cycle). Now the blueprint is waiting for the appliance to resume. 
-            <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
-          - <strong><u><ins>detached_overload</ins></u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
-          - <strong><u><ins>job_ongoing</ins></u></strong> - Triggered when the previous job cycle is completed and the Starting Power threshold is surpassed.
-          - <strong><u><ins>job_completed</ins></u></strong> - Triggered when the current job cycle is incomplete, and the appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
+      - <strong><u><ins>unplugged</ins></u></strong> - The appliance is no longer powered. 
+        It happens when the user manually turns off the smart socket (from HA or the socket itself).
+        
+      - <strong><u><ins>idle</ins></u></strong> - There is no pending job, the machine is powered but idling.
+        
+      - <strong><u><ins>paused</ins></u></strong> - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it. The inhibitors of these state are the <strong><i>datached_overload</i></strong> and <strong><i>unplugged</i></strong> states. 
+        In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually or maybe the job needs some time to recover).
+        The blueprint is waiting for the appliance to resume.
+
+        <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
+        
+      - <strong><u><ins>detached_overload</ins></u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
+        
+      - <strong><u><ins>job_ongoing</ins></u></strong> - Triggered in two cases:
+          - when a new job cycle begins: the previous one is completed and the Starting Power threshold is surpassed.
+          - when a job is resumed.
+          
+      - <strong><u><ins>job_completed</ins></u></strong> - Triggered when the current incomplete job cycle is finished. The appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
 
         <br>
 

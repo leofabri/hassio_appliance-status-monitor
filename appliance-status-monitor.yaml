@@ -3,10 +3,10 @@ blueprint:
   description: >-
     This automation helps you to detect and control the status of an appliance
     such as a dishwasher, a washing machine, etc.
-    
+
 
     I want this to be as universal and versatile as possible! In the blueprint, I keep referring to actions with the generic word: 'job', because the job here could be anything.
-    
+
 
     You'll be able to tell the status of the appliance step-by-step. You can pair this with other automations and services. Maybe one that 
     sends alerts if the washing machine is not resuming a job, if you want to send TTS notifications, if 
@@ -15,14 +15,24 @@ blueprint:
 
 
     The State Machine:
-      - <strong><u>unplugged</u></strong> - The appliance is no longer powered. Happens when the user manually turns off the smart socket (from HA or the socket itself).
-      - <strong><u>idle</u></strong> - There is no pending job, the machine is idling.
-      - <strong><u>paused</u></strong> - Indicates that the appliance was either in the <strong><i>datached_overload</i></strong> state or <strong><i>unplugged</i></strong> when there's a job pending (an incomplete cycle). Now the blueprint is waiting for the appliance to resume. 
-        <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
-      - <strong><u>detached_overload</u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
-      - <strong><u>job_ongoing</u></strong> - Triggered when the previous job cycle is completed and the Starting Power threshold is surpassed.
-      - <strong><u>job_completed</u></strong> - Triggered when the current job cycle is incomplete, and the appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
+      - <strong><u>unplugged</u></strong> - The appliance is no longer powered. 
+        It happens when the user manually turns off the smart socket (from HA or the socket itself).
+        
+      - <strong><u>idle</u></strong> - There is no pending job, the machine is powered but idling.
+        
+      - <strong><u>paused</u></strong> - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it. The inhibitors of these state are the <strong><i>datached_overload</i></strong> and <strong><i>unplugged</i></strong> states. 
+        In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually or maybe the job needs some time to recover).
+        The blueprint is waiting for the appliance to resume.
 
+        <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
+        
+      - <strong><u>detached_overload</u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
+        
+      - <strong><u>job_ongoing</u></strong> - Triggered in two cases:
+          - when a new job cycle begins: the previous one is completed and the Starting Power threshold is surpassed.
+          - when a job is resumed.
+          
+      - <strong><u>job_completed</u></strong> - Triggered when the current incomplete job cycle is finished. The appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
 
     <strong>First setup?</strong> <i>Check out the instructions [here](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>.
   domain: automation
@@ -36,8 +46,7 @@ blueprint:
           domain: switch
     appliance_power_sensor:
       name: Power Sensor
-      description:
-        The power entity that provides the power absorption readings.
+      description: The power entity that provides the power absorption readings.
       default: []
       selector:
         entity:
@@ -49,7 +58,7 @@ blueprint:
         or not.<br>
 
         This has to be a boolean (so: 0 or 1).<br> <strong>off</strong> -> the appliance is
-        not performing any job<br> <strong>on</strong> -> the job is incomplete. 
+        not performing any job<br> <strong>on</strong> -> the job is incomplete.
         <br>
 
         <strong>Note that this entity does not provide any information about the detailed status
@@ -116,15 +125,15 @@ blueprint:
         thus entering the job_completed state (even when not finished at all).
 
         Despite it being a rare occurrence, it might happen. 
-        With this value set, the automation will wait for x seconds and see if in the defined timespan power consumption rises.
+        With this value set, the automation will wait for x seconds and see if in that timespan the power consumption rises.
 
         ...
 
         <strong>WARNING:</strong> Setting a duration introduces a delay on the transition to the 'job_completed' state.
         Please make sure that you need this, or leave it 0 if unsure.
-        
 
-        <i>(Suggested: 0, Default: 0 | DISABLED)</i>
+
+        <strong><i>(Suggested: 0, Default: 0 | DISABLED)</i></strong>
       default: 0.0
       selector:
         number:
@@ -138,7 +147,7 @@ blueprint:
       name: Automation Self-triggering entity
       description: >-
         This entity is in charge of triggering the execution of the automation when it changes from off -> on.
-        
+
         Sometimes, if the power consumption of the appliance is perfectly steady, no other trigger will work, but this will.
 
         This variable allows the automation to call itself when some conditions are met.
@@ -152,28 +161,28 @@ blueprint:
       description: >-
         Executed when the appliance is detected as unplugged (because of an overload
         situation).
-        
+
         ...
-        
+
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things.
-        
+
         A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
     actions_paused_after_overload:
-      name: Action(s) when the overload situaton is solved, now paused
+      name: Action(s) when the overload situation is solved, now paused
       description: >-
         Executed when the state changes from <strong>detached_overload -> paused</strong> (NOT resuming the job).
-        
+
         ...
-        
+
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things.
-        
+
         A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
@@ -182,13 +191,13 @@ blueprint:
       name: Action(s) when the appliance is pugged back in, now paused
       description: >-
         Executed when the state changes from <strong>unplugged -> paused</strong> (NOT resuming the job).
-        
+
         ...
-        
+
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things.
-        
+
         A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
@@ -198,46 +207,64 @@ blueprint:
       description: >-
         Executed when the state changes from <strong>detached_overload
         -> job_ongoing</strong> (resuming the previous job).
-        
+
         ...
-        
+
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things.
-        
+
         A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
 
-    actions_on:
-      name: Action(s) when a new job cycle starts
+    actions_new_job_cycle_begins:
+      name: Action(s) when a new job cycle begins
       description: >-
         Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
-        
+        Note that here the job cycle indicator is off, which means that no previous job has to be completed.
+
         ...
-        
+
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things.
-        
+
         A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
         action:
-    actions_off:
+    actions_job_cycle_resumes:
+      name: Action(s) when a job cycle resumes
+      description: >-
+        Executed when a pending job cycle is resumed (<strong>paused | unplugged | detached_overload -> job_ongoing</strong>
+        state).
+        Note that in this case, the job cycle indicator is still on. That's how I know that the appliance is resuming and not startig a job.
+
+        ...
+
+        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
+        Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
+        This section is meant to be used to trigger other things.
+
+        A clean solution is to call other services or use the State Machine to wake up other external automations.
+      default: []
+      selector:
+        action:
+    actions_job_cycle_ends:
       name: Action(s) when a job cycle is finished
       description: >-
         Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
-        
+
         ...
-        
+
         **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, waits, or anything that could slow down the automation. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things.
-        
+
         A clean solution is to call other services or use the State Machine to wake up other external automations.
       default: []
       selector:
@@ -312,11 +339,11 @@ action:
       - conditions:
           - condition: and
             conditions:
-            - condition: template
-              value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
-            - condition: state
-              entity_id: !input "appliance_job_cycle"
-              state: "on"
+              - condition: template
+                value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
+              - condition: state
+                entity_id: !input "appliance_job_cycle"
+                state: "on"
 
         sequence:
           - condition: not
@@ -334,72 +361,66 @@ action:
 
   - choose:
       - conditions:
-        - condition: state
-          entity_id: !input "appliance_job_cycle"
-          state: "on"
-        - condition: template
-          value_template: "{{ states(appliance_suspended_sensor) | float <= 0.0 }}"
-        - condition: template
-          value_template: "{{ states(appliance_socket) == 'on' }}"
-        - condition: numeric_state
-          entity_id: !input "appliance_power_sensor"
-          below: !input "appliance_finishing_power_threshold"
-        - condition: or
-          conditions:
           - condition: state
-            entity_id: !input "appliance_state_machine"
-            state: detached_overload
-          - condition: state
-            entity_id: !input "appliance_state_machine"
-            state: unplugged
-        sequence:
+            entity_id: !input "appliance_job_cycle"
+            state: "on"
+          - condition: template
+            value_template: "{{ states(appliance_suspended_sensor) | float <= 0.0 }}"
+          - condition: template
+            value_template: "{{ states(appliance_socket) == 'on' }}"
+          - condition: numeric_state
+            entity_id: !input "appliance_power_sensor"
+            below: !input "appliance_finishing_power_threshold"
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: !input "appliance_state_machine"
+                state: detached_overload
+              - condition: state
+                entity_id: !input "appliance_state_machine"
+                state: unplugged
           - condition: not
             conditions:
               - condition: state
                 entity_id: !input "appliance_state_machine"
                 state: paused
+        sequence:
           - service: input_select.select_option
             data:
               option: paused
             target:
               entity_id: !input "appliance_state_machine"
-          
+
       - conditions:
-          - condition: or
+          - condition: template
+            value_template: "{{ states(appliance_socket) == 'off' }}"
+          - condition: not
             conditions:
-            - condition: template
-              value_template: "{{ states(appliance_socket) == 'off' }}"
-            - condition: and
-              conditions:
               - condition: template
-                value_template: "{{ states(appliance_socket) == 'off' }}"
-              - condition: not
-                conditions:
-                  - condition: template
-                    value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
-                  - condition: state
-                    entity_id: !input "appliance_state_machine"
-                    state: detached_overload
+                value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
+              - condition: state
+                entity_id: !input "appliance_state_machine"
+                state: detached_overload
         sequence:
           - condition: not
             conditions:
-            - condition: state
-              entity_id: !input "appliance_state_machine"
-              state: unplugged
+              - condition: state
+                entity_id: !input "appliance_state_machine"
+                state: unplugged
           - service: input_select.select_option
             data:
               option: unplugged
             target:
               entity_id: !input "appliance_state_machine"
           - choose:
-            - conditions:
-                - condition: template
-                  value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
-              sequence:
-                - service: timer.cancel
-                  data: {}
-                  target:
-                    entity_id: !input "delayed_job_completion_timer"
+              - conditions:
+                  - condition: template
+                    value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
+                sequence:
+                  - service: timer.cancel
+                    data: {}
+                    target:
+                      entity_id: !input "delayed_job_completion_timer"
       - conditions:
           - condition: trigger
             id: paused_after_overload_event
@@ -429,21 +450,20 @@ action:
                   - condition: state
                     entity_id: !input "appliance_job_cycle"
                     state: "off"
-                  - condition: and
-                    conditions:
-                      - condition: or
-                        conditions:
-                        - condition: state
-                          entity_id: !input "appliance_state_machine"
-                          state: paused
-                        - condition: state
-                          entity_id: !input "appliance_state_machine"
-                          state: detached_overload
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: unplugged
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: paused
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: detached_overload
+              - condition: template
+                value_template: "{{ states(appliance_socket) == 'on' }}"
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
-              - condition: template
-                value_template: "{{ states(appliance_socket) == 'on' }}"
             sequence:
               - service: input_boolean.turn_on
                 data: {}
@@ -455,16 +475,26 @@ action:
                 target:
                   entity_id: !input "appliance_state_machine"
               - choose:
-                - conditions:
-                    - condition: template
-                      value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
-                  sequence:
-                    - service: timer.cancel
-                      data: {}
-                      target:
-                        entity_id: !input "delayed_job_completion_timer"
-              - choose: []
-                default: !input "actions_on"
+                  - conditions:
+                      - condition: template
+                        value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
+                    sequence:
+                      - service: timer.cancel
+                        data: {}
+                        target:
+                          entity_id: !input "delayed_job_completion_timer"
+
+              - choose:
+                  - conditions:
+                      - condition: state
+                        entity_id: !input "appliance_job_cycle"
+                        state: "off"
+                    sequence:
+                      - choose: []
+                        default: !input "actions_new_job_cycle_begins"
+                default:
+                  - choose: []
+                    default: !input "actions_job_cycle_resumes"
 
           - conditions:
               - condition: state
@@ -550,7 +580,7 @@ action:
                         target:
                           entity_id: !input "delayed_job_completion_timer"
               - choose: []
-                default: !input "actions_off"
+                default: !input "actions_job_cycle_ends"
               - choose:
                   - conditions:
                       - condition: trigger
