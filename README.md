@@ -83,7 +83,7 @@ Mine is a <strong>Meross MSS310EU</strong>, but it shouldn't be that important.
 ## Let's make some helper variables (<i style="text-color: red">mandatory</i>)
 To make those, head over to `configuration.yaml` and add the following pieces of code:
 
-><strong>PRESETS</strong> - If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0/examples) examples that I prepared.
+><strong>PRESETS</strong> - If want to simplify this even more, check out one of the pre-made [`config.yaml`](https://github.com/leofabri/hassio_appliance-status-monitor/tree/main/configuration-examples) examples that I prepared.
 ### 1. The State Machine
 
 ```yaml
