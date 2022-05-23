@@ -13,13 +13,15 @@
 </p>
 
 
-Here's the automation I made to control the status of the most power-hungry appliances in my house. 
-I'm sure that I can automate my machines without wasting money to buy them new and so, what I'm offering here is a a cheap and simple solution that does just that.
+Here's the automation I made to control the status of the most power-hungry appliances in my house.
 
-I use this for my dishwasher and washing machine, and so far the results have been great! 
-My family ❤️s it! Even if they don't really get what's all the fuss about this intricate thing.
+There aren't numerous blueprints that do what I want, and I'm sure that I have the skills to automate my machines without wasting money to buy them new. 
+Here's my cheap (🆓😲) and reliable solution that does just that.
 
-I'm sharing this with everyone, hoping that you'll find it useful.
+I use this for my dishwasher and washing machine. So far, the results have been great! The blueprint is very extensible and easy to use.
+My family ❤️s this thing! Even if they don't understand its complexity and get what all the fuss is about.
+
+As I said, I'm sharing this with everyone. I'm sure that you'll find it useful!
 
 ## 📋 Features
 
@@ -52,7 +54,7 @@ For the record: there is more inside. Anyways, here's a summary:
           - <strong><u><ins>job_completed</ins></u></strong> - Triggered when the current incomplete job cycle is finished. The appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
 
         ...
-        
+
         <strong>Note:</strong> Each state transition is handled automatically, you just have to provide the initial configuration.
 *   **More triggers: more control,** even if Home Assistant reboots!
     *   This automation is triggered on each power read. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own. 
