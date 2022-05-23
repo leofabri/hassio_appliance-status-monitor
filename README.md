@@ -3,8 +3,7 @@
 
 <br>
 
-> ## Warning! This needs more testing, and could potentially break the existing automation!
-> It's a beta, it'll be merged when ready.
+> ## Warning! It's a beta, it'll be merged when ready.
 
 <br>
 
@@ -219,8 +218,6 @@ ___
     - **+ADDED+ detached_overload state**: The new detached_overload state was introduced to make things tidier and clearer to understand. The pause state indicates that the appliance is not resuming the previous job.
 
     - **/CHANGED/** The automation now runs in restart mode, not in single-mode anymore. I did this because I am prioritizing the trigger over the internal checks.
-  
-    > More details below (*if you are installing the blueprint for the first time, you can discard this message*)
 
 ##  <p id="update">**To update:**</p>
 
