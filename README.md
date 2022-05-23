@@ -42,7 +42,7 @@ For the record: there is more inside. Anyways, here's a summary:
             In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually or maybe the job needs some time to recover).
             The blueprint is waiting for the appliance to resume.
 
-            <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
+            <strong>Pro Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
             
           - <strong><u><ins>detached_overload</ins></u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
             
