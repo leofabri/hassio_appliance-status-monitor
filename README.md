@@ -22,7 +22,7 @@ As I said, I'm sharing this with everyone. I'm sure that you'll find it useful!
 
 For the record: there is more inside. Anyways, here's a summary:
 
-*   **Set your own custom actions** for each of the following states:
+*   **Set your own custom actions** for each of the following conditions:
       * when an overload occurs
       * when the overload situation is solved, now paused
       * when the appliance is plugged back in, now paused
