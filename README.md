@@ -13,10 +13,11 @@
 </p>
 
 
-Here's the automation I made to control the status of the most power-hungry appliances in my house. I like to think that I can automate my machines without wasting money to buy them new. Here I'm offering a cheap and simple solution that just works.
+Here's the automation I made to control the status of the most power-hungry appliances in my house. 
+I'm sure that I can automate my machines without wasting money to buy them new and so, what I'm offering here is a a cheap and simple solution that does just that.
 
 I use this for my dishwasher and washing machine, and so far the results have been great! 
-My family ❤️s it! Even if they don't really get what's the fuss about this intricate thing. 
+My family ❤️s it! Even if they don't really get what's all the fuss about this intricate thing.
 
 I'm sharing this with everyone, hoping that you'll find it useful.
 
@@ -31,27 +32,26 @@ For the record: there is more inside. Anyways, here's a summary:
     *   On Powered Again After Overload
 *   **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
     *   You can tell if it's in one of the following states:
-      - <strong><u><ins>unplugged</ins></u></strong> - The appliance is no longer powered. 
-        It happens when the user manually turns off the smart socket (from HA or the socket itself).
-        
-      - <strong><u><ins>idle</ins></u></strong> - There is no pending job, the machine is powered but idling.
-        
-      - <strong><u><ins>paused</ins></u></strong> - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it. The inhibitors of these state are the <strong><i>datached_overload</i></strong> and <strong><i>unplugged</i></strong> states. 
-        In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually or maybe the job needs some time to recover).
-        The blueprint is waiting for the appliance to resume.
+          - <strong><u><ins>unplugged</ins></u></strong> - The appliance is no longer powered. 
+            It happens when the user manually turns off the smart socket (from HA or the socket itself).
+            
+          - <strong><u><ins>idle</ins></u></strong> - There is no pending job, the machine is powered but idling.
+            
+          - <strong><u><ins>paused</ins></u></strong> - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it. The inhibitors of these state are the <strong><i>datached_overload</i></strong> and <strong><i>unplugged</i></strong> states. 
+            In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually or maybe the job needs some time to recover).
+            The blueprint is waiting for the appliance to resume.
 
-        <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
-        
-      - <strong><u><ins>detached_overload</ins></u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
-        
-      - <strong><u><ins>job_ongoing</ins></u></strong> - Triggered in two cases:
-          - when a new job cycle begins: the previous one is completed and the Starting Power threshold is surpassed.
-          - when a job is resumed.
-          
-      - <strong><u><ins>job_completed</ins></u></strong> - Triggered when the current incomplete job cycle is finished. The appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
+            <strong>Tip!</strong> You could also use this to diagnose and warn if a job is not resumed after x minutes. 
+            
+          - <strong><u><ins>detached_overload</ins></u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
+            
+          - <strong><u><ins>job_ongoing</ins></u></strong> - Triggered in two cases:
+              - when a new job cycle begins: the previous one is completed and the Starting Power threshold is surpassed.
+              - when a job is resumed.
+              
+          - <strong><u><ins>job_completed</ins></u></strong> - Triggered when the current incomplete job cycle is finished. The appliance consumes less than the Finishing Power threshold (also with the possibility of selecting for how long).
 
-        <br>
-
+        ...
         <strong>Note:</strong> Each state transition is handled automatically, you just have to provide the initial configuration.
 *   **More triggers: more control,** even if Home Assistant reboots!
     *   This automation is triggered on each power read. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own. 
