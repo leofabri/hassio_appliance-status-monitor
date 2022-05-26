@@ -7,16 +7,14 @@
   <img width="240" height="auto" src="assets/automation-tree.jpg" alt="Monitor the status of an appliance - by leofabri"/>
 </p>
 
+This is the automation I made to control the status of the most power-hungry appliances in my house.
 
-Here's the automation I made to control the status of the most power-hungry appliances in my house.
+There aren’t numerous blueprints that do what I want, and I’m sure that I have the skills to automate my machines without wasting money and buying them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
 
-There aren't numerous blueprints that do what I want, and I'm sure that I have the skills to automate my machines without wasting money to buy them new. 
-Here's my cheap (🆓😲) and reliable solution that does just that.
+I use this for my dishwasher and washing machine and the results have been great! The blueprint is very extensible and easy to use.
+My family ❤️s this thing! Even if they don’t understand its complexity and get what all the fuss is about.
 
-I use this for my dishwasher and washing machine. So far, the results have been great! The blueprint is very extensible and easy to use.
-My family ❤️s this thing! Even if they don't understand its complexity and get what all the fuss is about.
-
-As I said, I'm sharing this with everyone. I'm sure that you'll find it useful!
+As I said, I’m sharing this with everyone. I’m sure that you’ll find it useful!
 
 ## 📋 Features
 

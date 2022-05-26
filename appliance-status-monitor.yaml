@@ -5,7 +5,8 @@ blueprint:
     such as a dishwasher, a washing machine, etc.
 
 
-    I want this to be as universal and versatile as possible! In the blueprint, I keep referring to actions with the generic word: 'job', because the job here could be anything.
+    I want this to be as universal and versatile as possible! 
+    In the blueprint, I keep referring to actions with the generic word: 'job', because the job here could be anything.
 
 
     You'll be able to tell the status of the appliance step-by-step. You can pair this with other automations and services. Maybe one that 
@@ -311,6 +312,13 @@ trigger:
       entity_id: !input "delayed_job_completion_timer"
     id: job_completed_timer_finished
 
+  - platform: homeassistant
+    event: start
+    id: home_assistant_started_event
+  - platform: event
+    event_type:
+      - automation_reloaded
+    id: automation_reloaded_event
 condition:
   - condition: or
     conditions:
@@ -330,6 +338,11 @@ condition:
         id: automation_self_triggered
       - condition: trigger
         id: job_completed_timer_finished
+
+      - condition: trigger
+        id: home_assistant_started_event
+      - condition: trigger
+        id: automation_reloaded_event
 action:
   - service: input_boolean.turn_off
     data: {}
