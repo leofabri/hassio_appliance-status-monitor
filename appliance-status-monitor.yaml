@@ -458,37 +458,12 @@ action:
     default:
       - choose:
           - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: !input "appliance_job_cycle"
-                    state: "off"
-                  - condition: state
-                    entity_id: !input "appliance_state_machine"
-                    state: unplugged
-                  - condition: state
-                    entity_id: !input "appliance_state_machine"
-                    state: paused
-                  - condition: state
-                    entity_id: !input "appliance_state_machine"
-                    state: detached_overload
               - condition: template
                 value_template: "{{ states(appliance_socket) == 'on' }}"
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
-
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: !input "appliance_state_machine"
-                    state: job_ongoing
             sequence:
-              - service: input_select.select_option
-                data:
-                  option: job_ongoing
-                target:
-                  entity_id: !input "appliance_state_machine"
               - choose:
                   - conditions:
                       - condition: template
@@ -498,6 +473,16 @@ action:
                         data: {}
                         target:
                           entity_id: !input "delayed_job_completion_timer"
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: job_ongoing
+              - service: input_select.select_option
+                data:
+                  option: job_ongoing
+                target:
+                  entity_id: !input "appliance_state_machine"
               - choose:
                   - conditions:
                       - condition: state
@@ -544,31 +529,48 @@ action:
                       - choose:
                           - conditions:
                               - condition: template
+                              # 1. The power cosnumption is below the finishing power threshold
+                              # 2. The timer is active and counting 
+                              # 3. The delay is not yet reached
+                              
                                 value_template: >-
+                                  
                                   {% if states(delayed_job_completion_timer) == 'active' %}
-                                  {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
-                                  {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
-                                  {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
-                                  {% set duration_split = t_total_duration.split(':') %}
-                                  {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
-                                  {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
-                                  {{ t_elapsed_sec < (delayed_job_completion_duration) | int }}
+                                    {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
+                                    {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                    {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
+                                    {% set duration_split = t_total_duration.split(':') %}
+                                    {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                    {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                    {{ t_elapsed_sec < (delayed_job_completion_duration) | int }}
                                   {% else %}
-                                  {{0}}
+                                    {{0}}
                                   {% endif %}
                             sequence:
-                              - service: timer.cancel
-                                data: {}
-                                target:
-                                  entity_id: !input "delayed_job_completion_timer"
-                              - service: timer.start
-                                data: {}
-                                target:
-                                  entity_id: !input "delayed_job_completion_timer"
+                              # - service: timer.cancel
+                              #   data: {}
+                              #   target:
+                              #     entity_id: !input "delayed_job_completion_timer"
+                              # - service: timer.start
+                              #   data: {}
+                              #   target:
+                              #     entity_id: !input "delayed_job_completion_timer"
 
                               - delay:
                                   seconds: >-
-                                    {{ 1 + (delayed_job_completion_duration) | int }}
+                                    {% if states(delayed_job_completion_timer) == 'active' %}
+                                      {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
+                                      {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                      {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
+                                      {% set duration_split = t_total_duration.split(':') %}
+                                      {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                      {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                      {% set t_remaining = ((delayed_job_completion_duration) | int) - t_elapsed_sec %}
+                                      
+                                      {{ 1 + t_remaining }}
+                                    {% else %}
+                                      {{ 1 + (delayed_job_completion_duration) | int }}
+                                    {% endif %}
 
                               - service: input_boolean.turn_on
                                 data: {}
@@ -615,21 +617,31 @@ action:
                         target:
                           entity_id: !input "automation_self_trigger"
         default:
-          choose:
-            - conditions:
-                - condition: state
-                  entity_id: !input "appliance_job_cycle"
-                  state: "off"
-                - condition: not
-                  conditions:
-                    - condition: state
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: !input "appliance_job_cycle"
+                    state: "off"
+                  - condition: not
+                    conditions:
+                      - condition: state
+                        entity_id: !input "appliance_state_machine"
+                        state: idle
+                sequence:
+                  - service: input_select.select_option
+                    data:
+                      option: idle
+                    target:
                       entity_id: !input "appliance_state_machine"
-                      state: idle
-              sequence:
-                - service: input_select.select_option
-                  data:
-                    option: idle
-                  target:
-                    entity_id: !input "appliance_state_machine"
+            # default:
+            #   - choose:
+            #       - conditions:
+            #           - condition: template
+            #             value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
+            #         sequence:
+            #           - service: timer.cancel
+            #             data: {}
+            #             target:
+            #               entity_id: !input "delayed_job_completion_timer"
 mode: restart
 max_exceeded: silent
