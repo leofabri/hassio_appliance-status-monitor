@@ -529,12 +529,7 @@ action:
                       - choose:
                           - conditions:
                               - condition: template
-                              # 1. The power cosnumption is below the finishing power threshold
-                              # 2. The timer is active and counting 
-                              # 3. The delay is not yet reached
-                              
                                 value_template: >-
-                                  
                                   {% if states(delayed_job_completion_timer) == 'active' %}
                                     {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
                                     {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
@@ -547,15 +542,6 @@ action:
                                     {{0}}
                                   {% endif %}
                             sequence:
-                              # - service: timer.cancel
-                              #   data: {}
-                              #   target:
-                              #     entity_id: !input "delayed_job_completion_timer"
-                              # - service: timer.start
-                              #   data: {}
-                              #   target:
-                              #     entity_id: !input "delayed_job_completion_timer"
-
                               - delay:
                                   seconds: >-
                                     {% if states(delayed_job_completion_timer) == 'active' %}
@@ -633,15 +619,5 @@ action:
                       option: idle
                     target:
                       entity_id: !input "appliance_state_machine"
-            # default:
-            #   - choose:
-            #       - conditions:
-            #           - condition: template
-            #             value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
-            #         sequence:
-            #           - service: timer.cancel
-            #             data: {}
-            #             target:
-            #               entity_id: !input "delayed_job_completion_timer"
 mode: restart
 max_exceeded: silent
