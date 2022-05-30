@@ -621,3 +621,5 @@ action:
                       entity_id: !input "appliance_state_machine"
 mode: restart
 max_exceeded: silent
+trace:
+    stored_traces: 10
