@@ -516,6 +516,10 @@ action:
                   - conditions:
                       - condition: template
                         value_template: "{{ states(delayed_job_completion_timer) != 'active' }}"
+                      - condition: not
+                        conditions:
+                          - condition: trigger
+                            id: job_completed_timer_finished
                     sequence:
                       - service: timer.start
                         data: {}
