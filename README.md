@@ -237,5 +237,5 @@ ___
     - **/CHANGED/** The automation now runs in restart mode, not in single-mode anymore. I did this because I am prioritizing the trigger over the internal checks.
 
 
-3. **[Version 1.0.1 of 05/16/2022](https://github.com/leofabri/hassio_appliance-status-monitor/tree/V1.0.1)** - DEPRECATED - [**FIX!**] *Fixes the error of the 'idle' state which was not working correctly.*
+3. **[Version 1.0.1 of 05/16/2022](https://github.com/leofabri/hassio_appliance-status-monitor/tree/1.0.1)** - DEPRECATED - [**FIX!**] *Fixes the error of the 'idle' state which was not working correctly.*
     
