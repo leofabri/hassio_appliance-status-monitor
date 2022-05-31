@@ -29,7 +29,7 @@ blueprint:
     * **<ins>job_completed</ins>** - Triggered when the current incomplete job cycle is finished. The appliance consumes less than the Finishing Power threshold (with the possibility of selecting for how long) 
 
 
-    <strong>First setup?</strong> <i>[Follow the instructions](https://github.com/leofabri/hassio_appliance-status-monitor/tree/2.0.0)</i>
+    <strong>First setup?</strong> <i>[Follow the instructions](https://github.com/leofabri/hassio_appliance-status-monitor)</i>
   domain: automation
   input:
     appliance_socket:
