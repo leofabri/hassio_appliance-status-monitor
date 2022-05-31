@@ -221,7 +221,7 @@ ___
 >  <br>
 
 
-2. [**Version 2.0.0 of 05/20/2022**](https://github.com/leofabri/hassio_appliance-status-monitor/blob/2.0.0/appliance-status-monitor.yaml) - [**MAJOR UPDATE**] Introduces a ton of new features:
+2. [**Version 2.0.0 of 05/20/2022**](https://github.com/leofabri/hassio_appliance-status-monitor/tree/release/v2.0.0) - [**MAJOR UPDATE**] Introduces a ton of new features:
 
    - **+-FIXED+- some subtle 🐛🐛🐛**: I hate bugs (the coded ones ofc)! I did notice some strange and unwanted behavior during some state state transitions. V1.0.1 seems to become unreliable when the user manually turns on and off the smart socket. This is a fix to that and to other smaller things.
 
