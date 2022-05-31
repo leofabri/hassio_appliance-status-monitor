@@ -1,4 +1,4 @@
-# 🔌 Detect and monitor the status of an appliance based on its power consumption - V2.0.0 ✨
+# 🔌 Detect and monitor the status of an appliance based on its power consumption - V2.1.0 ✨
 ### Automation Blueprint for Home Assistant
 
 <br>
@@ -7,16 +7,14 @@
   <img width="240" height="auto" src="assets/automation-tree.jpg" alt="Monitor the status of an appliance - by leofabri"/>
 </p>
 
+This is the automation I made to control the status of the most power-hungry appliances in my house.
 
-Here's the automation I made to control the status of the most power-hungry appliances in my house.
+There aren’t numerous blueprints that do what I want, and I’m sure that I have the skills to automate my machines without wasting money and buying them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
 
-There aren't numerous blueprints that do what I want, and I'm sure that I have the skills to automate my machines without wasting money to buy them new. 
-Here's my cheap (🆓😲) and reliable solution that does just that.
+I use this for my dishwasher and washing machine and the results have been great! The blueprint is very extensible and easy to use.
+My family ❤️s this thing! Even if they don’t understand its complexity and get what all the fuss is about.
 
-I use this for my dishwasher and washing machine. So far, the results have been great! The blueprint is very extensible and easy to use.
-My family ❤️s this thing! Even if they don't understand its complexity and get what all the fuss is about.
-
-As I said, I'm sharing this with everyone. I'm sure that you'll find it useful!
+As I said, I’m sharing this with everyone. I’m sure that you’ll find it useful!
 
 ## 📋 Features
 
@@ -206,7 +204,24 @@ ___
 
 # 📯Important notice! 🚨
 ### 🆕 The code has been updated
-1. **Version 2.0.0 of 05/20/2022** - [**MAJOR UPDATE**] Introduces a ton of new features:
+1. [**Version 2.1.0 of 05/31/2022**]() - [**FIX!** | **IMPROVEMENTS**] 
+   - Fixes an issue with the timer that was restarting indefinitely. The delay should now be working.
+   - Added two more triggers: when HA starts, when the automation is reloaded.
+   - The description inside the automation has been updated/improved.
+   - The order of definition of the input entities is now different.
+   - There's a new version tag visible inside the blueprint's description.
+
+>##  <p id="update">**To update:**</p>
+>
+>   * Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is for now.
+>   * Create the missing helpers (entities) as shown in the instructions
+>   * Add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml) and reload home assistant.
+>   * Open your automation and add the previously created helpers (entities)
+>  
+>  <br>
+
+
+2. [**Version 2.0.0 of 05/20/2022**](https://github.com/leofabri/hassio_appliance-status-monitor/tree/release/v2.0.0) - [**MAJOR UPDATE**] Introduces a ton of new features:
 
    - **+-FIXED+- some subtle 🐛🐛🐛**: I hate bugs (the coded ones ofc)! I did notice some strange and unwanted behavior during some state state transitions. V1.0.1 seems to become unreliable when the user manually turns on and off the smart socket. This is a fix to that and to other smaller things.
 
@@ -221,19 +236,6 @@ ___
 
     - **/CHANGED/** The automation now runs in restart mode, not in single-mode anymore. I did this because I am prioritizing the trigger over the internal checks.
 
-##  <p id="update">**To update:**</p>
 
-  > <strong>HEY, READ ME!</strong> You'll lose some of your custom Actions if you don't save them! 
-  >
-  > Some naming has changed in V2. If you have some custom code configured (Actions(s) ...), please copy that outside of the automation before upgrading.
-
-   * Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is for now.
-   * Create the missing helpers (entities) as shown in the instructions
-   * Add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml) and reload home assistant.
-   * Open your automation and add the previously created helpers (entities)
-  
-  <br>
-
-
-1. **[Version 1.0.1 of 05/16/2022](https://github.com/leofabri/hassio_appliance-status-monitor/tree/V1.0.1)** - [**FIX!**] *Fixes the error of the 'idle' state which was not working correctly.*
+3. **[Version 1.0.1 of 05/16/2022](https://github.com/leofabri/hassio_appliance-status-monitor/tree/1.0.1)** - DEPRECATED - [**FIX!**] *Fixes the error of the 'idle' state which was not working correctly.*
     
