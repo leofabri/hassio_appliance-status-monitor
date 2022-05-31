@@ -1,7 +1,7 @@
 blueprint:
   name: Monitor the status of an appliance - by leofabri
   description: >-
-    `- Version: 2.0.1 -`
+    `- Version: 2.1.0 -`
 
 
     This automation can detect and monitor the status of your appliances by observing their power consumption.
