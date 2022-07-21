@@ -4,7 +4,7 @@ blueprint:
     `- Version: 2.1.1 -`
 
 
-    This automation can detect and monitor the status of your appliances by observing their power consumption.
+    This automation can detect and monitor the state of your appliances by observing their power consumption.
 
     This automation blueprint is universal and very versatile. You can use it with anything that consumes energy: a washing machine, a dishwasher, your fridge, the TV, etc. 
     I refer to the appliance's operations with the generic word job. A job could be anything (washing, rinsing...).
