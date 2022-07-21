@@ -1,7 +1,7 @@
 blueprint:
   name: Monitor the status of an appliance - by leofabri
   description: >-
-    `- Version: 2.1.0 -`
+    `- Version: 2.1.1 -`
 
 
     This automation can detect and monitor the status of your appliances by observing their power consumption.
@@ -21,15 +21,15 @@ blueprint:
     * **<ins>unplugged</ins>** - The appliance is no longer powered. It happens when the user manually turns off the smart socket (from HA or the socket itself).
 
     * **<ins>idle</ins>** - There is no pending job, the machine is powered but idling.
-    
+
     * **paused** - Indicates that a job is pending (incomplete cycle), but the appliance is not performing it. The inhibitors of these state are the ***datached_overload*** and ***unplugged*** states. In this condition the power consumption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually, or maybe the job needs some time to recover). The blueprint is waiting for the appliance to resume. **Pro Tip!** You could also use this to diagnose and warn if a job is not resumed after x minutes.
-    
+
     * **<ins>detached_overload</ins>** - This happens when, during a cycle, the appliance used too much power and was suspended. It is also technically unplugged.
-    
+
     * **<ins>job_ongoing</ins>** - Triggered in two cases:
       * when a new job cycle begins: the previous one is completed, and the Starting Power threshold is surpassed.
       * when a job is resumed.
-    
+
     * **<ins>job_completed</ins>** - Triggered when the current incomplete job cycle is finished. The appliance consumes less than the Finishing Power threshold (with the possibility of selecting for how long) 
 
 
@@ -40,7 +40,7 @@ blueprint:
       name: Appliance Smart Socket
       description: >-
         (*REQUIRED)
-        
+
 
         The socket that is used to control this appliance.
       default: []
@@ -51,7 +51,7 @@ blueprint:
       name: Appliance Power Consumption
       description: >-
         (*REQUIRED)
-        
+
 
         The power entity with the current power absorption in Watts.
       default: []
@@ -62,7 +62,7 @@ blueprint:
       name: Starting power threshold
       description: >-
         (*REQUIRED)
-        
+
 
         Power threshold above which we assume the appliance has started
         a new job or is resuming the current one (job_ongoing state).
@@ -78,7 +78,7 @@ blueprint:
       name: Finishing power threshold
       description: >-
         (*REQUIRED)
-        
+
 
         Power threshold below which we assume the appliance has finished
         a job (job_completed state).
@@ -135,7 +135,7 @@ blueprint:
           domain: input_boolean
     delayed_job_completion_timer:
       name: Delayed Job Completion timer
-      description:  >-
+      description: >-
         (*REQUIRED | Helper | Name: <i><strong><your_appliance_name>_delayed_job_completion_timer</i></strong> | [?](https://github.com/leofabri/hassio_appliance-status-monitor#3-the-delay-timer--added-in-version-v200))
 
 
@@ -146,7 +146,7 @@ blueprint:
           domain: timer
     automation_self_trigger:
       name: Automation Self-triggering entity
-      description:  >-
+      description: >-
         (*REQUIRED | Helper | Name: <i><strong><your_appliance_name>_automation_self_trigger</i></strong> | [?](https://github.com/leofabri/hassio_appliance-status-monitor#4-the-automation-self-trigger--added-in-version-v200))
 
 
@@ -351,19 +351,16 @@ condition:
         id: power_event
       - condition: trigger
         id: socket_state_change_event
-
       - condition: trigger
         id: paused_after_overload_event
       - condition: trigger
         id: paused_after_unplugged_event
       - condition: trigger
         id: resuming_after_paused_overload_event
-
       - condition: trigger
         id: automation_self_triggered
       - condition: trigger
         id: job_completed_timer_finished
-
       - condition: trigger
         id: home_assistant_started_event
       - condition: trigger
@@ -375,6 +372,8 @@ action:
       entity_id: !input "automation_self_trigger"
   - choose:
       - conditions:
+          - condition: template
+            value_template: "{{ appliance_suspended_sensor|length > 0 }}"
           - condition: and
             conditions:
               - condition: template
@@ -382,7 +381,6 @@ action:
               - condition: state
                 entity_id: !input "appliance_job_cycle"
                 state: "on"
-
         sequence:
           - condition: not
             conditions:
@@ -396,14 +394,13 @@ action:
               entity_id: !input "appliance_state_machine"
           - choose: []
             default: !input "actions_unplugged_overload"
-
   - choose:
       - conditions:
           - condition: state
             entity_id: !input "appliance_job_cycle"
             state: "on"
           - condition: template
-            value_template: "{{ states(appliance_suspended_sensor) | float <= 0.0 }}"
+            value_template: "{% if appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float <= 0.0 }}{% else %}true{% endif %}"
           - condition: template
             value_template: "{{ states(appliance_socket) == 'on' }}"
           - condition: numeric_state
@@ -428,17 +425,20 @@ action:
               option: paused
             target:
               entity_id: !input "appliance_state_machine"
-
       - conditions:
           - condition: template
             value_template: "{{ states(appliance_socket) == 'off' }}"
           - condition: not
             conditions:
               - condition: template
-                value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
-              - condition: state
-                entity_id: !input "appliance_state_machine"
-                state: detached_overload
+                value_template: "{{ appliance_suspended_sensor|length > 0 }}"
+              - condition: and
+                conditions:
+                  - condition: template
+                    value_template: "{% if appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float > 0.0 }}{% else %}false{% endif %}"
+                  - condition: state
+                    entity_id: !input "appliance_state_machine"
+                    state: detached_overload
         sequence:
           - condition: not
             conditions:
@@ -465,21 +465,18 @@ action:
         sequence:
           - choose: []
             default: !input "actions_paused_after_overload"
-
       - conditions:
           - condition: trigger
             id: paused_after_unplugged_event
         sequence:
           - choose: []
             default: !input "actions_paused_after_unplugged"
-
       - conditions:
           - condition: trigger
             id: resuming_after_paused_overload_event
         sequence:
           - choose: []
             default: !input "actions_resuming_after_overload"
-
     default:
       - choose:
           - conditions:
@@ -492,7 +489,9 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
+                        value_template:
+                          "{{ states(delayed_job_completion_timer) == 'active'
+                          }}"
                     sequence:
                       - service: timer.cancel
                         data: {}
@@ -523,7 +522,6 @@ action:
                 default:
                   - choose: []
                     default: !input "actions_job_cycle_resumes"
-
           - conditions:
               - condition: state
                 entity_id: !input "appliance_state_machine"
@@ -540,7 +538,9 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ states(delayed_job_completion_timer) != 'active' }}"
+                        value_template:
+                          "{{ states(delayed_job_completion_timer) != 'active'
+                          }}"
                       - condition: not
                         conditions:
                           - condition: trigger
@@ -558,43 +558,40 @@ action:
                       - choose:
                           - conditions:
                               - condition: template
-                                value_template: >-
-                                  {% if states(delayed_job_completion_timer) == 'active' %}
-                                    {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
-                                    {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
-                                    {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
-                                    {% set duration_split = t_total_duration.split(':') %}
-                                    {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
-                                    {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
-                                    {{ t_elapsed_sec < (delayed_job_completion_duration) | int }}
-                                  {% else %}
-                                    {{0}}
-                                  {% endif %}
+                                value_template:
+                                  "{% if states(delayed_job_completion_timer) == 'active'\
+                                  \ %}\n  {% set t_expiring_date = state_attr(delayed_job_completion_timer,\
+                                  \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
+                                  \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
+                                  \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_completion_timer,\
+                                  \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
+                                  \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
+                                  \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
+                                  \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec)\
+                                  \ | int %}\n  {{ t_elapsed_sec < (delayed_job_completion_duration)\
+                                  \ | int }}\n{% else %}\n  {{0}}\n{% endif %}"
                             sequence:
                               - delay:
-                                  seconds: >-
-                                    {% if states(delayed_job_completion_timer) == 'active' %}
-                                      {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
-                                      {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
-                                      {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
-                                      {% set duration_split = t_total_duration.split(':') %}
-                                      {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
-                                      {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
-                                      {% set t_remaining = ((delayed_job_completion_duration) | int) - t_elapsed_sec %}
-                                      
-                                      {{ 1 + t_remaining }}
-                                    {% else %}
-                                      {{ 1 + (delayed_job_completion_duration) | int }}
-                                    {% endif %}
-
+                                  seconds:
+                                    "{% if states(delayed_job_completion_timer) == 'active'\
+                                    \ %}\n  {% set t_expiring_date = state_attr(delayed_job_completion_timer,\
+                                    \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
+                                    \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
+                                    \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_completion_timer,\
+                                    \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
+                                    \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
+                                    \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
+                                    \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec -\
+                                    \ t_remaining_sec) | int %}\n  {% set t_remaining = ((delayed_job_completion_duration)\
+                                    \ | int) - t_elapsed_sec %}\n  \n  {{ 1 + t_remaining }}\n{% else\
+                                    \ %}\n  {{ 1 + (delayed_job_completion_duration) | int }}\n{%\
+                                    \ endif %}"
                               - service: input_boolean.turn_on
                                 data: {}
                                 target:
                                   entity_id: !input "automation_self_trigger"
-
                               - condition: template
-                                value_template: >-
-                                  {{0}}
+                                value_template: "{{0}}"
                 default: []
               - service: input_boolean.turn_off
                 data: {}
@@ -608,7 +605,9 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
+                        value_template:
+                          "{{ states(delayed_job_completion_timer) == 'active'
+                          }}"
                     sequence:
                       - service: timer.cancel
                         data: {}
@@ -651,4 +650,4 @@ action:
 mode: restart
 max_exceeded: silent
 trace:
-    stored_traces: 10
+  stored_traces: 10
