@@ -84,13 +84,13 @@ Mine is a <strong>Meross MSS310EU</strong>, but most smart sockets should be sup
 ---
 
 ## ⚙️ **Initial Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
-There are two possible ways of doing this:
+There are **two possible ways** of doing this:
 
-- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little bit into shiny-but-dark UIs might want setup this blueprint with [this documentation here](Alternative%20UI%20Setup.md)
+- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little bit into shiny-but-dark UIs 😎 might want setup this blueprint following [this documentation here](Alternative%20UI%20Setup.md).
 
   ...
 
-- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans etc) in one shot. Continue reading for this one ⬇️
+- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans etc) in one shot. <i>Continue reading for this one</i> ⬇️
 
 Creating a package is super easy. Some of you may already have the right configuration in place, but I'll show you how to do that anyway.
 
@@ -102,7 +102,7 @@ Back to us, here are the two steps for creating a package:
    
     If you are a beginner or you are starting fresh with your HA installation, it's likely that the `packages` dir is not present.
    
-   To add it , you can:
+   To add it, you can:
    > Open your HomeAssistant VSCode editor and create a directory called `packages` (at the same level as the configuration.yaml file).
   
    OR
@@ -134,7 +134,7 @@ For example, I'm calling mine `washing_machine.yaml` but yours could be differen
 
 ><strong>PRESETS</strong> - If want to simplify this even more, check out one of the already pre-made [packages](home%20assistant/packages/) I prepared for you.
 
-Remember that in order to use the blueprint **you'll always need these four ingredients**:
+Remember that in order to use the blueprint **you'll always need these four ingredients** inside a package ([like so](home%20assistant/packages/your_appliance_name.yaml)):
 ### A. The State Machine
 
 ```yaml
@@ -182,11 +182,10 @@ input_boolean:
 
 **Important!** Don't forget to edit all the fields `<your_appliance_name>`, `<Your Appliance Name>` and `<your_appliance_icon>` accordingly.
 
-><strong>PRESETS</strong> - If want to simplify this even more, check out one of the already pre-made [packages](home%20assistant/packages/) I prepared for you.
-
+---
 
 # ➕ Download & Import
->Are you trying to update to a newer version? [Let's do that in a snap! Follow this instead](#to-update).
+>Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this  guide](#to-update).
 
 If you have just created your package, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
 
@@ -196,6 +195,7 @@ If you have just created your package, please reboot Home Assistant ([at this pa
    
 That's it!
 
+---
 ## Results 🎉
 ### You should see the 4 new entities:
 
