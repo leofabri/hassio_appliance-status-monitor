@@ -47,4 +47,6 @@ This is how you do that within the home assistant UI:
 
 Done!
 
+---
+
 ## Next Up: [You can now proceed with the Download & Import of the Blueprint](#-download--import)

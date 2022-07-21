@@ -16,6 +16,7 @@ My family ❤️s this thing! Even if they don’t understand its complexity and
 
 As I said, I’m sharing this with everyone. I’m sure that you’ll find it useful!
 
+---
 ## 📋 Features
 
 For the record: there is more inside but, here's a summary of what this thing allows you to do:
@@ -66,9 +67,10 @@ The objective of this automation is to allow a more granular control over what's
 <br>
 
 Let's install it!
-## What do I need to run this blueprint? 🗸
 
-### Premise
+---
+## Requirements: What do I need to run this blueprint? 🗸
+
 To achieve this level of control **the socket must have some basic features**: 
 - Power monitoring (a polling rate of circa 60 sec. or less for best results)
 - ON/OFF control over HomeAssistant
@@ -79,10 +81,16 @@ Mine is a <strong>Meross MSS310EU</strong>, but most smart sockets should be sup
 ### One more thing:
 - <u>OPTIONAL:</u> To get **the pause state** to work properly, **you also need another automation that can detect an overload**. I'm not the author of any of that, but the one I'm using is [here](https://github.com/andbad/HA_PowerControl) (disclaimer: it's just in Italian 🍝). <br>
 
-...
+---
 
-## Let's make some helper variables (<i style="text-color: red">mandatory</i>)
-The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans etc) in one shot.
+## **Initial Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
+There are two possible ways of doing this:
+
+- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little bit into shiny-but-dark UIs might want setup this blueprint with [this documentation here](Alternative%20UI%20Setup.md)
+
+  ...
+
+- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans etc) in one shot. Continue reading for this one ⬇️
 
 Creating a package is super easy. Some of you may already have the right configuration in place, but I'll show you how to do that anyway.
 
@@ -121,12 +129,12 @@ Back to us, here are the two steps for creating a package:
 **Now we are ready to create our first package**.
 
 Open the `packages/` directory and create a file with the name of your appliance.
-For example, I'm calling mine `washing_machine.yaml` but yours might be different of course. It's always better to call it something like `<your_appliance_name>.yaml`
+For example, I'm calling mine `washing_machine.yaml` but yours could be different. It's always better to call it something like `<your_appliance_name>.yaml`
 
 
 ><strong>PRESETS</strong> - If want to simplify this even more, check out one of the already pre-made [packages](home%20assistant/packages/) I prepared for you.
 
-Remember that in order to use the blueprint **you'll always need these ingredients**:
+Remember that in order to use the blueprint **you'll always need these four ingredients**:
 ### A. The State Machine
 
 ```yaml
