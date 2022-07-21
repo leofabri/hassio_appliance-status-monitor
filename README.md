@@ -244,7 +244,7 @@ ___
 
 ## **How do I know if there is a new version?**
 >
-> Easy! [Look for the current version number in the title](https://github.com/leofabri/hassio_appliance-status-monitor#-detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption). Now, open on eof the automations that currently uses this blueprint and notice the version tag:
+> Easy! [Look for the current version number in the title](https://github.com/leofabri/hassio_appliance-status-monitor#-detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption). Now, open one of the automations that currently uses this blueprint and notice the version tag:
 > <p align="center">
 >  <img src="assets/need-to-update.jpg" alt="Do I need to update?"/>
 </p>
