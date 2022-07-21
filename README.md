@@ -9,7 +9,7 @@
 
 This is the automation I made to control the state of the most power-hungry appliances in my house.
 
-There aren’t numerous blueprints that do what I want, and I’m sure that I have the skills to automate my machines without wasting money and buying them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
+There aren’t numerous blueprints that do what I want, and I’m sure that I have the skills to automate my machines without wasting money to buy them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
 
 I use this for my dishwasher and washing machine and the results have been great! The blueprint is very extensible and easy to use.
 My family ❤️s this thing! Even if they don’t understand its complexity and get what all the fuss is about.
@@ -241,10 +241,19 @@ ___
     > required one.<br>
 2. The changes related to the **older versions** are shown <u>[here](older_versions_changelog.md)</u>.
 ---
-##  <p id="update">**How to update:**</p>
+
+## **How do I know if there is a new version?**
 >
+> Easy! [Look for the current version number in the title](https://github.com/leofabri/hassio_appliance-status-monitor#-detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption). Now, open on eof the automations that currently uses this blueprint and notice the version tag:
+> <p align="center">
+>  <img src="assets/need-to-update.jpg" alt="Do I need to update?"/>
+</p>
+
+##  <p id="update">**How to update:**</p>
 >   * Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is for now.
 >   * Create the missing helpers (entities) as shown in the instructions
 >   * Add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml) and reload home assistant.
 >   * Open your automation and add the previously created helpers (entities)
 
+# Q&A - Things you may want to know
+[See the dedicated documentation](Frequent%20Questions%20and%20Answers.md)

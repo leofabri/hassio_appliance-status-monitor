@@ -1,5 +1,5 @@
 blueprint:
-  name: Monitor the status of an appliance - by leofabri
+  name: Monitor the state of an appliance - by leofabri
   description: >-
     `- Version: 2.1.1 -`
 
