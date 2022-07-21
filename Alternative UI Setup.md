@@ -7,7 +7,7 @@ Having the yaml configuration in place allows you to make your Home Assistant se
 
 However, if we truly want to make Home Assistant easier for less techy people, we still need to provide an easier way of creating helpers. 
 
-## Using the Hepers UI
+## Using the Hepers UI 📱
 
 This is how you do that within the home assistant UI:
 

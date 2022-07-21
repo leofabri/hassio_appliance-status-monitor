@@ -1,13 +1,13 @@
-# 🔌 Detect and monitor the status of an appliance based on its power consumption - V2.1.1 ✨
+# 🔌 Detect and monitor the state of an appliance based on its power consumption - V2.1.1 ✨
 ### Automation Blueprint for Home Assistant
 
 <br>
 
 <p align="center">
-  <img width="240" height="auto" src="assets/automation-tree.jpg" alt="Monitor the status of an appliance - by leofabri"/>
+  <img width="240" height="auto" src="assets/automation-tree.jpg" alt="Monitor the state of an appliance - by leofabri"/>
 </p>
 
-This is the automation I made to control the status of the most power-hungry appliances in my house.
+This is the automation I made to control the state of the most power-hungry appliances in my house.
 
 There aren’t numerous blueprints that do what I want, and I’m sure that I have the skills to automate my machines without wasting money and buying them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
 
@@ -17,18 +17,18 @@ My family ❤️s this thing! Even if they don’t understand its complexity and
 As I said, I’m sharing this with everyone. I’m sure that you’ll find it useful!
 
 ---
-## 📋 Features
+## **Features**
 
 For the record: there is more inside but, here's a summary of what this thing allows you to do:
-*   **More triggers: more control,** even across Home Assistant reboots!
+*   🎛️ **More triggers: more control,** even across Home Assistant reboots!
     *   **This automation is triggered on each power read**. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own.
-The objective of this automation is to allow a more granular control over what's happening do  that reliably.
+The objective of this automation is to allow a more granular control over what's happening and do that reliably.
 
-*   **Faster machine start-to-finish detection**: one of the problems that I always face is **timing**. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
+*   ⏱️ **Faster machine start-to-finish detection**: one of the problems that I always face is **timing**. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
   
-*   **Unreliable power absorption filtering and inhibition**: This is useful! It prevents the blueprint from thinking that a job was completed as soon as the power falls below the finishing power threshold. You can set your own timing here.
+*   📉 **Unreliable power absorption filtering and inhibition**: This is useful! It prevents the blueprint from thinking that a job was completed as soon as the power falls below the finishing power threshold. You can set your own timing here.
   
-*   **Set your own custom actions** for each of the following conditions:
+*   📅 **Set your own custom actions** for each of the following conditions:
       * when an overload occurs
       * when the overload situation is solved, now paused
       * when the appliance is plugged back in, now paused
@@ -41,7 +41,7 @@ The objective of this automation is to allow a more granular control over what's
 
 <br>
 
-*   **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
+*   🥷 **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
     *   So that you can tell if it's in one of the following states:
           - <strong><u><ins>unplugged</ins></u></strong> - means that the appliance is no longer powered. 
             It happens when the user manually turns off the smart socket (from HA or the socket itself).
@@ -69,12 +69,12 @@ The objective of this automation is to allow a more granular control over what's
 Let's install it!
 
 ---
-## Requirements: What do I need to run this blueprint? 🗸
+## 📋**Requirements:** What do I need to run this blueprint?
 
 To achieve this level of control **the socket must have some basic features**: 
 - Power monitoring (a polling rate of circa 60 sec. or less for best results)
 - ON/OFF control over HomeAssistant
-- Status reporting (if it's ON or OFF)
+- State reporting (if it's ON or OFF)
 
 Mine is a <strong>Meross MSS310EU</strong>, but most smart sockets should be supported.
 
@@ -83,7 +83,7 @@ Mine is a <strong>Meross MSS310EU</strong>, but most smart sockets should be sup
 
 ---
 
-## **Initial Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
+## ⚙️ **Initial Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
 There are two possible ways of doing this:
 
 - **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little bit into shiny-but-dark UIs might want setup this blueprint with [this documentation here](Alternative%20UI%20Setup.md)
