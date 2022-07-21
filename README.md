@@ -21,14 +21,14 @@ As I said, I’m sharing this with everyone. I’m sure that you’ll find it us
 
 For the record: there is more inside but, here's a summary of what this thing allows you to do:
 *   🎛️ **More triggers: more control,** even across Home Assistant reboots!
-    *   **This automation is triggered on each power read**. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own.
-The objective of this automation is to allow a more granular control over what's happening and do that reliably.
+    *   **This automation is triggered on each power reading**. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own.
+The objective of this blueprint is to allow more granular control over what's happening and do that reliably.
 
 *   ⏱️ **Faster machine start-to-finish detection**: one of the problems that I always face is **timing**. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
   
-*   📉 **Unreliable power absorption filtering and inhibition**: This is useful! It prevents the blueprint from thinking that a job was completed as soon as the power falls below the finishing power threshold. You can set your own timing here.
+*   📉 **Unreliable power absorption filtering and inhibition**: This is useful! It prevents the blueprint from thinking that a job was completed as soon as the power falls below the finishing power threshold. You can set your timing here.
   
-*   📅 **Set your own custom actions** for each of the following conditions:
+*   📅 **Set your custom actions** for each of the following conditions:
       * when an overload occurs
       * when the overload situation is solved, now paused
       * when the appliance is plugged back in, now paused
@@ -86,28 +86,28 @@ Mine is a <strong>Meross MSS310EU</strong>, but most smart sockets should be sup
 ## ⚙️ **Initial Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
 There are **two possible ways** of doing this:
 
-- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little bit into shiny-but-dark UIs 😎 might want setup this blueprint following [this documentation here](Alternative%20UI%20Setup.md).
+- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little bit into shiny-but-dark UIs 😎 might want to set up this blueprint following [this documentation here](Alternative%20UI%20Setup.md).
 
   ...
 
-- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans etc) in one shot. <i>Continue reading for this one</i> ⬇️
+- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans, etc) in one shot. <i>Continue reading for this one</i> ⬇️
 
 Creating a package is super easy. Some of you may already have the right configuration in place, but I'll show you how to do that anyway.
 
-> Note: you need to have the VScode intergation enabled. This will allow you to manually edit the necessary files. Need help with that? [Read this](https://www.home-assistant.io/docs/configuration/).
+> Note: you need to have the VScode integration enabled. This will allow you to manually edit the necessary files. Need help with that? [Read this](https://www.home-assistant.io/docs/configuration/).
 
 Back to us, here are the two steps for creating a package:
 
 1. **Make sure that you have a directory called 'packages'**.
    
-    If you are a beginner or you are starting fresh with your HA installation, it's likely that the `packages` dir is not present.
+    If you are a beginner or you are starting fresh with your HA installation, likely, the `packages` dir is not present.
    
    To add it, you can:
    > Open your HomeAssistant VSCode editor and create a directory called `packages` (at the same level as the configuration.yaml file).
   
    OR
 
-   > Issure this command in the terminal section of you VSCode:
+   > Issue this command in the terminal section of your VSCode:
    >
    >  ```
    > cd /config && mkdir packages
