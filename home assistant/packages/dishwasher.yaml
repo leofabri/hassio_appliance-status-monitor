@@ -5,8 +5,6 @@ timer:
     restore: true
     icon: mdi:dishwasher
 
-  # ...
-
 input_boolean:
   dishwasher_job_cycle:
     name: Dishwasher - Job Cycle
@@ -15,8 +13,6 @@ input_boolean:
   dishwasher_automation_self_trigger:
     name: Dishwasher - Automation Self-trigger
     icon: mdi:dishwasher
-
-  # ...
 
 input_select:
   dishwasher_state_machine:
@@ -29,5 +25,3 @@ input_select:
       - job_ongoing
       - job_completed
     icon: mdi:dishwasher
-
-  # ...

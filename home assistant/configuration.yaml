@@ -1,0 +1,7 @@
+# You likely have some configuration variables above
+
+homeassistant: # <- Look for this one. If it doesn't exist, create it
+  ## Packages support enabled
+  packages: !include_dir_named packages/ # Includes every package that is inside the packages/ directory
+
+# You likely have sone configuration variables below

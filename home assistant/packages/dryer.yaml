@@ -5,8 +5,6 @@ timer:
     restore: true
     icon: mdi:tumble-dryer
 
-  # ...
-
 input_boolean:
   dryer_job_cycle:
     name: Dryer - Job Cycle
@@ -15,8 +13,6 @@ input_boolean:
   dryer_automation_self_trigger:
     name: Dryer - Automation Self-trigger
     icon: mdi:tumble-dryer
-
-  # ...
 
 input_select:
   dryer_state_machine:
@@ -29,5 +25,3 @@ input_select:
       - job_ongoing
       - job_completed
     icon: mdi:tumble-dryer
-  
-  # ...

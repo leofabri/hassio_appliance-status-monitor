@@ -5,8 +5,6 @@ timer:
     restore: true
     icon: mdi:washing-machine
 
-  # ...
-
 input_boolean:
   washing_machine_job_cycle:
     name: Washing Machine - Job Cycle
@@ -15,8 +13,6 @@ input_boolean:
   washing_machine_automation_self_trigger:
     name: Washing Machine - Automation Self-trigger
     icon: mdi:washing-machine
-
-  # ...
 
 input_select:
   washing_machine_state_machine:
@@ -29,5 +25,3 @@ input_select:
       - job_ongoing
       - job_completed
     icon: mdi:washing-machine
-
-  # ...
