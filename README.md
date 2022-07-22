@@ -233,12 +233,15 @@ ___
 # Versions & Changelogs:
 ## 📯Important notice! 🚨
 ### 🆕 The code has been updated
-1. [**Version 2.1.1 of 07/21/2022**]() - [**FIX!**]
+1. [**Version 2.1.1 of 07/21/2022**](https://github.com/leofabri/hassio_appliance-status-monitor/tree/release/v2.1.1) - [**FIX!**]
    - Fixed [this bug](https://community.home-assistant.io/t/detect-and-monitor-the-state-of-an-appliance-based-on-its-power-consumption-v2-1-0/421670/37?u=leofabri):
     > ### Description:      
     > When you don’t indicate the Appliance suspended entity - which I
     > marked as optional - the automation becomes unresponsive, thus making the optional value a
     > required one.<br>
+
+  - Added some new documentation. You can decide to make your helpers through the UI instead of VSCode.
+  - We are now using packages instead of overloading the configuration.yaml file with the helpers.
 2. The changes related to the **older versions** are shown <u>[here](older_versions_changelog.md)</u>.
 ---
 
