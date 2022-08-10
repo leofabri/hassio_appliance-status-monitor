@@ -29,7 +29,7 @@ This is how you do that within the home assistant UI:
   
         Please respect the underscores and the lowercase letters. These states are very important and all needed.
 
-   2. **Type:** Button (The Job Cycle indicator)<br>
+   2. **Type:** Toggle (The Job Cycle indicator)<br>
       **Name:** Your Appliance Name - Job Cycle<br>
       **Icon:** mdi:<your_appliance_icon><br>
 
@@ -40,7 +40,7 @@ This is how you do that within the home assistant UI:
       **Duration:** 00:15:00 (leave it 15 minutes)<br>
       **Restore:** Checked, True
 
-   4. **Type:** Button (The automation self-trigger)<br>
+   4. **Type:** Toggle (The automation self-trigger)<br>
       **Name:** Your Appliance Name - Automation Self-trigger<br>
       **Icon:** mdi:<your_appliance_icon><br>
 
