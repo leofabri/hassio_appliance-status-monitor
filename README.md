@@ -12,7 +12,7 @@ This is the automation I made to control the state of the most power-hungry appl
 There aren’t numerous blueprints that do what I want, and I’m sure that I have the skills to automate my machines without wasting money to buy them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
 
 I use this for my dishwasher and washing machine and the results have been great! The blueprint is very extensible and easy to use.
-My family ❤️s this thing! Even if they don’t understand its complexity and get what all the fuss is about.
+My family ❤️ this thing! Even if they don’t understand its complexity and get what all the fuss is about.
 
 As I said, I’m sharing this with everyone. I’m sure that you’ll find it useful!
 
@@ -48,8 +48,8 @@ The objective of this blueprint is to allow more granular control over what's ha
             
           - <strong><u><ins>idle</ins></u></strong> - There is no pending job, the machine is powered but idling.
             
-          - <strong><u><ins>paused</ins></u></strong> - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it. The inhibitors of these state are the <strong><i>datached_overload</i></strong> and <strong><i>unplugged</i></strong> states. 
-            In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually or maybe the job needs some time to recover).
+          - <strong><u><ins>paused</ins></u></strong> - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it. The inhibitors of these state are the <strong><i>detached_overload</i></strong> and <strong><i>unplugged</i></strong> states. 
+            In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually, or maybe the job needs some time to recover).
             The blueprint is waiting for the appliance to resume.
 
             <strong>Pro Tip!</strong> You could use this state to diagnose and warn if a job is not resumed after x minutes. 
@@ -73,68 +73,72 @@ Let's install it!
 
 To achieve this level of control **the socket must have some basic features**: 
 - Power monitoring (a polling rate of circa 60 sec. or less for best results)
-- ON/OFF control over HomeAssistant
+- ON/OFF control over Home Assistant
 - State reporting (if it's ON or OFF)
 
 Mine is a <strong>Meross MSS310EU</strong>, but most smart sockets should be supported.
 
 ### One more thing:
-- <u>OPTIONAL:</u> To get **the pause state** to work properly, **you also need another automation that can detect an overload**. I'm not the author of any of that, but the one I'm using is [here](https://github.com/andbad/HA_PowerControl) (disclaimer: it's just in Italian 🍝). <br>
+- <u>OPTIONAL:</u> To get **the pause state** to work properly, **you also need another automation that can detect an overload**. I'm not the author of that, but the one I'm using is [here](https://github.com/andbad/HA_PowerControl) (disclaimer: it's just in Italian 🍝). <br>
 
 ---
 
 ## ⚙️ **Initial Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
 There are **two possible ways** of doing this:
 
-- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little bit into shiny-but-dark UIs 😎 might want to set up this blueprint following [this documentation here](Alternative%20UI%20Setup.md).
+- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little into shiny-but-dark UIs 😎 might want to set up this blueprint following [this documentation here](Alternative%20UI%20Setup.md).
 
   ...
 
-- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans, etc) in one shot. <i>Continue reading for this one</i> ⬇️
+- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans, etc.) in one shot. <i>Continue reading for this one</i> ⬇️
 
 Creating a package is super easy. Some of you may already have the right configuration in place, but I'll show you how to do that anyway.
 
-> Note: you need to have the VScode integration enabled. This will allow you to manually edit the necessary files. Need help with that? [Read this](https://www.home-assistant.io/docs/configuration/).
+> Note: you need to have the VS Code integration enabled. This will allow you to manually edit the necessary files. Need help with that? [Read this](https://www.home-assistant.io/docs/configuration/).
 
 Back to us, here are the two steps for creating a package:
 
 1. **Make sure that you have a directory called 'packages'**.
    
-    If you are a beginner or you are starting fresh with your HA installation, likely, the `packages` dir is not present.
+    If you are a beginner, or you are starting fresh with your HA installation, likely, the `packages` dir is not present.
    
    To add it, you can:
-   > Open your HomeAssistant VSCode editor and create a directory called `packages` (at the same level as the configuration.yaml file).
+   > Open your HomeAssistant VS Code editor and create a directory called `packages` (at the same level as the configuration.yaml file).
   
    OR
 
-   > Issue this command in the terminal section of your VSCode:
+   > Issue this command in the terminal section of your VS Code:
    >
    >  ```
    > cd /config && mkdir packages
    > ```
-   > easy peasy.
+   > Easy-peasy.
 
 
-   <u>**Result:**</u> You should see the packages directory <u>**at the same level**</u> as the `configuration.yaml` file.
+   <u>**Result:**</u> You should see the packages' directory <u>**at the same level**</u> as the `configuration.yaml` file.
 
 
-2. **Make sure that the packages support is enabled** inside of the `configuration.yaml` file as shown below:
+2. **Make sure that the packages support is enabled** inside the [`configuration.yaml`](home%20assistant/configuration.yaml) file as shown below:
 
     ```yaml
     homeassistant:
-      ## Packages support enabled - Includes every package that is inside the packages/ directory
+      ## Packages support enabled - Includes every .yaml file that is inside the packages/ directory
       packages: !include_dir_named packages/
+      ## Warning! Please pay attention to the indentation!
     ```
 
 **Now we are ready to create our first package**.
 
+### Use the presets
+><strong>PRESETS</strong> - If you want to simplify this setup even more, check out one of the already pre-made [packages](home%20assistant/packages/) I prepared for you. ([Washing Machine](home%20assistant/packages/washing_machine.yaml), [Dryer](home%20assistant/packages/dryer.yaml), [Dishwasher](home%20assistant/packages/dishwasher.yaml) and more are already supported)
+
+### Alternative, custom package definition:
+
 Open the `packages/` directory and create a file with the name of your appliance.
-For example, I'm calling mine `washing_machine.yaml` but yours could be different. It's always better to call it something like `<your_appliance_name>.yaml`
+For example, I'm calling mine `washing_machine.yaml` but yours could be different. It's always better to call it something like `<your_appliance_name>.yaml`. [Here's a blank file for that](home%20assistant/packages/your_appliance_name.yaml).
 
 
-><strong>PRESETS</strong> - If want to simplify this even more, check out one of the already pre-made [packages](home%20assistant/packages/) I prepared for you.
-
-Remember that in order to use the blueprint **you'll always need these four ingredients** inside a package ([like so](home%20assistant/packages/your_appliance_name.yaml)):
+Remember that in order to use the blueprint **you'll always need these four ingredients** inside a package:
 ### A. The State Machine
 
 ```yaml
@@ -185,11 +189,11 @@ input_boolean:
 ---
 
 # ➕ Download & Import
->Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this  guide](#to-update).
+>Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this guide](#to-update).
 
-If you have just created your package, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) -> Verify & if okay, Reboot)
+If you have just created your package, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) → Verify & if okay, Reboot)
 
-1.  Add this blueprint to your Home Assistant  [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
+1.  Add this blueprint to your Home Assistant [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
 2.  Create a New Automation from that blueprint
 3.  Configure the variables as indicated inside the blueprint's UI.
    
@@ -240,7 +244,7 @@ ___
     > marked as optional - the automation becomes unresponsive, thus making the optional value a
     > required one.<br>
 
-  - Added some new documentation. You can decide to make your helpers through the UI instead of VSCode.
+  - Added some new documentation. You can decide to make your helpers through the UI instead of VS Code.
   - We are now using packages instead of overloading the configuration.yaml file with the helpers.
 2. The changes related to the **older versions** are shown <u>[here](older_versions_changelog.md)</u>.
 ---
@@ -253,9 +257,9 @@ ___
 </p>
 
 ##  <p id="update">**How to update:**</p>
->   * Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few sec, you can leave the automation as it is for now.
+>   * Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few secs, you can leave the automation as it is for now.
 >   * Create the missing helpers (entities) as shown in the instructions
->   * Add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml) and reload home assistant.
+>   * Add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml) and reload Home Assistant.
 >   * Open your automation and add the previously created helpers (entities)
 
 # Q&A - Things you may want to know
