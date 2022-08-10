@@ -1,18 +1,18 @@
 # Introduction
 Some of you asked to document how to make the helpers using the Home Assistant UI instead of the editor.
 
-While I do agree that this might be useful for newcomers, I still believe that using the old good VSCode yaml solution is indeed the better option. 
+While I do agree that this might be useful for newcomers, I still believe that using the old good VS Code .yaml solution is indeed the better option. 
 
-Having the yaml configuration in place allows you to make your Home Assistant setup more modular and portable. You choose how to organize the helpers, and the overall result it's just better in my opinion. 
+Having the .yaml configuration in place allows you to make your Home Assistant setup more modular and portable. You choose how to organize the helpers, and the overall result it's just better in my opinion. 
 
-However, if we truly want to make Home Assistant easier for less techy people, we still need to provide an easier way of creating helpers. 
+However, if we truly want to make Home Assistant easier for less techie people, we still need to provide an easier way of creating helpers. 
 
-## Using the Hepers UI 📱
+## Using the Helpers UI 📱
 
 This is how you do that within the home assistant UI:
 
-1. Go to the Helpers page of your instance: [![Open your Home Assistant instance and show your helper entities.](https://my.home-assistant.io/badges/helpers.svg)](https://my.home-assistant.io/redirect/helpers/)
-2. Select "Create Helper" and now, Create these ones:
+1. Go to the Helpers' page of your instance: [![Open your Home Assistant instance and show your helper entities.](https://my.home-assistant.io/badges/helpers.svg)](https://my.home-assistant.io/redirect/helpers/)
+2. Select "Create Helper" and now, Create these:
 
 >**Important!** Don't forget to edit all the fields `<your_appliance_name>`, `Your Appliance Name` and `<your_appliance_icon>` accordingly.
 
@@ -27,7 +27,7 @@ This is how you do that within the home assistant UI:
         - job_ongoing<br>
         - job_completed<br>
   
-        Please respect the underscores and the lowcase letters. These states are very important and all needed.
+        Please respect the underscores and the lowercase letters. These states are very important and all needed.
 
    2. **Type:** Button (The Job Cycle indicator)<br>
       **Name:** Your Appliance Name - Job Cycle<br>

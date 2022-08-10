@@ -1,0 +1,4 @@
+{"rule":"NOW","sentence":"^\\QIdle - There is no pending job, the machine is powered but idling.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qidle - There is no pending job, the machine is powered but idling.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qpaused - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it.\\E$"}
+{"rule":"NOW","sentence":"^\\Qidle - There is no pending job, the machine is powered but idling.\\E$"}
