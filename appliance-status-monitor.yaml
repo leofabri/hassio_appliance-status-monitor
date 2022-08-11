@@ -90,10 +90,21 @@ blueprint:
           unit_of_measurement: W
           mode: slider
           step: 1.0
+    appliance_overload_state_enabled:
+      name: Appliance Overload State Enabled
+      description: >-
+        (*REQUIRED)
+
+
+        Activate this if you want your appliance to use the overload states.
+        Note: If you enable this one, you alsoo need the "Appliance Suspsended entity".
+      default: false
+      selector:
+        boolean:
     appliance_suspended_sensor:
       name: Appliance Suspended entity
       description: >-
-        (OPTIONAL)
+        (OPTIONAL | *REQUIRED if Appliance Overload State Enabled is On)
 
 
         An input_number variable that turns into a value > 0 when an overload occurs. That would
@@ -372,14 +383,12 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ appliance_suspended_sensor|length > 0 }}"
-          - condition: and
-            conditions:
-              - condition: template
-                value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
-              - condition: state
-                entity_id: !input "appliance_job_cycle"
-                state: "on"
+            value_template: "{{ appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 }}"
+          - condition: template
+            value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
+          - condition: state
+            entity_id: !input "appliance_job_cycle"
+            state: "on"
         sequence:
           - condition: not
             conditions:
@@ -399,7 +408,7 @@ action:
             entity_id: !input "appliance_job_cycle"
             state: "on"
           - condition: template
-            value_template: "{% if appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float <= 0.0 }}{% else %}true{% endif %}"
+            value_template: "{% if appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float <= 0.0 }}{% else %}true{% endif %}"
           - condition: template
             value_template: "{{ states(appliance_socket) == 'on' }}"
           - condition: numeric_state
@@ -430,14 +439,12 @@ action:
           - condition: not
             conditions:
               - condition: template
-                value_template: "{{ appliance_suspended_sensor|length > 0 }}"
-              - condition: and
-                conditions:
-                  - condition: template
-                    value_template: "{% if appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float > 0.0 }}{% else %}false{% endif %}"
-                  - condition: state
-                    entity_id: !input "appliance_state_machine"
-                    state: detached_overload
+                value_template: "{{ appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 }}"
+              - condition: template
+                value_template: "{% if appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float > 0.0 }}{% else %}false{% endif %}"
+              - condition: state
+                entity_id: !input "appliance_state_machine"
+                state: detached_overload
         sequence:
           - condition: not
             conditions:

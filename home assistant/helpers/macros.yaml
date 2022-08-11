@@ -1,0 +1,60 @@
+>
+
+  {## 
+      -- State translation macro --
+
+    This is a macro that translates each state into something more human-readable.
+    The following lines define how each state should be translated:
+      <state>: <translation to whatever I like>
+    This is very useful, as it allows you to customize how each state should be displayed on the UI.
+
+  ##}
+  {%- macro state_machine_translation(state) -%}
+  {% set STATE_MACHINE_TRANSLATION = {
+    "unplugged": "Unplugged",
+    "idle": "Idle",
+    "paused": "Paused",
+    "detached_overload": "Overload",
+    "job_ongoing": "Washing in progress",
+    "job_completed": "Washing completed",
+  } %}
+  {{ STATE_MACHINE_TRANSLATION[state]}}
+  {%- endmacro -%}
+
+  {{ state_machine_translation(states('input_select.washing_machine_state_machine')) }}
+
+
+
+  {## 
+      -- Extended state translation macro --
+
+    This is a macro that translates each state into something more human-readable.
+    The following lines define how each state should be translated:
+      <state>: <translation to whatever I like>
+    This is very useful, as it allows you to customize how each state should be displayed on the UI.
+
+  ##}
+  {%- macro extended_state_machine_translation(state) -%}
+  {% set STATE_MACHINE_TRANSLATION = {
+    "unplugged": "is unplugged",
+    "idle": "is Idle but ready",
+    "paused": "has been paused and waiting to resume the pending job",
+    "detached_overload": "has been detached temporarily since it caused an overload on the grid",
+    "job_ongoing": "is currently is washing the laundry",
+    "job_completed": "has finished washing",
+  } %}
+  The washing machine {{ STATE_MACHINE_TRANSLATION[state]}}
+  {%- endmacro -%}
+
+  {{ extended_state_machine_translation(states('input_select.washing_machine_state_machine')) }}.
+
+
+
+
+  {# a macro that removes all newline characters, empty spaces, and returns formatted text #}
+  {%- macro cleanup(data) -%}
+    {%- for item in data.split("\n")  if item | trim != "" -%}
+      {{ item | trim }} {% endfor -%}
+  {%- endmacro -%}
+
+  

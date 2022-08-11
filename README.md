@@ -1,3 +1,4 @@
+# Warning! This release is still under development
 # 🔌 Detect and monitor the state of an appliance based on its power consumption - V2.1.1 ✨
 ### Automation Blueprint for Home Assistant
 
@@ -5,6 +6,11 @@
 
 <p align="center">
   <img width="240" height="auto" src="assets/automation-tree.jpg" alt="Monitor the state of an appliance - by leofabri"/>
+</p>
+
+<p align="center" position="absolute">
+  <img width="120" height="auto" src="assets/washing_machine_widget.jpg" alt="Monitor the state of an appliance - by leofabri"/>
+  <img width="320" height="auto" src="assets/washing_machine_widget_markdown.jpg" alt="Monitor the state of an appliance - by leofabri"/>
 </p>
 
 This is the automation I made to control the state of the most power-hungry appliances in my house.
