@@ -1,0 +1,62 @@
+timer:
+  micro_wave_delayed_job_completion_timer:
+    name: Microwave - Delayed Job Completion Timer
+    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:microwave
+
+input_boolean:
+  micro_wave_job_cycle:
+    name: Microwave - Job Cycle
+    icon: mdi:microwave
+
+  micro_wave_automation_self_trigger:
+    name: Microwave - Automation Self-trigger
+    icon: mdi:microwave
+
+input_select:
+  micro_wave_state_machine:
+    name: Microwave - State Machine
+    options:
+      - unplugged
+      - idle
+      - paused
+      - detached_overload
+      - job_ongoing
+      - job_completed
+    icon: mdi:microwave
+
+template: [] # <- IMPORTANT! Remove the [] if you enable any macro
+  ## -- MACROS --
+  ## 
+  ## **OPTIONAL**
+  ## NAME: State translation macro
+  ## INSTRUCTIONS: https://github.com/leofabri/hassio_appliance-status-monitor/issues/16#issuecomment-1211764562
+  ## DSCRIPTION: This macro translates each state into something more human-readable.
+  ##             A sensor is created and available to the user.
+  ##             The following lines define how each state should be translated:
+  ##                <state>: <translation to whatever I like>
+  ##
+  ##             It allows you to customize how each state should be displayed on the UI.
+
+  ## The template below is disabled by default, 
+  ## if you want to enable it you need to uncomment the lines that will follow (remove all the '# ').
+  ## Press ctrl + K & ctrl + U to uncomment from VSCode. 
+
+#   - sensor:
+#       - name: Microwave Current State - Translated
+#         unique_id: micro_wave_current_state_translated
+#         icon: "mdi:microwave"
+#         state: >
+#           {%- macro state_machine_translation(state) -%}
+#           {% set STATE_MACHINE_TRANSLATION = {
+#             "unplugged": "Unplugged",
+#             "idle": "Idle",
+#             "paused": "Paused",
+#             "detached_overload": "Overload",
+#             "job_ongoing": "Washing in progress",
+#             "job_completed": "Washing completed",
+#           } %}
+#           {{ STATE_MACHINE_TRANSLATION[state]}}
+#           {%- endmacro -%}
+#           {{ state_machine_translation(states('input_select.micro_wave_state_machine')) }}

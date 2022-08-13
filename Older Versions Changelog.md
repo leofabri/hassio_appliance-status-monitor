@@ -1,4 +1,4 @@
-## Changelogs:
+## Changelogs
 
 These are the older versions of the blueprint. 
 The current release is always shown in the main [README.md](/README.md) file.
@@ -14,9 +14,9 @@ The current release is always shown in the main [README.md](/README.md) file.
 
 3. [**Version 2.0.0 of 05/20/2022**](https://github.com/leofabri/hassio_appliance-status-monitor/tree/v2.0.0) - [**MAJOR UPDATE**] Introduces a ton of new features:
 
-   - **+-FIXED+- some subtle 🐛🐛🐛**: I hate bugs (the coded ones of course)! I did notice some strange and unwanted behavior during some state transitions. V1.0.1 seems to become unreliable when the user manually turns on and off the smart socket. This is a fix to that and to other smaller things.
+   - **±FIXED± some subtle 🐛🐛🐛**: I hate bugs (the coded ones of course)! I did notice some strange and unwanted behavior during some state transitions. V1.0.1 seems to become unreliable when the user manually turns on and off the smart socket. This is a fix to that and to other smaller things.
 
-   - **+ADDED+ Low Power Threshold -> job_completed inhibition**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
+   - **+ADDED+ Low Power Threshold → job_completed inhibition**: [@siklosi](https://community.home-assistant.io/t/detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption-updated-v1-0-1/421670/4?u=leofabri) found that some appliances may intermittently absorb less than the Low Power Threshold, and that causes the automation to act like if multiple jobs were started and finished consecutively.
   
       This version aims to fix this issue by waiting and checking if, during that period, the appliance's power consumption rises again. 
       The only disadvantage is that waiting for a long time also means that a possible job length estimate is less accurate because the state machine is not as reactive.

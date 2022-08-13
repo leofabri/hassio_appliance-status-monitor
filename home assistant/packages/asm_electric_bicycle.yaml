@@ -1,0 +1,62 @@
+timer:
+  electric_bicycle.yamldelayed_job_completion_timer:
+    name: Electric Bicycle - Delayed Job Completion Timer
+    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:bicycle-electric
+
+input_boolean:
+  electric_bicycle_job_cycle:
+    name: Electric Bicycle - Job Cycle
+    icon: mdi:bicycle-electric
+
+  electric_bicycle_automation_self_trigger:
+    name: Electric Bicycle - Automation Self-trigger
+    icon: mdi:bicycle-electric
+
+input_select:
+  electric_bicycle_state_machine:
+    name: Electric Bicycle - State Machine
+    options:
+      - unplugged
+      - idle
+      - paused
+      - detached_overload
+      - job_ongoing
+      - job_completed
+    icon: mdi:bicycle-electric
+
+template: [] # <- IMPORTANT! Remove the [] if you enable any macro
+  ## -- MACROS --
+  ## 
+  ## **OPTIONAL**
+  ## NAME: State translation macro
+  ## INSTRUCTIONS: https://github.com/leofabri/hassio_appliance-status-monitor/issues/16#issuecomment-1211764562
+  ## DSCRIPTION: This macro translates each state into something more human-readable.
+  ##             A sensor is created and available to the user.
+  ##             The following lines define how each state should be translated:
+  ##                <state>: <translation to whatever I like>
+  ##
+  ##             It allows you to customize how each state should be displayed on the UI.
+
+  ## The template below is disabled by default, 
+  ## if you want to enable it you need to uncomment the lines that will follow (remove all the '# ').
+  ## Press ctrl + K & ctrl + U to uncomment from VSCode. 
+
+#   - sensor:
+#       - name: Electric Bicycle Current State - Translated
+#         unique_id: electric_bicycle_current_state_translated
+#         icon: "mdi:bicycle-electric"
+#         state: >
+#           {%- macro state_machine_translation(state) -%}
+#           {% set STATE_MACHINE_TRANSLATION = {
+#             "unplugged": "Unplugged",
+#             "idle": "Idle",
+#             "paused": "Paused",
+#             "detached_overload": "Overload",
+#             "job_ongoing": "Washing in progress",
+#             "job_completed": "Washing completed",
+#           } %}
+#           {{ STATE_MACHINE_TRANSLATION[state]}}
+#           {%- endmacro -%}
+#           {{ state_machine_translation(states('input_select.electric_bicycle_state_machine')) }}

@@ -1,7 +1,7 @@
 blueprint:
   name: Monitor the state of an appliance - by leofabri
   description: >-
-    `- Version: 2.1.1 -`
+    `- Version: 3.0.0 -`
 
 
     This automation can detect and monitor the state of your appliances by observing their power consumption.
@@ -227,6 +227,23 @@ blueprint:
       default: []
       selector:
         action:
+    job_completed_persist_for:
+      name: Persist the completion of a job for
+      description: >-
+        (OPTIONAL | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
+
+
+        This defines for how long the blueprint should "wait" before going from the job_completed -> idle state.
+        Setting this to 0 will disable the waiting. This means that once the job has been done, if a new power reading is receives, the state will immediately transition to idle. 
+        It could be minutes, or less than a second.
+      default: 60
+      selector:
+        number:
+          min: 0
+          max: 10
+          step: 1
+          unit_of_measurement: minutes
+          mode: slider
     actions_job_cycle_ends:
       name: Action(s) when a job cycle is finished
       description: >-
@@ -311,6 +328,7 @@ variables:
   appliance_suspended_sensor: !input "appliance_suspended_sensor"
   delayed_job_completion_duration: !input "delayed_job_completion_duration"
   delayed_job_completion_timer: !input "delayed_job_completion_timer"
+  appliance_overload_state_enabled: !input "appliance_overload_state_enabled"
 trigger:
   - platform: state
     entity_id: !input "appliance_power_sensor"
@@ -383,7 +401,8 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 }}"
+            value_template: > 
+              {{ appliance_overload_state_enabled }}
           - condition: template
             value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
           - condition: state
@@ -408,7 +427,7 @@ action:
             entity_id: !input "appliance_job_cycle"
             state: "on"
           - condition: template
-            value_template: "{% if appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float <= 0.0 }}{% else %}true{% endif %}"
+            value_template: "{% if appliance_overload_state_enabled %}{{ states(appliance_suspended_sensor) | float <= 0.0 }}{% else %}true{% endif %}"
           - condition: template
             value_template: "{{ states(appliance_socket) == 'on' }}"
           - condition: numeric_state
@@ -438,10 +457,10 @@ action:
             value_template: "{{ states(appliance_socket) == 'off' }}"
           - condition: not
             conditions:
+              # - condition: template
+              #   value_template: "{{ appliance_overload_state_enabled }}"
               - condition: template
-                value_template: "{{ appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 }}"
-              - condition: template
-                value_template: "{% if appliance_overload_state_enabled and appliance_suspended_sensor|length > 0 %}{{ states(appliance_suspended_sensor) | float > 0.0 }}{% else %}false{% endif %}"
+                value_template: "{% if appliance_overload_state_enabled %}{{ states(appliance_suspended_sensor) | float > 0.0 }}{% else %}false{% endif %}"
               - condition: state
                 entity_id: !input "appliance_state_machine"
                 state: detached_overload
