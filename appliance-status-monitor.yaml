@@ -22,7 +22,7 @@ blueprint:
 
     * **<ins>idle</ins>** - There is no pending job, the machine is powered but idling.
 
-    * **paused** - Indicates that a job is pending (incomplete cycle), but the appliance is not performing it. The inhibitors of these state are the ***detached_overload*** and ***unplugged*** states. In this condition the power consumption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually, or maybe the job needs some time to recover). The blueprint is waiting for the appliance to resume. **Pro Tip!** You could also use this to diagnose and warn if a job is not resumed after x minutes.
+    * **<ins>paused</ins>** - Indicates that a job is pending (incomplete cycle), but the appliance is not performing it. The inhibitors of these state are the ***detached_overload*** and ***unplugged*** states. In this condition the power consumption is lower than the finishing power threshold. The appliance must be off (maybe the user turned it off manually, or maybe the job needs some time to recover). The blueprint is waiting for the appliance to resume. **Pro Tip!** You could also use this to diagnose and warn if a job is not resumed after x minutes.
 
     * **<ins>detached_overload</ins>** - This happens when, during a cycle, the appliance used too much power and was suspended. It is also technically unplugged but we don't say that.
 
@@ -63,10 +63,12 @@ blueprint:
       description: >-
         (*REQUIRED)
 
-        The **Starting Power threshold** must always be **>** than the **Finishing Power threshold**.
 
         Power threshold above which we assume the appliance has started
         a new job or is resuming the current one (job_ongoing state).
+
+
+        The **Starting Power threshold** must always be **>** than the **Finishing Power threshold**.
       default: 5
       selector:
         number:
@@ -75,16 +77,52 @@ blueprint:
           unit_of_measurement: W
           mode: slider
           step: 1.0
+    delayed_job_ongoing_timer:
+      name: Delayed Job Ongoing timer
+      description: >-
+        (*REQUIRED | Helper | Name: <i><strong><your_appliance_name>_delayed_job_ongoing_timer</i></strong> | [?](https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/home%20assistant/packages/your_appliance_name.yaml#L2))
+
+
+        The timer that will allow to 'wait' & 'see' before assuming that a new job has started
+      default: []
+      selector:
+        entity:
+          domain: timer
+
+    delayed_job_ongoing_duration:
+      name: Delayed Job Completion duration
+      description: >-
+        (OPTIONAL | Helper | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
+
+
+        During a job cycle, some appliances may intermittently use more power than the starting power threshold, 
+        thus entering the job_ongoing state (even when the job is not really started).
+
+        With this value set, the automation will wait for the indicated time in seconds, and see if in that timespan the power consumption stays higher than the starting power threshold.
+
+        ...
+
+        <i><strong>WARNING:</strong> Setting a duration introduces a delay on the transition to the 'job_ongoing' state.
+        Please make sure that you really need this, or leave it 0 if unsure.</i>
+      default: 0.0
+      selector:
+        number:
+          min: 0.0
+          max: 900.0
+          step: 1.0
+          unit_of_measurement: seconds
+          mode: slider
     appliance_finishing_power_threshold:
       name: Finishing power threshold
       description: >-
         (*REQUIRED)
 
-        The **Finishing Power threshold** must always be **<** than the **Starting Power threshold**.
-
         Power threshold below which we assume the appliance has finished
         a job (job_completed state).
-      default: 3
+
+
+        The **Finishing Power threshold** must always be **<** than the **Starting Power threshold**.
+      default: 3.0
       selector:
         number:
           min: 0.1
@@ -92,6 +130,29 @@ blueprint:
           unit_of_measurement: W
           mode: slider
           step: 0.1
+    delayed_job_completion_duration: # TODO: This should be renamed 'dalayed_job_finish_timer', but the value assigned by the user would be lost.
+      name: Delayed Job Completion duration
+      description: >-
+        (OPTIONAL | Helper | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
+
+
+        During a job cycle, some appliances may intermittently use less power than the finishing power threshold, 
+        thus entering the job_completed state (even when the job is not finished).
+
+        With this value set, the automation will wait for the indicated time in seconds, and see if in that timespan the power consumption rises.
+
+        ...
+
+        <i><strong>WARNING:</strong> Setting a duration introduces a delay on the transition to the 'job_completed' state.
+        Please make sure that you really need this, or leave it 0 if unsure.</i>
+      default: 0.0
+      selector:
+        number:
+          min: 0.0
+          max: 900.0
+          step: 1.0
+          unit_of_measurement: seconds
+          mode: slider
     appliance_overload_state_enabled:
       name: Appliance Overload State Enabled
       description: >-
@@ -172,31 +233,12 @@ blueprint:
       selector:
         entity:
           domain: input_boolean
-    delayed_job_completion_duration:
-      name: Delayed Job Completion duration
-      description: >-
-        (OPTIONAL | Helper | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
 
-
-        During a job cycle, some appliances may intermittently use less power than the finishing power threshold, 
-        thus entering the job_completed state (even when the job is not finished).
-
-        With this value set, the automation will wait for the indicated time in seconds, and see if in that timespan the power consumption rises.
-
-        ...
-
-        <strong>WARNING:</strong> Setting a duration introduces a delay on the transition to the 'job_completed' state.
-        Please make sure that you really need this, or leave it 0 if unsure.
-      default: 0.0
-      selector:
-        number:
-          min: 0.0
-          max: 900.0
-          step: 1.0
-          unit_of_measurement: seconds
-          mode: slider
+    #####################
+    # FLAG: ACTIONS #
+    #####################
     actions_new_job_cycle_begins:
-      name: Action(s) when a new job cycle begins
+      name: ACTION(S) - when a new job cycle begins
       description: >-
         Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
@@ -204,16 +246,16 @@ blueprint:
 
         ...
 
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
+        <i>**WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
-        This section is meant to be used to trigger other things.
+        This section is meant to be used to trigger other things.</i>
 
         If you really need to trigger long operations, a clean solution is to dispatch the work by calling other services or using the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
     actions_job_cycle_resumes:
-      name: Action(s) when a job cycle resumes
+      name: ACTION(S) - when a job cycle resumes
       description: >-
         Executed when a pending job cycle is resumed (<strong>paused | unplugged | detached_overload -> job_ongoing</strong>
         state).
@@ -221,15 +263,15 @@ blueprint:
 
         ...
 
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
+        <i>**WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
-        This section is meant to be used to trigger other things.
+        This section is meant to be used to trigger other things.</i>
 
         If you really need to trigger long operations, a clean solution is to dispatch the work by calling other services or using the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
-    job_completed_persist_for:
+    job_completed_persist_duration:
       name: Persist the completion of a job for
       description: >-
         (OPTIONAL | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
@@ -247,90 +289,106 @@ blueprint:
           unit_of_measurement: minutes
           mode: slider
     actions_job_cycle_ends:
-      name: Action(s) when a job cycle is finished
+      name: ACTION(S) - when a job cycle is finished
       description: >-
         Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
 
         ...
 
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
+        <i>**WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
-        This section is meant to be used to trigger other things.
+        This section is meant to be used to trigger other things.</i>
 
         If you really need to trigger long operations, a clean solution is to dispatch the work by calling other services or using the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
     actions_unplugged_overload:
-      name: Action(s) when an overload occurs
+      name: ACTION(S) - when an overload occurs
       description: >-
         Executed when the appliance is detected as unplugged (because of an overload
         situation).
 
         ...
 
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
+        <i>**WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
-        This section is meant to be used to trigger other things.
+        This section is meant to be used to trigger other things.</i>
 
         If you really need to trigger long operations, a clean solution is to dispatch the work by calling other services or using the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
     actions_paused_after_overload:
-      name: Action(s) when the overload situation is solved, now paused
+      name: ACTION(S) - when the overload situation is solved, now paused
       description: >-
         Executed when the state changes from <strong>detached_overload -> paused</strong> (NOT resuming the job).
 
         ...
 
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
+        <i>**WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
-        This section is meant to be used to trigger other things.
+        This section is meant to be used to trigger other things.</i>
 
         If you really need to trigger long operations, a clean solution is to dispatch the work by calling other services or using the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
     actions_resuming_after_overload:
-      name: Action(s) when the overload situation is solved, now resuming
+      name: ACTION(S) - when the overload situation is solved, now resuming
       description: >-
         Executed when the state changes from <strong>detached_overload
         -> job_ongoing</strong> (resuming the previous job).
 
         ...
 
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
+        <i>**WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
-        This section is meant to be used to trigger other things.
+        This section is meant to be used to trigger other things.</i>
 
         If you really need to trigger long operations, a clean solution is to dispatch the work by calling other services or using the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
     actions_paused_after_unplugged:
-      name: Action(s) when the appliance is plugged back in, now paused
+      name: ACTION(S) - when the appliance is plugged back in, now paused
       description: >-
         Executed when the state changes from <strong>unplugged -> paused</strong> (NOT resuming the job).
 
         ...
 
-        **WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
+        <i>**WARNING:** Just use non-blocking actions in this space! No delays, actionable notifications, TTS, waits, or anything that takes time to execute. 
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
-        This section is meant to be used to trigger other things.
+        This section is meant to be used to trigger other things.</i>
 
         If you really need to trigger long operations, a clean solution is to dispatch the work by calling other services or using the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
+          
+
   source_url: https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/appliance-status-monitor.yaml
+
+# FLAG: Variables
 variables:
+  # Socket info
   appliance_socket: !input "appliance_socket"
   appliance_suspended_sensor: !input "appliance_suspended_sensor"
-  delayed_job_completion_duration: !input "delayed_job_completion_duration"
-  delayed_job_completion_timer: !input "delayed_job_completion_timer"
+
+  # Delays
+  delayed_job_ongoing_duration: !input "delayed_job_ongoing_duration"       # precedes job_start
+  delayed_job_completion_duration: !input "delayed_job_completion_duration" # precedes job_completed
+  job_completed_persist_duration: !input "job_completed_persist_duration"
+
+  # Timer entities
+  delayed_job_ongoing_timer: !input "delayed_job_ongoing_timer"        # precedes job_start
+  delayed_job_completion_timer: !input "delayed_job_completion_timer"   # precedes job_completed
+  
+  # Blueprint settings
   appliance_overload_state_enabled: !input "appliance_overload_state_enabled"
+
+# FLAG: Triggers
 trigger:
   - platform: state
     entity_id: !input "appliance_power_sensor"
@@ -364,6 +422,12 @@ trigger:
   - platform: event
     event_type: timer.finished
     event_data:
+      entity_id: !input "delayed_job_ongoing_timer"
+    id: job_started_timer_finished
+
+  - platform: event
+    event_type: timer.finished
+    event_data:
       entity_id: !input "delayed_job_completion_timer"
     id: job_completed_timer_finished
 
@@ -390,16 +454,24 @@ condition:
       - condition: trigger
         id: automation_self_triggered
       - condition: trigger
+        id: job_started_timer_finished
+      - condition: trigger
         id: job_completed_timer_finished
       - condition: trigger
         id: home_assistant_started_event
       - condition: trigger
         id: automation_reloaded_event
+
+# FLAG: Logic
 action:
   - service: input_boolean.turn_off
     data: {}
     target:
       entity_id: !input "automation_self_trigger"
+
+  ##################################################
+  # NOTE: "detached_overload" state handling logic #
+  ##################################################
   - choose:
       - conditions:
           - condition: template
@@ -418,11 +490,16 @@ action:
                 state: detached_overload
           - service: input_select.select_option
             data:
-              option: detached_overload
+              option: detached_overload # FLAG: detached_overload STATE TRANSITION
             target:
               entity_id: !input "appliance_state_machine"
           - choose: []
             default: !input "actions_unplugged_overload"
+
+
+  ##################################################
+  # NOTE: "paused" state handling logic            #
+  ##################################################
   - choose:
       - conditions:
           - condition: state
@@ -451,9 +528,14 @@ action:
         sequence:
           - service: input_select.select_option
             data:
-              option: paused
+              option: paused # FLAG: paused STATE TRANSITION
             target:
               entity_id: !input "appliance_state_machine"
+      
+      
+        ##################################################
+        # NOTE: "unplugged" state handling logic         #
+        ##################################################
       - conditions:
           - condition: template
             value_template: "{{ states(appliance_socket) == 'off' }}"
@@ -474,7 +556,7 @@ action:
                 state: unplugged
           - service: input_select.select_option
             data:
-              option: unplugged
+              option: unplugged # FLAG: unplugged STATE TRANSITION
             target:
               entity_id: !input "appliance_state_machine"
           - choose:
@@ -505,6 +587,10 @@ action:
           - choose: []
             default: !input "actions_resuming_after_overload"
     default:
+      
+        ##################################################
+        # NOTE: "job_ongoing" state handling logic       #
+        ##################################################
       - choose:
           - conditions:
               - condition: template
@@ -513,6 +599,7 @@ action:
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
             sequence:
+              # Delete the delayed_job_completion_timer if it's running
               - choose:
                   - conditions:
                       - condition: template
@@ -524,6 +611,73 @@ action:
                         data: {}
                         target:
                           entity_id: !input "delayed_job_completion_timer"
+
+                # IF
+              - conditions:
+                  # the timer isn't active
+                  - condition: template
+                    value_template:
+                      "{{ states(delayed_job_ongoing_timer) != 'active'
+                      }}"
+                  # the job_completed_timer didn't trigger this automation this time
+                  - condition: not
+                    conditions:
+                      - condition: trigger
+                        id: job_started_timer_finished
+                sequence:
+                  # Start the timer, strart counting backwards
+                  - service: timer.start
+                    data: {}
+                    target:
+                      entity_id: !input "delayed_job_ongoing_timer"
+              - choose:
+                  # if the timer should last for a time that is not 0
+                  - conditions:
+                      - condition: template
+                        value_template: "{{ delayed_job_ongoing_duration > 0 }}"
+                    sequence:
+                      - choose:
+                          # if the elapsed time is less than the wanted delayed_job_ongoing_duration
+                          - conditions:
+                              - condition: template
+                                value_template:
+                                  "{% if states(delayed_job_ongoing_timer) == 'active'\
+                                  \ %}\n  {% set t_expiring_date = state_attr(delayed_job_ongoing_timer,\
+                                  \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
+                                  \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
+                                  \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_ongoing_timer,\
+                                  \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
+                                  \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
+                                  \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
+                                  \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec)\
+                                  \ | int %}\n  {{ t_elapsed_sec < (delayed_job_ongoing_duration)\
+                                  \ | int }}\n{% else %}\n  {{0}}\n{% endif %}"
+                            sequence:
+                              # try to wait here until the remaining time is elapsed
+                              - delay:
+                                  seconds:
+                                    "{% if states(delayed_job_ongoing_timer) == 'active'\
+                                    \ %}\n  {% set t_expiring_date = state_attr(delayed_job_ongoing_timer,\
+                                    \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
+                                    \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
+                                    \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_ongoing_timer,\
+                                    \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
+                                    \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
+                                    \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
+                                    \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec -\
+                                    \ t_remaining_sec) | int %}\n  {% set t_remaining = ((delayed_job_ongoing_duration)\
+                                    \ | int) - t_elapsed_sec %}\n  \n  {{ 1 + t_remaining }}\n{% else\
+                                    \ %}\n  {{ 1 + (delayed_job_ongoing_duration) | int }}\n{%\
+                                    \ endif %}"
+                              # if the delay is elapsed, self trig the atomation
+                              - service: input_boolean.turn_on
+                                data: {}
+                                target:
+                                  entity_id: !input "automation_self_trigger"
+                              # make sure that the execution doesn't continue. So that the job_completed state is not reached. Likely not necessary.
+                              - condition: template
+                                value_template: "{{0}}"
+                default: [] # Do nothing. End
               - condition: not
                 conditions:
                   - condition: state
@@ -531,9 +685,19 @@ action:
                     state: job_ongoing
               - service: input_select.select_option
                 data:
-                  option: job_ongoing
+                  option: job_ongoing # FLAG: job_ongoing STATE TRANSITION
                 target:
                   entity_id: !input "appliance_state_machine"
+              - conditions:
+                  - condition: template
+                    value_template:
+                      "{{ states(delayed_job_ongoing_timer) == 'active'
+                      }}"
+                sequence:
+                  - service: timer.cancel
+                    data: {}
+                    target:
+                      entity_id: !input "delayed_job_ongoing_timer"
               - choose:
                   - conditions:
                       - condition: state
@@ -549,40 +713,57 @@ action:
                 default:
                   - choose: []
                     default: !input "actions_job_cycle_resumes"
+              
+
+
+          ##################################################
+          # NOTE: "job_completed" state handling logic     #
+          ##################################################
+          # IF
           - conditions:
+              # The job is currently ongoing
               - condition: state
                 entity_id: !input "appliance_state_machine"
                 state: job_ongoing
+              # The job cycle is still in progress
               - condition: state
                 entity_id: !input "appliance_job_cycle"
                 state: "on"
+              # The socket is on
               - condition: template
                 value_template: "{{ states(appliance_socket) == 'on' }}"
+              # A value below the finishing power threshold is received
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 below: !input "appliance_finishing_power_threshold"
             sequence:
               - choose:
+                  # IF
                   - conditions:
+                      # the timer isn't active
                       - condition: template
                         value_template:
                           "{{ states(delayed_job_completion_timer) != 'active'
                           }}"
+                      # the job_completed_timer didn't trigger this automation this time
                       - condition: not
                         conditions:
                           - condition: trigger
                             id: job_completed_timer_finished
                     sequence:
+                      # Start the timer, strart counting backwards
                       - service: timer.start
                         data: {}
                         target:
                           entity_id: !input "delayed_job_completion_timer"
               - choose:
+                  # if the timer should last for a time that is not 0
                   - conditions:
                       - condition: template
                         value_template: "{{ delayed_job_completion_duration > 0 }}"
                     sequence:
                       - choose:
+                          # if the elapsed time is less than the wanted delayed_job_completion_duration
                           - conditions:
                               - condition: template
                                 value_template:
@@ -598,6 +779,7 @@ action:
                                   \ | int %}\n  {{ t_elapsed_sec < (delayed_job_completion_duration)\
                                   \ | int }}\n{% else %}\n  {{0}}\n{% endif %}"
                             sequence:
+                              # try to wait here until the remaining time is elapsed
                               - delay:
                                   seconds:
                                     "{% if states(delayed_job_completion_timer) == 'active'\
@@ -613,20 +795,22 @@ action:
                                     \ | int) - t_elapsed_sec %}\n  \n  {{ 1 + t_remaining }}\n{% else\
                                     \ %}\n  {{ 1 + (delayed_job_completion_duration) | int }}\n{%\
                                     \ endif %}"
+                              # if the delay is elapsed, self trig the atomation
                               - service: input_boolean.turn_on
                                 data: {}
                                 target:
                                   entity_id: !input "automation_self_trigger"
+                              # make sure that the execution doesn't continue. So that the job_completed state is not reached. Likely not necessary.
                               - condition: template
                                 value_template: "{{0}}"
-                default: []
+                default: [] # Do nothing. End
               - service: input_boolean.turn_off
                 data: {}
                 target:
                   entity_id: !input "appliance_job_cycle"
               - service: input_select.select_option
                 data:
-                  option: job_completed
+                  option: job_completed # FLAG: job_completed STATE TRANSITION
                 target:
                   entity_id: !input "appliance_state_machine"
               - choose:
@@ -658,6 +842,10 @@ action:
                         target:
                           entity_id: !input "automation_self_trigger"
         default:
+          
+          ##################################################
+          # NOTE: "idle" state handling logic              #
+          ##################################################
           - choose:
               - conditions:
                   - condition: state
@@ -671,7 +859,7 @@ action:
                 sequence:
                   - service: input_select.select_option
                     data:
-                      option: idle
+                      option: idle # FLAG: idle STATE TRANSITION
                     target:
                       entity_id: !input "appliance_state_machine"
 mode: restart
