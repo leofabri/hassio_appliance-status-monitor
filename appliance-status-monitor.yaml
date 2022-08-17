@@ -130,7 +130,7 @@ blueprint:
           unit_of_measurement: W
           mode: slider
           step: 0.1
-    delayed_job_completion_duration: # TODO: This should be renamed 'dalayed_job_finish_timer', but the value assigned by the user would be lost.
+    delayed_job_completion_duration:
       name: Delayed Job Completion duration
       description: >-
         (OPTIONAL | Helper | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
@@ -208,7 +208,7 @@ blueprint:
         entity:
           domain: input_boolean
     delayed_job_completion_timer:
-      name: Delayed Job Completion timer
+      name: Job Completion | Delayed Job Completion timer
       description: >-
         (*REQUIRED | Helper | Name: <i><strong><your_appliance_name>_delayed_job_completion_timer</i></strong> | [?](https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/home%20assistant/packages/your_appliance_name.yaml#L2))
 
@@ -218,6 +218,37 @@ blueprint:
       selector:
         entity:
           domain: timer
+
+    job_completed_persistence_timer:
+      name: Job completed | State persistence Timer
+      description: >-
+        (*REQUIRED | Helper | Name: <i><strong><your_appliance_name>_job_completed_persistence_timer</i></strong> | [?](https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/home%20assistant/packages/your_appliance_name.yaml#L2))
+
+
+        The timer that will allow to stick to the job_completed state for some time.
+      default: []
+      selector:
+        entity:
+          domain: timer
+
+    job_completed_persistence_duration:
+      name: Job completed | State Persistence duration
+      description: >-
+        (OPTIONAL | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
+
+
+        This defines for how long the blueprint should "wait" before going from the job_completed -> idle state.
+        Setting this to 0 will disable the waiting. This means that once the job has been done, if a new power reading is receives, the state will immediately transition to idle. 
+        It could be minutes, or less than a second.
+      default: 60
+      selector:
+        number:
+          min: 0
+          max: 10
+          step: 1
+          unit_of_measurement: minutes
+          mode: slider
+
     automation_self_trigger:
       name: Automation Self-triggering entity
       description: >-
@@ -238,7 +269,7 @@ blueprint:
     # FLAG: ACTIONS #
     #####################
     actions_new_job_cycle_begins:
-      name: ACTION(S) - when a new job cycle begins
+      name: ACTION(S) | When a new job cycle begins
       description: >-
         Executed when the appliance starts a new job cycle (<strong>idle -> job_ongoing</strong>
         state).
@@ -255,7 +286,7 @@ blueprint:
       selector:
         action:
     actions_job_cycle_resumes:
-      name: ACTION(S) - when a job cycle resumes
+      name: ACTION(S) | When a job cycle resumes
       description: >-
         Executed when a pending job cycle is resumed (<strong>paused | unplugged | detached_overload -> job_ongoing</strong>
         state).
@@ -271,25 +302,9 @@ blueprint:
       default: []
       selector:
         action:
-    job_completed_persist_duration:
-      name: Persist the completion of a job for
-      description: >-
-        (OPTIONAL | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
 
-
-        This defines for how long the blueprint should "wait" before going from the job_completed -> idle state.
-        Setting this to 0 will disable the waiting. This means that once the job has been done, if a new power reading is receives, the state will immediately transition to idle. 
-        It could be minutes, or less than a second.
-      default: 60
-      selector:
-        number:
-          min: 0
-          max: 10
-          step: 1
-          unit_of_measurement: minutes
-          mode: slider
     actions_job_cycle_ends:
-      name: ACTION(S) - when a job cycle is finished
+      name: ACTION(S) | When a job cycle is finished
       description: >-
         Executed when the appliance finishes a job cycle (<strong>job_ongoing -> job_completed</strong>
         state).
@@ -305,7 +320,7 @@ blueprint:
       selector:
         action:
     actions_unplugged_overload:
-      name: ACTION(S) - when an overload occurs
+      name: ACTION(S) | When an overload occurs
       description: >-
         Executed when the appliance is detected as unplugged (because of an overload
         situation).
@@ -321,7 +336,7 @@ blueprint:
       selector:
         action:
     actions_paused_after_overload:
-      name: ACTION(S) - when the overload situation is solved, now paused
+      name: ACTION(S) | When the overload situation is solved, now paused
       description: >-
         Executed when the state changes from <strong>detached_overload -> paused</strong> (NOT resuming the job).
 
@@ -336,7 +351,7 @@ blueprint:
       selector:
         action:
     actions_resuming_after_overload:
-      name: ACTION(S) - when the overload situation is solved, now resuming
+      name: ACTION(S) | When the overload situation is solved, now resuming
       description: >-
         Executed when the state changes from <strong>detached_overload
         -> job_ongoing</strong> (resuming the previous job).
@@ -352,7 +367,7 @@ blueprint:
       selector:
         action:
     actions_paused_after_unplugged:
-      name: ACTION(S) - when the appliance is plugged back in, now paused
+      name: ACTION(S) | When the appliance is plugged back in, now paused
       description: >-
         Executed when the state changes from <strong>unplugged -> paused</strong> (NOT resuming the job).
 
@@ -379,11 +394,12 @@ variables:
   # Delays
   delayed_job_ongoing_duration: !input "delayed_job_ongoing_duration"       # precedes job_start
   delayed_job_completion_duration: !input "delayed_job_completion_duration" # precedes job_completed
-  job_completed_persist_duration: !input "job_completed_persist_duration"
+  job_completed_persistence_duration: !input "job_completed_persistence_duration"
 
   # Timer entities
   delayed_job_ongoing_timer: !input "delayed_job_ongoing_timer"        # precedes job_start
   delayed_job_completion_timer: !input "delayed_job_completion_timer"   # precedes job_completed
+  job_completed_persistence_timer: !input "job_completed_persistence_timer"
   
   # Blueprint settings
   appliance_overload_state_enabled: !input "appliance_overload_state_enabled"
@@ -611,25 +627,25 @@ action:
                         data: {}
                         target:
                           entity_id: !input "delayed_job_completion_timer"
-
+              - choose:
                 # IF
-              - conditions:
-                  # the timer isn't active
-                  - condition: template
-                    value_template:
-                      "{{ states(delayed_job_ongoing_timer) != 'active'
-                      }}"
-                  # the job_completed_timer didn't trigger this automation this time
-                  - condition: not
-                    conditions:
-                      - condition: trigger
-                        id: job_started_timer_finished
-                sequence:
-                  # Start the timer, strart counting backwards
-                  - service: timer.start
-                    data: {}
-                    target:
-                      entity_id: !input "delayed_job_ongoing_timer"
+                - conditions:
+                    # the timer isn't active
+                    - condition: template
+                      value_template:
+                        "{{ states(delayed_job_ongoing_timer) != 'active'
+                        }}"
+                    # the job_completed_timer didn't trigger this automation this time
+                    - condition: not
+                      conditions:
+                        - condition: trigger
+                          id: job_started_timer_finished
+                  sequence:
+                    # Start the timer, strart counting backwards
+                    - service: timer.start
+                      data: {}
+                      target:
+                        entity_id: !input "delayed_job_ongoing_timer"
               - choose:
                   # if the timer should last for a time that is not 0
                   - conditions:
@@ -688,16 +704,17 @@ action:
                   option: job_ongoing # FLAG: job_ongoing STATE TRANSITION
                 target:
                   entity_id: !input "appliance_state_machine"
-              - conditions:
-                  - condition: template
-                    value_template:
-                      "{{ states(delayed_job_ongoing_timer) == 'active'
-                      }}"
-                sequence:
-                  - service: timer.cancel
-                    data: {}
-                    target:
-                      entity_id: !input "delayed_job_ongoing_timer"
+              - choose:
+                - conditions:
+                    - condition: template
+                      value_template:
+                        "{{ states(delayed_job_ongoing_timer) == 'active'
+                        }}"
+                  sequence:
+                    - service: timer.cancel
+                      data: {}
+                      target:
+                        entity_id: !input "delayed_job_ongoing_timer"
               - choose:
                   - conditions:
                       - condition: state
@@ -857,11 +874,92 @@ action:
                         entity_id: !input "appliance_state_machine"
                         state: idle
                 sequence:
+                  # TODO: Handle here the job_completed state persistence
+                  # ...
+                  - choose:
+                    # IF
+                    - conditions:
+                        # the timer isn't active
+                        - condition: template
+                          value_template:
+                            "{{ states(job_completed_persistence_timer) != 'active'
+                            }}"
+                        # the job_completed_timer didn't trigger this automation this time
+                        - condition: not
+                          conditions:
+                            - condition: trigger
+                              id: job_completed_timer_finished
+                      sequence:
+                        # Start the timer, strart counting backwards
+                        - service: timer.start
+                          data: {}
+                          target:
+                            entity_id: !input "job_completed_persistence_timer"
+                  - choose:
+                      # if the timer should last for a time that is not 0
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ job_completed_persistence_duration > 0 }}"
+                        sequence:
+                          - choose:
+                              # if the elapsed time is less than the wanted job_completed_persistence_duration
+                              - conditions:
+                                  - condition: template
+                                    value_template:
+                                      "{% if states(job_completed_persistence_timer) == 'active'\
+                                      \ %}\n  {% set t_expiring_date = state_attr(job_completed_persistence_timer,\
+                                      \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
+                                      \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
+                                      \ | int %}\n  {% set t_total_duration = state_attr(job_completed_persistence_timer,\
+                                      \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
+                                      \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
+                                      \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
+                                      \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec)\
+                                      \ | int %}\n  {{ t_elapsed_sec < (job_completed_persistence_duration)\
+                                      \ | int }}\n{% else %}\n  {{0}}\n{% endif %}"
+                                sequence:
+                                  # try to wait here until the remaining time is elapsed
+                                  - delay:
+                                      seconds:
+                                        "{% if states(job_completed_persistence_timer) == 'active'\
+                                        \ %}\n  {% set t_expiring_date = state_attr(job_completed_persistence_timer,\
+                                        \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
+                                        \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
+                                        \ | int %}\n  {% set t_total_duration = state_attr(job_completed_persistence_timer,\
+                                        \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
+                                        \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
+                                        \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
+                                        \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec -\
+                                        \ t_remaining_sec) | int %}\n  {% set t_remaining = ((job_completed_persistence_duration)\
+                                        \ | int) - t_elapsed_sec %}\n  \n  {{ 1 + t_remaining }}\n{% else\
+                                        \ %}\n  {{ 1 + (job_completed_persistence_duration) | int }}\n{%\
+                                        \ endif %}"
+                                  # if the delay is elapsed, self trig the atomation
+                                  - service: input_boolean.turn_on
+                                    data: {}
+                                    target:
+                                      entity_id: !input "automation_self_trigger"
+                                  # make sure that the execution doesn't continue. So that the job_completed state is not reached. Likely not necessary.
+                                  - condition: template
+                                    value_template: "{{0}}"
+                    default: [] # Do nothing. End
+                  # Go to idle
                   - service: input_select.select_option
                     data:
                       option: idle # FLAG: idle STATE TRANSITION
                     target:
                       entity_id: !input "appliance_state_machine"
+                  - choose:
+                    - conditions:
+                        - condition: template
+                          value_template:
+                            "{{ states(job_completed_persistence_timer) == 'active'
+                            }}"
+                      sequence:
+                        - service: timer.cancel
+                          data: {}
+                          target:
+                            entity_id: !input "job_completed_persistence_timer"
 mode: restart
 max_exceeded: silent
 trace:
