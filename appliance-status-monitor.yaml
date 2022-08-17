@@ -63,6 +63,7 @@ blueprint:
       description: >-
         (*REQUIRED)
 
+        The **Starting Power threshold** must always be **>** than the **Finishing Power threshold**.
 
         Power threshold above which we assume the appliance has started
         a new job or is resuming the current one (job_ongoing state).
@@ -70,7 +71,7 @@ blueprint:
       selector:
         number:
           min: 1.0
-          max: 100.0
+          max: 1000.0
           unit_of_measurement: W
           mode: slider
           step: 1.0
@@ -79,17 +80,18 @@ blueprint:
       description: >-
         (*REQUIRED)
 
+        The **Finishing Power threshold** must always be **<** than the **Starting Power threshold**.
 
         Power threshold below which we assume the appliance has finished
         a job (job_completed state).
       default: 3
       selector:
         number:
-          min: 1.0
-          max: 100.0
+          min: 0.1
+          max: 1000.0
           unit_of_measurement: W
           mode: slider
-          step: 1.0
+          step: 0.1
     appliance_overload_state_enabled:
       name: Appliance Overload State Enabled
       description: >-
