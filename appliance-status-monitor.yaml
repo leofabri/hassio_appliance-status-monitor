@@ -585,8 +585,6 @@ action:
             value_template: "{{ states(appliance_socket) == 'off' }}"
           - condition: not
             conditions:
-              # - condition: template
-              #   value_template: "{{ appliance_overload_state_enabled }}"
               - condition: template
                 value_template: "{% if appliance_overload_state_enabled %}{{ states(appliance_suspended_sensor) | float > 0.0 }}{% else %}false{% endif %}"
               - condition: state
@@ -658,11 +656,6 @@ action:
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
-              # - condition: not
-              #   conditions:
-              #     - condition: state
-              #       entity_id: !input "appliance_state_machine"
-              #       state: job_ongoing
             sequence:
               # Delete the delayed_job_completion_timer if it's running
               # If the job completed timer is running, then the power consumption was high enough.
