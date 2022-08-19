@@ -1,0 +1,1 @@
+tail -f /config/home-assistant.log | grep "homeassistant.components.asm_blueprint"

@@ -77,6 +77,8 @@ blueprint:
           unit_of_measurement: W
           mode: slider
           step: 1.0
+
+    # TIMER delayed_job_ongoing_timer
     delayed_job_ongoing_timer:
       name: Delayed Job Ongoing timer
       description: >-
@@ -90,7 +92,7 @@ blueprint:
           domain: timer
 
     delayed_job_ongoing_duration:
-      name: Delayed Job Completion duration
+      name: Delayed Job Ongoing duration
       description: >-
         (OPTIONAL | Helper | <i><strong>Suggested: 0, Default: 0 | DISABLED</strong></i>)
 
@@ -207,6 +209,8 @@ blueprint:
       selector:
         entity:
           domain: input_boolean
+
+    # TIMER delayed_job_completion_timer
     delayed_job_completion_timer:
       name: Job Completion | Delayed Job Completion timer
       description: >-
@@ -219,6 +223,7 @@ blueprint:
         entity:
           domain: timer
 
+    # TIMER job_completed_persistence_timer
     job_completed_persistence_timer:
       name: Job completed | State persistence Timer
       description: >-
@@ -240,13 +245,13 @@ blueprint:
         This defines for how long the blueprint should "wait" before going from the job_completed -> idle state.
         Setting this to 0 will disable the waiting. This means that once the job has been done, if a new power reading is receives, the state will immediately transition to idle. 
         It could be minutes, or less than a second.
-      default: 60
+      default: 300
       selector:
         number:
           min: 0
-          max: 10
+          max: 3600
           step: 1
-          unit_of_measurement: minutes
+          unit_of_measurement: seconds
           mode: slider
 
     automation_self_trigger:
@@ -381,7 +386,6 @@ blueprint:
       default: []
       selector:
         action:
-          
 
   source_url: https://github.com/leofabri/hassio_appliance-status-monitor/blob/main/appliance-status-monitor.yaml
 
@@ -392,15 +396,15 @@ variables:
   appliance_suspended_sensor: !input "appliance_suspended_sensor"
 
   # Delays
-  delayed_job_ongoing_duration: !input "delayed_job_ongoing_duration"       # precedes job_start
+  delayed_job_ongoing_duration: !input "delayed_job_ongoing_duration" # precedes job_start
   delayed_job_completion_duration: !input "delayed_job_completion_duration" # precedes job_completed
   job_completed_persistence_duration: !input "job_completed_persistence_duration"
 
   # Timer entities
-  delayed_job_ongoing_timer: !input "delayed_job_ongoing_timer"        # precedes job_start
-  delayed_job_completion_timer: !input "delayed_job_completion_timer"   # precedes job_completed
+  delayed_job_ongoing_timer: !input "delayed_job_ongoing_timer" # precedes job_start
+  delayed_job_completion_timer: !input "delayed_job_completion_timer" # precedes job_completed
   job_completed_persistence_timer: !input "job_completed_persistence_timer"
-  
+
   # Blueprint settings
   appliance_overload_state_enabled: !input "appliance_overload_state_enabled"
 
@@ -435,18 +439,25 @@ trigger:
     to: "on"
     id: automation_self_triggered
 
+  # EVENTS from timers
   - platform: event
     event_type: timer.finished
     event_data:
       entity_id: !input "delayed_job_ongoing_timer"
     id: job_started_timer_finished
-
   - platform: event
     event_type: timer.finished
     event_data:
       entity_id: !input "delayed_job_completion_timer"
     id: job_completed_timer_finished
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: !input "job_completed_persistence_timer"
+    id: job_completed_persistence_timer_finished
+  # ----
 
+  # EVENTS from Home Assistant
   - platform: homeassistant
     event: start
     id: home_assistant_started_event
@@ -454,7 +465,10 @@ trigger:
     event_type:
       - automation_reloaded
     id: automation_reloaded_event
+  # ----
+
 condition:
+  # Accepted triggers:
   - condition: or
     conditions:
       - condition: trigger
@@ -474,6 +488,8 @@ condition:
       - condition: trigger
         id: job_completed_timer_finished
       - condition: trigger
+        id: job_completed_persistence_timer_finished
+      - condition: trigger
         id: home_assistant_started_event
       - condition: trigger
         id: automation_reloaded_event
@@ -491,7 +507,7 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: > 
+            value_template: >
               {{ appliance_overload_state_enabled }}
           - condition: template
             value_template: "{{ states(appliance_suspended_sensor) | float > 0.0 }}"
@@ -509,9 +525,15 @@ action:
               option: detached_overload # FLAG: detached_overload STATE TRANSITION
             target:
               entity_id: !input "appliance_state_machine"
+          # ***** LOG SECTION *****
+          - service: system_log.write
+            data_template:
+              level: debug
+              logger: homeassistant.components.asm_blueprint
+              message: "STATE CHANGE - Entered the detached_overload state."
+          # ***********************
           - choose: []
             default: !input "actions_unplugged_overload"
-
 
   ##################################################
   # NOTE: "paused" state handling logic            #
@@ -547,8 +569,14 @@ action:
               option: paused # FLAG: paused STATE TRANSITION
             target:
               entity_id: !input "appliance_state_machine"
-      
-      
+          # ***** LOG SECTION *****
+          - service: system_log.write
+            data_template:
+              level: debug
+              logger: homeassistant.components.asm_blueprint
+              message: "STATE CHANGE - Entered the paused state."
+          # ***********************
+
         ##################################################
         # NOTE: "unplugged" state handling logic         #
         ##################################################
@@ -575,6 +603,13 @@ action:
               option: unplugged # FLAG: unplugged STATE TRANSITION
             target:
               entity_id: !input "appliance_state_machine"
+          # ***** LOG SECTION *****
+          - service: system_log.write
+            data_template:
+              level: debug
+              logger: homeassistant.components.asm_blueprint
+              message: "STATE CHANGE - Entered the unplugged state."
+          # ***********************
           - choose:
               - conditions:
                   - condition: template
@@ -584,6 +619,13 @@ action:
                     data: {}
                     target:
                       entity_id: !input "delayed_job_completion_timer"
+                  # ***** LOG SECTION *****
+                  - service: system_log.write
+                    data_template:
+                      level: debug
+                      logger: homeassistant.components.asm_blueprint
+                      message: "TIMER - delayed_job_completion_timer canceled and stopped."
+                  # ***********************
       - conditions:
           - condition: trigger
             id: paused_after_overload_event
@@ -603,49 +645,74 @@ action:
           - choose: []
             default: !input "actions_resuming_after_overload"
     default:
-      
-        ##################################################
-        # NOTE: "job_ongoing" state handling logic       #
-        ##################################################
+      ##################################################
+      # NOTE: "job_ongoing" state handling logic       #
+      ##################################################
       - choose:
+          # IF (and)
           - conditions:
+              # the socket is on
               - condition: template
                 value_template: "{{ states(appliance_socket) == 'on' }}"
+              # the power consumption > appliance_starting_power_threshold
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
+              # - condition: not
+              #   conditions:
+              #     - condition: state
+              #       entity_id: !input "appliance_state_machine"
+              #       state: job_ongoing
             sequence:
               # Delete the delayed_job_completion_timer if it's running
+              # If the job completed timer is running, then the power consumption was high enough.
+              # The delayed_job_completion_timer timer has to be discarded     
               - choose:
                   - conditions:
                       - condition: template
-                        value_template:
-                          "{{ states(delayed_job_completion_timer) == 'active'
-                          }}"
+                        value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
                     sequence:
                       - service: timer.cancel
                         data: {}
                         target:
                           entity_id: !input "delayed_job_completion_timer"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: debug
+                          logger: homeassistant.components.asm_blueprint
+                          message: "TIMER - The starting power threshold was surpassed again => delayed_job_completion_timer canceled and stopped"
+                      # ***********************
               - choose:
-                # IF
-                - conditions:
-                    # the timer isn't active
-                    - condition: template
-                      value_template:
-                        "{{ states(delayed_job_ongoing_timer) != 'active'
-                        }}"
-                    # the job_completed_timer didn't trigger this automation this time
-                    - condition: not
-                      conditions:
-                        - condition: trigger
-                          id: job_started_timer_finished
-                  sequence:
-                    # Start the timer, strart counting backwards
-                    - service: timer.start
-                      data: {}
-                      target:
-                        entity_id: !input "delayed_job_ongoing_timer"
+                  # IF
+                  - conditions:
+                      # Start the timer only if the state is not already job_ongoing
+                      - condition: not
+                        conditions:
+                          - condition: state
+                            entity_id: !input "appliance_state_machine"
+                            state: job_ongoing
+                      # the delayed_job_ongoing_timer isn't active
+                      - condition: template
+                        value_template: "{{ states(delayed_job_ongoing_timer) != 'active' }}"
+                      # the job_completed_timer wasn't the one that triggered this automation
+                      - condition: not
+                        conditions:
+                          - condition: trigger
+                            id: job_started_timer_finished
+                    sequence:
+                      # Start the timer, start counting backwards
+                      - service: timer.start
+                        data: {}
+                        target:
+                          entity_id: !input "delayed_job_ongoing_timer"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: debug
+                          logger: homeassistant.components.asm_blueprint
+                          message: "TIMER - delayed_job_ongoing_timer start invoked. Now it's {{ states(delayed_job_ongoing_timer) }}"
+                      # ***********************
               - choose:
                   # if the timer should last for a time that is not 0
                   - conditions:
@@ -656,43 +723,49 @@ action:
                           # if the elapsed time is less than the wanted delayed_job_ongoing_duration
                           - conditions:
                               - condition: template
-                                value_template:
-                                  "{% if states(delayed_job_ongoing_timer) == 'active'\
-                                  \ %}\n  {% set t_expiring_date = state_attr(delayed_job_ongoing_timer,\
-                                  \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
-                                  \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
-                                  \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_ongoing_timer,\
-                                  \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
-                                  \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
-                                  \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
-                                  \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec)\
-                                  \ | int %}\n  {{ t_elapsed_sec < (delayed_job_ongoing_duration)\
-                                  \ | int }}\n{% else %}\n  {{0}}\n{% endif %}"
+                                value_template: |-
+                                  {% if states(delayed_job_ongoing_timer) == 'active' %}
+                                    {% set t_expiring_date = state_attr(delayed_job_ongoing_timer, 'finishes_at') %}
+                                    {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                    {% set t_total_duration = state_attr(delayed_job_ongoing_timer, 'duration') %}
+                                    {% set duration_split = t_total_duration.split(':') %}
+                                    {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                    {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                    {{ t_elapsed_sec < (delayed_job_ongoing_duration) | int }}
+                                  {% else %}
+                                    {{0}}
+                                  {% endif %}
                             sequence:
+                              # ***** LOG SECTION *****
+                              - service: system_log.write
+                                data_template:
+                                  level: debug
+                                  logger: homeassistant.components.asm_blueprint
+                                  message: "WAIT - Waiting {{ delayed_job_ongoing_duration }} seconds, then I will decide if job_ongoing state should be entered."
+                              # ***********************
                               # try to wait here until the remaining time is elapsed
                               - delay:
-                                  seconds:
-                                    "{% if states(delayed_job_ongoing_timer) == 'active'\
-                                    \ %}\n  {% set t_expiring_date = state_attr(delayed_job_ongoing_timer,\
-                                    \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
-                                    \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
-                                    \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_ongoing_timer,\
-                                    \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
-                                    \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
-                                    \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
-                                    \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec -\
-                                    \ t_remaining_sec) | int %}\n  {% set t_remaining = ((delayed_job_ongoing_duration)\
-                                    \ | int) - t_elapsed_sec %}\n  \n  {{ 1 + t_remaining }}\n{% else\
-                                    \ %}\n  {{ 1 + (delayed_job_ongoing_duration) | int }}\n{%\
-                                    \ endif %}"
+                                  seconds: |-
+                                    {% if states(delayed_job_ongoing_timer) == 'active' %}
+                                      {% set t_expiring_date = state_attr(delayed_job_ongoing_timer, 'finishes_at') %}
+                                      {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                      {% set t_total_duration = state_attr(delayed_job_ongoing_timer, 'duration') %}
+                                      {% set duration_split = t_total_duration.split(':') %}
+                                      {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                      {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                      {% set t_remaining = ((delayed_job_ongoing_duration) | int) - t_elapsed_sec %}
+                                      
+                                      {{ 1 + t_remaining }}
+                                    {% else %}
+                                      {{ 1 + (delayed_job_ongoing_duration) | int }}
+                                    {% endif %}
                               # if the delay is elapsed, self trig the atomation
                               - service: input_boolean.turn_on
                                 data: {}
                                 target:
                                   entity_id: !input "automation_self_trigger"
-                              # make sure that the execution doesn't continue. So that the job_completed state is not reached. Likely not necessary.
-                              - condition: template
-                                value_template: "{{0}}"
+                              # make sure that the execution doesn't continue. So that the job_completed state is not reached.
+                              - stop: ""
                 default: [] # Do nothing. End
               - condition: not
                 conditions:
@@ -704,17 +777,30 @@ action:
                   option: job_ongoing # FLAG: job_ongoing STATE TRANSITION
                 target:
                   entity_id: !input "appliance_state_machine"
+              # ***** LOG SECTION *****
+              - service: system_log.write
+                data_template:
+                  level: debug
+                  logger: homeassistant.components.asm_blueprint
+                  message: "STATE CHANGE - Entered the job_ongoing state."
+              # ***********************
               - choose:
-                - conditions:
-                    - condition: template
-                      value_template:
-                        "{{ states(delayed_job_ongoing_timer) == 'active'
-                        }}"
-                  sequence:
-                    - service: timer.cancel
-                      data: {}
-                      target:
-                        entity_id: !input "delayed_job_ongoing_timer"
+                  - conditions:
+                      - condition: template
+                        value_template:
+                          "{{ states(delayed_job_ongoing_timer) == 'active' }}"
+                    sequence:
+                      - service: timer.cancel
+                        data: {}
+                        target:
+                          entity_id: !input "delayed_job_ongoing_timer"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: debug
+                          logger: homeassistant.components.asm_blueprint
+                          message: "TIMER - delayed_job_ongoing_timer canceled and stopped."
+                      # ***********************
               - choose:
                   - conditions:
                       - condition: state
@@ -725,13 +811,18 @@ action:
                         data: {}
                         target:
                           entity_id: !input "appliance_job_cycle"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: debug
+                          logger: homeassistant.components.asm_blueprint
+                          message: "CYCLE START - A new Job Cycle started"
+                      # ***********************
                       - choose: []
                         default: !input "actions_new_job_cycle_begins"
                 default:
                   - choose: []
                     default: !input "actions_job_cycle_resumes"
-              
-
 
           ##################################################
           # NOTE: "job_completed" state handling logic     #
@@ -759,20 +850,25 @@ action:
                   - conditions:
                       # the timer isn't active
                       - condition: template
-                        value_template:
-                          "{{ states(delayed_job_completion_timer) != 'active'
-                          }}"
+                        value_template: "{{ states(delayed_job_completion_timer) != 'active' }}"
                       # the job_completed_timer didn't trigger this automation this time
                       - condition: not
                         conditions:
                           - condition: trigger
                             id: job_completed_timer_finished
                     sequence:
-                      # Start the timer, strart counting backwards
+                      # Start the timer, start counting backwards
                       - service: timer.start
                         data: {}
                         target:
                           entity_id: !input "delayed_job_completion_timer"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: debug
+                          logger: homeassistant.components.asm_blueprint
+                          message: "TIMER - delayed_job_completion_timer start invoked. Now it's {{ states(delayed_job_completion_timer) }}"
+                      # ***********************
               - choose:
                   # if the timer should last for a time that is not 0
                   - conditions:
@@ -783,43 +879,48 @@ action:
                           # if the elapsed time is less than the wanted delayed_job_completion_duration
                           - conditions:
                               - condition: template
-                                value_template:
-                                  "{% if states(delayed_job_completion_timer) == 'active'\
-                                  \ %}\n  {% set t_expiring_date = state_attr(delayed_job_completion_timer,\
-                                  \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
-                                  \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
-                                  \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_completion_timer,\
-                                  \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
-                                  \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
-                                  \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
-                                  \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec)\
-                                  \ | int %}\n  {{ t_elapsed_sec < (delayed_job_completion_duration)\
-                                  \ | int }}\n{% else %}\n  {{0}}\n{% endif %}"
+                                value_template: |-
+                                  {% if states(delayed_job_completion_timer) == 'active' %}
+                                    {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
+                                    {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                    {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
+                                    {% set duration_split = t_total_duration.split(':') %}
+                                    {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                    {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                    {{ t_elapsed_sec < (delayed_job_completion_duration) | int }}
+                                  {% else %}
+                                    {{0}}
+                                  {% endif %}
                             sequence:
-                              # try to wait here until the remaining time is elapsed
+                              # ***** LOG SECTION *****
+                              - service: system_log.write
+                                data_template:
+                                  level: debug
+                                  logger: homeassistant.components.asm_blueprint
+                                  message: "WAIT - Waiting {{ delayed_job_completion_duration }} seconds, then I will decide if job_completed state should be entered."
+                              # ***********************
                               - delay:
-                                  seconds:
-                                    "{% if states(delayed_job_completion_timer) == 'active'\
-                                    \ %}\n  {% set t_expiring_date = state_attr(delayed_job_completion_timer,\
-                                    \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
-                                    \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
-                                    \ | int %}\n  {% set t_total_duration = state_attr(delayed_job_completion_timer,\
-                                    \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
-                                    \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
-                                    \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
-                                    \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec -\
-                                    \ t_remaining_sec) | int %}\n  {% set t_remaining = ((delayed_job_completion_duration)\
-                                    \ | int) - t_elapsed_sec %}\n  \n  {{ 1 + t_remaining }}\n{% else\
-                                    \ %}\n  {{ 1 + (delayed_job_completion_duration) | int }}\n{%\
-                                    \ endif %}"
+                                  seconds: |-
+                                    {% if states(delayed_job_completion_timer) == 'active' %}
+                                      {% set t_expiring_date = state_attr(delayed_job_completion_timer, 'finishes_at') %}
+                                      {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                      {% set t_total_duration = state_attr(delayed_job_completion_timer, 'duration') %}
+                                      {% set duration_split = t_total_duration.split(':') %}
+                                      {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                      {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                      {% set t_remaining = ((delayed_job_completion_duration) | int) - t_elapsed_sec %}
+                                      
+                                      {{ 1 + t_remaining }}
+                                    {% else %}
+                                      {{ 1 + (delayed_job_completion_duration) | int }}
+                                    {% endif %}
                               # if the delay is elapsed, self trig the atomation
                               - service: input_boolean.turn_on
                                 data: {}
                                 target:
                                   entity_id: !input "automation_self_trigger"
-                              # make sure that the execution doesn't continue. So that the job_completed state is not reached. Likely not necessary.
-                              - condition: template
-                                value_template: "{{0}}"
+                              # make sure that the execution doesn't continue. So that the job_completed state is not reached.
+                              - stop: ""
                 default: [] # Do nothing. End
               - service: input_boolean.turn_off
                 data: {}
@@ -830,6 +931,20 @@ action:
                   option: job_completed # FLAG: job_completed STATE TRANSITION
                 target:
                   entity_id: !input "appliance_state_machine"
+              # ***** LOG SECTION *****
+              - service: system_log.write
+                data_template:
+                  level: debug
+                  logger: homeassistant.components.asm_blueprint
+                  message: "CYCLE END - The Job Cycle is over"
+              # ***********************
+              # ***** LOG SECTION *****
+              - service: system_log.write
+                data_template:
+                  level: debug
+                  logger: homeassistant.components.asm_blueprint
+                  message: "STATE CHANGE - Entered the job_completed state."
+              # ***********************
               - choose:
                   - conditions:
                       - condition: template
@@ -841,6 +956,13 @@ action:
                         data: {}
                         target:
                           entity_id: !input "delayed_job_completion_timer"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: debug
+                          logger: homeassistant.components.asm_blueprint
+                          message: "TIMER - delayed_job_completion_timer canceled and stopped."
+                      # ***********************
               - choose: []
                 default: !input "actions_job_cycle_ends"
               - choose:
@@ -852,14 +974,14 @@ action:
                           - condition: template
                             value_template: "{{ delayed_job_completion_duration <= 0 }}"
                     sequence:
-                      - delay:
-                          minutes: 1
+                      # - delay:
+                      #     minutes: 1
+                      # Self trigger once more to move to the idle state
                       - service: input_boolean.turn_on
                         data: {}
                         target:
                           entity_id: !input "automation_self_trigger"
         default:
-          
           ##################################################
           # NOTE: "idle" state handling logic              #
           ##################################################
@@ -874,27 +996,37 @@ action:
                         entity_id: !input "appliance_state_machine"
                         state: idle
                 sequence:
-                  # TODO: Handle here the job_completed state persistence
-                  # ...
                   - choose:
-                    # IF
-                    - conditions:
-                        # the timer isn't active
-                        - condition: template
-                          value_template:
-                            "{{ states(job_completed_persistence_timer) != 'active'
-                            }}"
-                        # the job_completed_timer didn't trigger this automation this time
-                        - condition: not
-                          conditions:
-                            - condition: trigger
-                              id: job_completed_timer_finished
-                      sequence:
-                        # Start the timer, strart counting backwards
-                        - service: timer.start
-                          data: {}
-                          target:
-                            entity_id: !input "job_completed_persistence_timer"
+                      # IF
+                      - conditions:
+                          # the job_completed_persistence_timer isn't active
+                          - condition: template
+                            value_template:
+                              "{{ states(job_completed_persistence_timer) != 'active' }}"
+                          # the job_completed_timer didn't trigger this automation this time
+                          - condition: not
+                            conditions:
+                              - condition: trigger
+                                id: job_completed_persistence_timer_finished
+                          # the state machine signals that a job is ongoing
+                          # This is helpful when, for example, the socket is turned of and on immediately
+                          # and whe need to reach the idle state ignoring the timer
+                          - condition: state
+                            entity_id: !input "appliance_state_machine"
+                            state: job_completed
+                        sequence:
+                          # Start the timer, strart counting backwards
+                          - service: timer.start
+                            data: {}
+                            target:
+                              entity_id: !input "job_completed_persistence_timer"
+                          # ***** LOG SECTION *****
+                          - service: system_log.write
+                            data_template:
+                              level: debug
+                              logger: homeassistant.components.asm_blueprint
+                              message: "TIMER - job_completed_persistence_timer start invoked. Now it's {{ states(job_completed_persistence_timer) }}"
+                          # ***********************
                   - choose:
                       # if the timer should last for a time that is not 0
                       - conditions:
@@ -905,43 +1037,48 @@ action:
                               # if the elapsed time is less than the wanted job_completed_persistence_duration
                               - conditions:
                                   - condition: template
-                                    value_template:
-                                      "{% if states(job_completed_persistence_timer) == 'active'\
-                                      \ %}\n  {% set t_expiring_date = state_attr(job_completed_persistence_timer,\
-                                      \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
-                                      \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
-                                      \ | int %}\n  {% set t_total_duration = state_attr(job_completed_persistence_timer,\
-                                      \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
-                                      \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
-                                      \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
-                                      \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec)\
-                                      \ | int %}\n  {{ t_elapsed_sec < (job_completed_persistence_duration)\
-                                      \ | int }}\n{% else %}\n  {{0}}\n{% endif %}"
+                                    value_template: |-
+                                      {% if states(job_completed_persistence_timer) == 'active' %}
+                                        {% set t_expiring_date = state_attr(job_completed_persistence_timer, 'finishes_at') %}
+                                        {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                        {% set t_total_duration = state_attr(job_completed_persistence_timer, 'duration') %}
+                                        {% set duration_split = t_total_duration.split(':') %}
+                                        {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                        {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                        {{ t_elapsed_sec < (job_completed_persistence_duration) | int }}
+                                      {% else %}
+                                        {{0}}
+                                      {% endif %}
                                 sequence:
-                                  # try to wait here until the remaining time is elapsed
+                                  # ***** LOG SECTION *****
+                                  - service: system_log.write
+                                    data_template:
+                                      level: debug
+                                      logger: homeassistant.components.asm_blueprint
+                                      message: "WAIT - Waiting {{ job_completed_persistence_duration }} seconds, then I will decide if idle state should be entered."
+                                  # ***********************
                                   - delay:
-                                      seconds:
-                                        "{% if states(job_completed_persistence_timer) == 'active'\
-                                        \ %}\n  {% set t_expiring_date = state_attr(job_completed_persistence_timer,\
-                                        \ 'finishes_at') %}\n  {% set t_remaining_sec = 0 if t_expiring_date\
-                                        \ == None else (as_datetime(t_expiring_date) - now()).total_seconds()\
-                                        \ | int %}\n  {% set t_total_duration = state_attr(job_completed_persistence_timer,\
-                                        \ 'duration') %}\n  {% set duration_split = t_total_duration.split(':')\
-                                        \ %}\n  {% set t_total_duration_sec  = (duration_split[0] | int\
-                                        \ * 3600) + (duration_split[1] | int * 60) + (duration_split[0]\
-                                        \ | int) %}\n  {% set t_elapsed_sec = (t_total_duration_sec -\
-                                        \ t_remaining_sec) | int %}\n  {% set t_remaining = ((job_completed_persistence_duration)\
-                                        \ | int) - t_elapsed_sec %}\n  \n  {{ 1 + t_remaining }}\n{% else\
-                                        \ %}\n  {{ 1 + (job_completed_persistence_duration) | int }}\n{%\
-                                        \ endif %}"
+                                      seconds: |-
+                                        {% if states(job_completed_persistence_timer) == 'active' %}
+                                          {% set t_expiring_date = state_attr(job_completed_persistence_timer, 'finishes_at') %}
+                                          {% set t_remaining_sec = 0 if t_expiring_date == None else (as_datetime(t_expiring_date) - now()).total_seconds() | int %}
+                                          {% set t_total_duration = state_attr(job_completed_persistence_timer, 'duration') %}
+                                          {% set duration_split = t_total_duration.split(':') %}
+                                          {% set t_total_duration_sec  = (duration_split[0] | int * 3600) + (duration_split[1] | int * 60) + (duration_split[0] | int) %}
+                                          {% set t_elapsed_sec = (t_total_duration_sec - t_remaining_sec) | int %}
+                                          {% set t_remaining = ((job_completed_persistence_duration) | int) - t_elapsed_sec %}
+                                          
+                                          {{ 1 + t_remaining }}
+                                        {% else %}
+                                          {{ 1 + (job_completed_persistence_duration) | int }}
+                                        {% endif %}
                                   # if the delay is elapsed, self trig the atomation
                                   - service: input_boolean.turn_on
                                     data: {}
                                     target:
                                       entity_id: !input "automation_self_trigger"
-                                  # make sure that the execution doesn't continue. So that the job_completed state is not reached. Likely not necessary.
-                                  - condition: template
-                                    value_template: "{{0}}"
+                                  # make sure that the execution doesn't continue. So that the job_completed state is not reached
+                                  - stop: ""
                     default: [] # Do nothing. End
                   # Go to idle
                   - service: input_select.select_option
@@ -949,17 +1086,47 @@ action:
                       option: idle # FLAG: idle STATE TRANSITION
                     target:
                       entity_id: !input "appliance_state_machine"
+                  # ***** LOG SECTION *****
+                  - service: system_log.write
+                    data_template:
+                      level: debug
+                      logger: homeassistant.components.asm_blueprint
+                      message: "STATE CHANGE - Entered the idle state."
+                  # ***********************
                   - choose:
-                    - conditions:
-                        - condition: template
-                          value_template:
-                            "{{ states(job_completed_persistence_timer) == 'active'
-                            }}"
-                      sequence:
-                        - service: timer.cancel
-                          data: {}
-                          target:
-                            entity_id: !input "job_completed_persistence_timer"
+                      - conditions:
+                          - condition: template
+                            value_template:
+                              "{{ states(job_completed_persistence_timer) == 'active' }}"
+                        sequence:
+                          - service: timer.cancel
+                            data: {}
+                            target:
+                              entity_id: !input "job_completed_persistence_timer"
+                          # ***** LOG SECTION *****
+                          - service: system_log.write
+                            data_template:
+                              level: debug
+                              logger: homeassistant.components.asm_blueprint
+                              message: "TIMER - job_completed_persistence_timer canceled and stopped."
+                          # ***********************
+            default:
+              - choose:
+                - conditions:
+                    - condition: template
+                      value_template:
+                        "{{ states(delayed_job_ongoing_timer) == 'active' }}"
+                  sequence:
+                    - service: timer.cancel
+                      data: {}
+                      target:
+                        entity_id: !input "delayed_job_ongoing_timer"
+                    # ***** LOG SECTION *****
+                    - service: system_log.write
+                      data_template:
+                        level: debug
+                        logger: homeassistant.components.asm_blueprint
+                        message: "TIMER - delayed_job_ongoing_timer canceled and stopped."
 mode: restart
 max_exceeded: silent
 trace:
