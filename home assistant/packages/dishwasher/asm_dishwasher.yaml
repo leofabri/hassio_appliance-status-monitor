@@ -5,6 +5,18 @@ timer:
     restore: true
     icon: mdi:dishwasher
 
+  dishwasher_delayed_job_ongoing_timer:
+    name: Dishwasher - Delayed Job Ongoing Timer
+    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:dishwasher
+
+  dishwasher_job_completed_persistence_timer:
+    name: Dishwasher - Job completed persistence timer
+    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:dishwasher
+
 input_boolean:
   dishwasher_job_cycle:
     name: Dishwasher - Job Cycle
@@ -26,6 +38,8 @@ input_select:
       - job_completed
     icon: mdi:dishwasher
 
+#________________________
+# * ADDITIONAL FEATURES *
 template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## -- MACROS --
   ## 
