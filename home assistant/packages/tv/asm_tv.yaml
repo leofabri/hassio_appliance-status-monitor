@@ -1,7 +1,19 @@
 timer:
   tv_delayed_job_completion_timer:
     name: TV - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:television-classic
+
+  tv_delayed_job_ongoing_timer:
+    name: TV - Delayed Job Ongoing Timer
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:television-classic
+
+  tv_job_completed_persistence_timer:
+    name: TV - Job completed persistence timer
+    duration: "01:30:00" # <- Notice the time here. Leave as it is (1h 30 min)
     restore: true
     icon: mdi:television-classic
 
@@ -26,6 +38,8 @@ input_select:
       - job_completed
     icon: mdi:television-classic
 
+#________________________
+# * ADDITIONAL FEATURES *
 template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## -- MACROS --
   ## 
@@ -44,9 +58,8 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## Press ctrl + K & ctrl + U to uncomment from VSCode. 
 
 #   - sensor:
-#       - name: Washing Machine Current State - Translated
+#       - name: TV Current State - Translated
 #         unique_id: washing_machine_current_state_translated
-#         icon: "mdi:television-classic"
 #         state: >
 #           {%- macro state_machine_translation(state) -%}
 #           {% set STATE_MACHINE_TRANSLATION = {

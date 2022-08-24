@@ -1,7 +1,19 @@
 timer:
   water_well_delayed_job_completion_timer:
     name: Water Well - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:water-well
+
+  water_well_delayed_job_ongoing_timer:
+    name: Water Well - Delayed Job Ongoing Timer
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:water-well
+
+  water_well_job_completed_persistence_timer:
+    name: Water Well - Job completed persistence timer
+    duration: "01:30:00" # <- Notice the time here. Leave as it is (1h 30 min)
     restore: true
     icon: mdi:water-well
 
@@ -26,6 +38,8 @@ input_select:
       - job_completed
     icon: mdi:water-well
 
+#________________________
+# * ADDITIONAL FEATURES *
 template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## -- MACROS --
   ## 
@@ -46,7 +60,6 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
 #   - sensor:
 #       - name: Water Well Current State - Translated
 #         unique_id: water_well_current_state_translated
-#         icon: "mdi:water-well"
 #         state: >
 #           {%- macro state_machine_translation(state) -%}
 #           {% set STATE_MACHINE_TRANSLATION = {

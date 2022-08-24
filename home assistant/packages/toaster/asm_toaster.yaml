@@ -1,7 +1,19 @@
 timer:
   toaster_delayed_job_completion_timer:
     name: Toaster - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:toaster
+
+  toaster_delayed_job_ongoing_timer:
+    name: Toaster - Delayed Job Ongoing Timer
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:toaster
+
+  toaster_job_completed_persistence_timer:
+    name: Toaster - Job completed persistence timer
+    duration: "01:30:00" # <- Notice the time here. Leave as it is (1h 30 min)
     restore: true
     icon: mdi:toaster
 
@@ -26,6 +38,8 @@ input_select:
       - job_completed
     icon: mdi:toaster
 
+#________________________
+# * ADDITIONAL FEATURES *
 template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## -- MACROS --
   ## 
@@ -45,8 +59,7 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
 
 #   - sensor:
 #       - name: Toaster Current State - Translated
-#         unique_id: toaster_current_state_translated
-#         icon: "mdi:toaster"
+#         unique_id: washing_machine_current_state_translated
 #         state: >
 #           {%- macro state_machine_translation(state) -%}
 #           {% set STATE_MACHINE_TRANSLATION = {

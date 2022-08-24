@@ -1,19 +1,19 @@
 timer:
   dishwasher_delayed_job_completion_timer:
     name: Dishwasher - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
     restore: true
     icon: mdi:dishwasher
 
   dishwasher_delayed_job_ongoing_timer:
     name: Dishwasher - Delayed Job Ongoing Timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
     restore: true
     icon: mdi:dishwasher
 
   dishwasher_job_completed_persistence_timer:
     name: Dishwasher - Job completed persistence timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    duration: "01:30:00" # <- Notice the time here. Leave as it is (1h 30 min)
     restore: true
     icon: mdi:dishwasher
 
@@ -58,7 +58,7 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## Press ctrl + K & ctrl + U to uncomment from VSCode. 
 
 #   - sensor:
-#       - name: Washing Machine Current State - Translated
+#       - name: Dishwasher Current State - Translated
 #         unique_id: washing_machine_current_state_translated
 #         state: >
 #           {%- macro state_machine_translation(state) -%}

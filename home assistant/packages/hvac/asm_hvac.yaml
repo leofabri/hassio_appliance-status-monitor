@@ -1,21 +1,33 @@
 timer:
-  hvac_conditioner_delayed_job_completion_timer:
+  hvac_delayed_job_completion_timer:
     name: HVAC - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:hvac
+
+  hvac_delayed_job_ongoing_timer:
+    name: HVAC - Delayed Job Ongoing Timer
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:hvac
+
+  hvac_job_completed_persistence_timer:
+    name: HVAC - Job completed persistence timer
+    duration: "01:30:00" # <- Notice the time here. Leave as it is (1h 30 min)
     restore: true
     icon: mdi:hvac
 
 input_boolean:
-  hvac_conditioner_job_cycle:
+  hvac_job_cycle:
     name: HVAC - Job Cycle
     icon: mdi:hvac
 
-  hvac_conditioner_automation_self_trigger:
+  hvac_automation_self_trigger:
     name: HVAC - Automation Self-trigger
     icon: mdi:hvac
 
 input_select:
-  hvac_conditioner_state_machine:
+  hvac_state_machine:
     name: HVAC - State Machine
     options:
       - unplugged
@@ -26,6 +38,8 @@ input_select:
       - job_completed
     icon: mdi:hvac
 
+#________________________
+# * ADDITIONAL FEATURES *
 template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## -- MACROS --
   ## 
@@ -45,8 +59,7 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
 
 #   - sensor:
 #       - name: HVAC Current State - Translated
-#         unique_id: hvac_conditioner_current_state_translated
-#         icon: "mdi:hvac"
+#         unique_id: washing_machine_current_state_translated
 #         state: >
 #           {%- macro state_machine_translation(state) -%}
 #           {% set STATE_MACHINE_TRANSLATION = {
@@ -59,4 +72,4 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
 #           } %}
 #           {{ STATE_MACHINE_TRANSLATION[state]}}
 #           {%- endmacro -%}
-#           {{ state_machine_translation(states('input_select.hvac_conditioner_state_machine')) }}
+#           {{ state_machine_translation(states('input_select.hvac_state_machine')) }}

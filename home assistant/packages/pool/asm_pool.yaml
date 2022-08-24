@@ -1,22 +1,34 @@
 timer:
-  swimming_pool_delayed_job_completion_timer:
-    name: Swimming Pool - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Note that the time here. Leave as it is (15 min)
+  pool_delayed_job_completion_timer:
+    name: Pool - Delayed Job Completion Timer
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:pool
+
+  pool_delayed_job_ongoing_timer:
+    name: Pool - Delayed Job Ongoing Timer
+    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    restore: true
+    icon: mdi:pool
+
+  pool_job_completed_persistence_timer:
+    name: Pool - Job completed persistence timer
+    duration: "01:30:00" # <- Notice the time here. Leave as it is (1h 30 min)
     restore: true
     icon: mdi:pool
 
 input_boolean:
-  swimming_pool_job_cycle:
-    name: Swimming Pool - Job Cycle
+  pool_job_cycle:
+    name: Pool - Job Cycle
     icon: mdi:pool
 
-  swimming_pool_automation_self_trigger:
-    name: Swimming Pool - Automation Self-trigger
+  pool_automation_self_trigger:
+    name: Pool - Automation Self-trigger
     icon: mdi:pool
 
 input_select:
-  swimming_pool_state_machine:
-    name: Swimming Pool - State Machine
+  pool_state_machine:
+    name: Pool - State Machine
     options:
       - unplugged
       - idle
@@ -26,6 +38,8 @@ input_select:
       - job_completed
     icon: mdi:pool
 
+#________________________
+# * ADDITIONAL FEATURES *
 template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## -- MACROS --
   ## 
@@ -44,9 +58,8 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ## Press ctrl + K & ctrl + U to uncomment from VSCode. 
 
 #   - sensor:
-#       - name: Swimming Pool Current State - Translated
-#         unique_id: swimming_pool_current_state_translated
-#         icon: "mdi:pool"
+#       - name: Pool Current State - Translated
+#         unique_id: washing_machine_current_state_translated
 #         state: >
 #           {%- macro state_machine_translation(state) -%}
 #           {% set STATE_MACHINE_TRANSLATION = {
@@ -59,4 +72,4 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
 #           } %}
 #           {{ STATE_MACHINE_TRANSLATION[state]}}
 #           {%- endmacro -%}
-#           {{ state_machine_translation(states('input_select.swimming_pool_state_machine')) }}
+#           {{ state_machine_translation(states('input_select.pool_state_machine')) }}
