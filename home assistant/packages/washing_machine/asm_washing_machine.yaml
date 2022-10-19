@@ -38,9 +38,9 @@ input_select:
       - job_completed
     icon: mdi:washing-machine
 
-#________________________
-# * ADDITIONAL FEATURES *
-template: [] # <- IMPORTANT! Remove the [] if you enable any macro
+#_________________________________
+# * ADDITIONAL OPTIONAL FEATURES *
+template: [] # <- IMPORTANT! Remove the [] if you enable any of the code belo
   ## -- MACROS --
   ## 
   ## **OPTIONAL**
@@ -52,8 +52,9 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
   ##                <state>: <translation to whatever I like>
   ##
   ##             It allows you to customize how each state should be displayed on the UI.
+  ##             If you want to specify what kind of job your appliance can do, this may come in handy
 
-  ## The template below is disabled by default, 
+  ## The template below is DISABLED BY DEFUALT, 
   ## if you want to enable it you need to uncomment the lines that will follow (remove all the '# ').
   ## Press ctrl + K & ctrl + U to uncomment from VSCode. 
 

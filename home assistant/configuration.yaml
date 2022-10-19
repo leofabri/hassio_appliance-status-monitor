@@ -1,8 +1,7 @@
-# You likely have some configuration variables above
+# You likely have some configuration above
 
 homeassistant: # <- Look for this one. If it doesn't exist, create it
-  ## Packages support enabled - Includes every .yaml file that is inside the packages/ directory
   packages: !include_dir_named packages/ # Includes every package that is inside the packages/ directory
   ## Warning! Please pay attention to the indentation!
 
-# You likely have sone configuration variables below
+# You likely have some more configuration below

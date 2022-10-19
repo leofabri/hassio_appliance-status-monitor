@@ -1,7 +1,7 @@
 # packages/ 
 This dir contains a library of pre-set packages you can use to speed up the automation setup process. 
 
-### Please copy just the files you need, or you'll have created a bunch of unused sensors!
+### Warning: Please copy just the files you need, or you'll end up creating a bunch of unused sensors!
 
 ---
 
@@ -30,5 +30,5 @@ This dir contains a library of pre-set packages you can use to speed up the auto
 - [Washing Machine](./washing_machine/asm_washing_machine.yaml)
 - [Water Well](./water_well/asm_water_well.yaml)
 
-## Yours is not present? Add your own
+## Yours is not present? Learn how to add your own:
 - [Universal, adaptable](./universal/asm_your_appliance_name.yaml)

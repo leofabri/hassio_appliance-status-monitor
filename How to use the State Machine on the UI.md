@@ -1,7 +1,7 @@
 There are at least two ways of doing that
 
 ## 1.  First way: Create a sensor
-You could create a sensor inside of <your_appliance_name>.yaml file inside of packages: 
+You could create a sensor inside <your_appliance_name>.yaml file inside of packages: 
 
 - **Advantages**: 
          - The configuration of your automation is all in one place (in you .yaml file), it's super portable and organized 
@@ -9,7 +9,7 @@ You could create a sensor inside of <your_appliance_name>.yaml file inside of pa
          - A sensor is way more usable and supported by most lovelace cards.
 - **Disadvantages**: 
         - It's quite inappropriate to use a sensor for translating things. It works, but I have mixed feelings about this. 
-        - you create a sensor just for that and some people dont't like that. 
+        - you create a sensor just for that and some people don't like that. 
 
     In this case, all you have to do is to add the following to the end of your `packages/your_appliance_name.yaml`:
 

@@ -67,8 +67,8 @@ template: [] # <- IMPORTANT! Remove the [] if you enable any macro
 #             "idle": "Idle",
 #             "paused": "Paused",
 #             "detached_overload": "Overload",
-#             "job_ongoing": "Washing in progress",
-#             "job_completed": "Washing completed",
+#             "job_ongoing": "Cooling/Heating",
+#             "job_completed": "Off",
 #           } %}
 #           {{ STATE_MACHINE_TRANSLATION[state]}}
 #           {%- endmacro -%}
