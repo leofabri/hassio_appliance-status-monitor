@@ -1,5 +1,4 @@
-# Warning! This release is still under development
-# 🔌 Detect and monitor the state of an appliance based on its power consumption - V2.1.1 ✨
+# 🔌 Detect the state of your appliances based on their power consumption - V3.0.0 ✨
 ### Automation Blueprint for Home Assistant
 
 <br>
@@ -13,22 +12,28 @@
   <img width="320" height="auto" src="assets/washing_machine_widget_markdown.jpg" alt="Monitor the state of an appliance - by leofabri"/>
 </p>
 
-This is the automation I made to control the state of the most power-hungry appliances in my house.
+# **Introduction**
 
-There aren’t numerous blueprints that do what I want, and I’m sure that I have the skills to automate my machines without wasting money to buy them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
+This automation can detect what your appliances are doing, inferring their state from their power consumption. All you need is a smart socket with a power monitoring feature.
 
-I use this for my dishwasher and washing machine and the results have been great! The blueprint is very extensible and easy to use.
-My family ❤️ this thing! Even if they don’t understand its complexity and get what all the fuss is about.
+## Why does this exist?
 
-As I said, I’m sharing this with everyone. I’m sure that you’ll find it useful!
+There aren’t numerous blueprints that do what I want, and I want to automate my machines without wasting money to buy them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
+
+## Use-cases
+I use this for my dishwasher, my washing machine, the electric bicycle and my desk. The results have been great! The blueprint is very extensible and easy to use.
+
+My family ❤️ this thing! Even if they don’t understand what all the fuss is about.
+
+I’m sharing this with everyone. I’m sure that you’ll find it useful!
 
 ---
-## **Features**
+# **Features**
 
-For the record: there is more inside but, here's a summary of what this thing allows you to do:
+For the record: there is more inside. Here's a summary of remarkable features:
 *   🎛️ **More triggers: more control,** even across Home Assistant reboots!
     *   **This automation is triggered on each power reading**. I'm doing the starting/finishing thresholds magic in the "actions" section, and you can also add some of your own.
-The objective of this blueprint is to allow more granular control over what's happening and do that reliably.
+    The goal of this blueprint is to allow a more granular control over what's happening. We also want to do that reliably.
 
 *   ⏱️ **Faster machine start-to-finish detection**: one of the problems that I always face is **timing**. <i>What if you want to measure how long it took for your appliance to complete its job?</i> The automation has to be <strong>very reactive</strong>. This logic should solve that problem for you.
   
@@ -75,7 +80,7 @@ The objective of this blueprint is to allow more granular control over what's ha
 Let's install it!
 
 ---
-## 📋**Requirements:** What do I need to run this blueprint?
+# 📋**Requirements:** What do I need to run this blueprint?
 
 To achieve this level of control **the socket must have some basic features**: 
 - Power monitoring (a polling rate of circa 60 sec. or less for best results)
@@ -89,7 +94,7 @@ Mine is a <strong>Meross MSS310EU</strong>, but most smart sockets should be sup
 
 ---
 
-## ⚙️ **Initial Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
+# ⚙️ **Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
 There are **two possible ways** of doing this:
 
 - **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little into shiny-but-dark UIs 😎 might want to set up this blueprint following [this documentation here](Alternative%20UI%20Setup.md).
@@ -194,7 +199,13 @@ input_boolean:
 
 ---
 
-# ➕ Download & Import
+# 🪛 **Tuning**
+
+Please refer to the guide [here](How%20to%20find%20the%20right%20Power%20Thresholds.md).
+
+---
+
+# ➕ **Download & Import**
 >Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this guide](#to-update).
 
 If you have just created your package, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) → Verify & if okay, Reboot)
@@ -206,7 +217,8 @@ If you have just created your package, please reboot Home Assistant ([at this pa
 That's it!
 
 ---
-## Results 🎉
+
+# **Final results** 🎉
 ### You should see the 4 new entities:
 
 > <strong>Warning |</strong> always use those entities as indicators, do not change their values manually! Leave that to your automation

@@ -21,7 +21,7 @@
 
       # * Overload controls
       appliance_overload_state_enabled: false # false = disabled. Important! If you enable option, please also set the appliance_suspended_sensor below
-      appliance_suspended_sensor: input_number.potenza_1_sospesa # Overload indicator. You'll need a separate automation to detect overloads for this to work
+      # appliance_suspended_sensor: input_number.potenza_1_sospesa # Overload indicator. You'll need a separate automation to detect overloads for this to work
 
       # * Timing
       delayed_job_ongoing_duration: 50 # seconds

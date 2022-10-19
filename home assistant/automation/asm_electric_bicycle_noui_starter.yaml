@@ -21,7 +21,7 @@
 
       # * Overload controls
       appliance_overload_state_enabled: false # false = disabled. Important! If you enable option, please also set the appliance_suspended_sensor below
-      appliance_suspended_sensor: input_number.potenza_1_sospesa # Overload indicator. You'll need a separate automation to detect overloads for this to work
+      # appliance_suspended_sensor: input_number.potenza_1_sospesa # Overload indicator. You'll need a separate automation to detect overloads for this to work
 
       # * Timing
       delayed_job_ongoing_duration: 50 # seconds
@@ -30,8 +30,8 @@
 
       # * Power Thresholds
       # Don't know how to find the right power thresholds? Read the guide: <link>
-      appliance_starting_power_threshold: 5 # Watts
-      appliance_finishing_power_threshold: 2 # Watts
+      appliance_starting_power_threshold: 2.2 # Watts
+      appliance_finishing_power_threshold: 1.7 # Watts
 
 
       # _____________________ #
