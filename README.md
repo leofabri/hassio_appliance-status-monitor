@@ -1,3 +1,5 @@
+# V3.0.0 is still under development
+
 # 🔌 Detect the state of your appliances based on their power consumption - V3.0.0 ✨
 ### Automation Blueprint for Home Assistant
 
