@@ -37,7 +37,7 @@ This is how you do that within the home assistant UI:
    3. **Type:** Timer (The State machine)<br>
       **Name:** Your Appliance Name - Delayed Job Completion Timer<br>
       **Icon:** mdi:<your_appliance_icon><br>
-      **Duration:** 00:15:00 (leave it 15 minutes)<br>
+      **Duration:** 01:00:00 (leave it 1 hourutes)<br>
       **Restore:** Checked, True
 
    4. **Type:** Toggle (The automation self-trigger)<br>

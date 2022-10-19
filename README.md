@@ -177,7 +177,7 @@ input_boolean:
 timer:
   <your_appliance_name>_delayed_job_completion_timer:
     name: <Your Appliance Name> - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Note that the time here. Leave it 15 min
+    duration: "01:00:00" # <- Note that the time here. Leave it 1 hour
     restore: true
     icon: mdi:<your_appliance_icon>
 ```

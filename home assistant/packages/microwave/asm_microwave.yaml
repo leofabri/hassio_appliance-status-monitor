@@ -1,13 +1,13 @@
 timer:
   microwave_delayed_job_completion_timer:
     name: Microwave - Delayed Job Completion Timer
-    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    duration: "01:00:00" # <- Notice the time here. Leave as it is (1 hour)
     restore: true
     icon: mdi:microwave
 
   microwave_delayed_job_ongoing_timer:
     name: Microwave - Delayed Job Ongoing Timer
-    duration: "00:15:00" # <- Notice the time here. Leave as it is (15 min)
+    duration: "01:00:00" # <- Notice the time here. Leave as it is (1 hour)
     restore: true
     icon: mdi:microwave
 
