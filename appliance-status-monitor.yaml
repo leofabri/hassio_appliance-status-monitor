@@ -58,6 +58,8 @@ blueprint:
       selector:
         entity:
           domain: sensor
+          device_class: power
+          multiple: false
     appliance_starting_power_threshold:
       name: Starting power threshold
       description: >-
