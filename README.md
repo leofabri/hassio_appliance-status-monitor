@@ -1,5 +1,3 @@
-# This is the development branch - V3.0.0 is still under development
-
 # 🔌 Detect the state of your appliances based on their power consumption - V3.0.0 ✨
 ### Automation Blueprint for Home Assistant
 
@@ -98,7 +96,7 @@ Mine is a <strong>Meross MSS310EU</strong>, but all the smart sockets with the m
 ## ⚙️ **Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
 There are **two possible ways** of doing this:
 
-- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little into shiny-but-dark UIs 😎 might want to do the set up following [this documentation here](Alternative%20UI%20Setup.md).
+- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little into shiny-but-dark UIs 😎 might want to do the set up following [this documentation here](./docs/Alternative%20UI%20Setup.md).
 
   
 
@@ -130,7 +128,7 @@ Back to us, here are the two steps for creating a package:
    <u>**Result:**</u> You should see the packages' directory <u>**at the same level**</u> as the `configuration.yaml` file.
 
 
-2. **Make sure that the packages support is enabled** inside the [`configuration.yaml`](home%20assistant/configuration.yaml) file as shown below:
+2. **Make sure that the packages support is enabled** inside the [`configuration.yaml`](./home%20assistant/configuration.yaml) file as shown below:
 
     ```yaml
     homeassistant:
@@ -141,7 +139,7 @@ Back to us, here are the two steps for creating a package:
 ## Helpers creation
 **We'll put all the helpers in a package, organized by appliance**. Now we are ready to create our first package.
 
-<strong>PRESETS</strong> - These are vital if you want to simplify this setup even more, check out one of the already pre-made [packages](home%20assistant/packages/README.md) I prepared for you ([Washing Machine](home%20assistant/packages/washing_machine.yaml), [Dryer](home%20assistant/packages/dryer.yaml), [Dishwasher](home%20assistant/packages/dishwasher.yaml) and more are among the already supported ones).
+<strong>PRESETS</strong> - These are vital if you want to simplify this setup even more, check out one of the already pre-made [packages](./home%20assistant/README.md) I prepared for you (Washing Machine, Dryer, Dishwasher and more are among the already supported ones).
 
 ---
 
@@ -160,7 +158,7 @@ That's it!
 
 ## 🪛 **Tuning the values**
 
-Please refer to the guide [here](How%20to%20find%20the%20right%20Power%20Thresholds.md).
+Please refer to the guide [here](./docs/How%20to%20find%20the%20right%20Power%20Thresholds.md).
 
 ---
 
@@ -205,7 +203,7 @@ ___
 ## - Version 3.0.0
 
 > ---
-> The changes related to the **older versions** are <u>[here](older_versions_changelog.md)</u>.
+> The changes related to the **older versions** are <u>[here](./docs/Older%20Versions%20Changelog.md.md)</u>.
 
 <br>
 
@@ -214,14 +212,14 @@ ___
 <br>
 
 # **How do I know if there is a new version?**
-[**Read here**](./Frequent%20Questions%20and%20Answers.md/#../How%20to%20find%20the%20right%20Power%20Thresholds.md)
+[**Read here**](./docs/Frequent%20Questions%20and%20Answers.md/#../How%20to%20find%20the%20right%20Power%20Thresholds.md)
 
 <br>
 
 #  <p id="update">**How to update:**</p>
-[Learn how](./Frequent%20Questions%20and%20Answers.md/#how-to-update)
+[Learn how](./docs/Frequent%20Questions%20and%20Answers.md/#how-to-update)
 
 <br>
 
 # Q&A - Things you may want to know
-[See the dedicated documentation](Frequent%20Questions%20and%20Answers.md)
+[See the dedicated documentation](./docs/Frequent%20Questions%20and%20Answers.md)
