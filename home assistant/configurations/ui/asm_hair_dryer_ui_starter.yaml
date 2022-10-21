@@ -1,0 +1,45 @@
+# --- Notes --- 
+# Copy and paste this file inside of your automations.yaml (it's located as the same level as the configuration.yaml)
+# -------------
+alias: Hair Dryer - ASM
+description: "[UI] Appliance State Monitor Automation - Control the state of the appliance using the power consumption values"
+use_blueprint:
+  # Make sure you imported the blueprint before using this file.
+  path: leofabri/appliance-status-monitor.yaml
+  input:
+    #########################################################################
+    # Arbitrary variables | Change these according to your needs IMPORTANT! #
+    #########################################################################
+    # * Socket info
+    appliance_socket: switch.hair_dryer_outlet # Please set this value to your outlet for this appliance
+    appliance_power_sensor: sensor.hair_dryer_power  # Please set value to your power meter for this appliance
+
+    # * Overload controls
+    appliance_overload_state_enabled: false # false = disabled. Important! If you enable option, please also set the appliance_suspended_sensor below
+    # appliance_suspended_sensor: input_number.potenza_1_sospesa # Overload indicator. You'll need a separate automation to detect overloads for this to work
+
+    # * Timing
+    delayed_job_ongoing_duration: 50 # seconds
+    delayed_job_completion_duration: 140 # seconds
+    job_completed_persistence_duration: 150 # seconds
+
+    # * Power Thresholds
+    # Don't know how to find the right power thresholds? Read the guide: <link>
+    appliance_starting_power_threshold: 5 # Watts
+    appliance_finishing_power_threshold: 2 # Watts
+
+
+    # _____________________ #
+
+    ###########
+    # Helpers #
+    ###########
+
+    # These match the enties created in the packages/ folder
+    # They are already matching the names, unless you changed them.
+    automation_self_trigger: input_boolean.hair_dryer_automation_self_trigger
+    appliance_state_machine: input_select.hair_dryer_state_machine
+    appliance_job_cycle: input_boolean.hair_dryer_job_cycle
+    delayed_job_completion_timer: timer.hair_dryer_delayed_job_completion_timer
+    delayed_job_ongoing_timer: timer.hair_dryer_delayed_job_ongoing_timer
+    job_completed_persistence_timer: timer.hair_dryer_job_completed_persistence_timer
