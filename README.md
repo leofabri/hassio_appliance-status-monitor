@@ -25,7 +25,7 @@
   - [➕ **Download & Import**](#-download--import)
   - [🧰 **Finalizing the configuration**](#-finalizing-the-configuration)
   - [🪛 **Fine-tuning the values**](#-fine-tuning-the-automation)
-  - [🎉 **Final results**](#final-results-)
+  - [🎉 **Final results**](#-final-results)
 - [**Versions & Changelog**](#versions--changelog)
 - [**Q&A - Things you may want to know**](#qa---things-you-may-want-to-know)
 ---
