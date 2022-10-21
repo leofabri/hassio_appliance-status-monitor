@@ -40,3 +40,4 @@ The structure of the **home assistant** folder is as follows:
 ## Other secondary utilities
 
 - [**templates/**](./templates/) — Contains a collection of templates that can be used to extend some features of the automation. The necessary ones are already inside the `packages/` directory, so you likely won't need them.
+
