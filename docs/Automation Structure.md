@@ -1,4 +1,4 @@
-# Detailed Inputs' list
+# Detailed Inputs list
 
 | Inputs | | | | | |
 | ------ | --- | ---- | -- | -- | -- |
@@ -30,7 +30,7 @@ The rest are constants, stored in the automation itself.
 
 
 
-# Detailed Triggers' list
+# Detailed Triggers list
 
 | Triggers | | |
 | -------- | --- | --- |
@@ -48,7 +48,7 @@ The rest are constants, stored in the automation itself.
 | 10       | **home\_assistant\_started\_event** | Event - Home Assistant has started |
 | 11       | **automation\_reloaded\_event** | Event - The automation have been reloaded |
 
-# Detailed States's list 
+# Detailed States list 
 
 | States | | |
 | ------ | --- | --- |
