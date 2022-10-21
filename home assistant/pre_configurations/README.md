@@ -1,7 +1,7 @@
 # **Pre-made Automation files**:
 
-## **How To**
-The `configurations/` folder has is organized this way:
+## How to use the files in this folder:
+The `pre_configurations/` folder has is organized this way:
 - [`no_ui/`](./no_ui/) -> Contains a curated list of pre-configuration files that you can copy and configure the blueprint **without the UI**. [More info](./no_ui/README.md)
 
 - [`ui/`](./ui/) -> Contains the same list of configuration files that can be used when creating a new automation **with the UI**. [More info](./ui/README.md)

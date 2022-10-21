@@ -25,6 +25,6 @@ If you click on the automation that just appeared, you'll see at the top of the 
   <img width="100%" height="auto" src="../../../assets/automation_can_not_be_edited_from_the_UI.jpg" alt="Monitor the state of an appliance - by leofabri"/>
 </p>
 
-Please DO NOT MIGRATE the automation! Doing that will clone the blueprint entirely, and you will not be able to push future updates!
+<font color=red>Please DO NOT MIGRATE the automation!</font> Doing that will clone the blueprint entirely, and you will not be able to push future updates!
 
 If you want to edit the configuration, you have to do that through VSCode. While this is a considerable disadvantage, it also makes the configuration more portable and easy to maintain.
