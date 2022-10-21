@@ -163,7 +163,7 @@ Back to us, here are the two steps for creating a package:
 ---
 
 ## ➕ **Download & Import**
->Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this guide](#to-update).
+>Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this guide](./docs/Frequent%20Questions%20and%20Answers.md/#how-to-update).
 
 If you have just created your package, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) → Verify & if okay, Reboot)
 
