@@ -67,7 +67,7 @@
 * ### **How do I know if there is a new version?**
   Easy! — [Look for the current version number in the title on GitHub](https://github.com/leofabri/hassio_appliance-status-monitor#-detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption). Now, open one of the automations that currently uses this blueprint and notice the version tag:
   <p align="center">
-  <img src="./assets/need-to-update.jpg" alt="Do I need to update?"/>
+  <img src="../assets/need-to-update.jpg" alt="Do I need to update?"/>
 
 * ### **How to update:**
   Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find **"ASM - Monitor the state of an appliance - by leofabri"** **and delete it** by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few secs, you can leave the automation as it is for now. <br>
