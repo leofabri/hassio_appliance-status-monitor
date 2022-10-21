@@ -68,4 +68,4 @@ I am free to access the automation whenever I want from [![Open your Home Assist
 
 ---
 ---
-### Done? Continue with the next section [Fine Tuning](../../README.md#🪛-fine-tuning-the-automation)
+### Done? Continue with the next section [Fine Tuning](../../README.md#-fine-tuning-the-automation)

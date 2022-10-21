@@ -156,9 +156,9 @@ Add this blueprint to your Home Assistant [![Open your Home Assistant instance a
 ## 🧰 **Finalizing the configuration**
 **Remember: we will put all the configuration and the helpers in a package, organized by appliance**.
 
-1. **Copy one of the packages of your choice to your `packages/` folder**: [See the packages section](./home%20assistant/README.md).
+1. **Copy one of the packages of your choice to your `packages/` folder**: [See the packages section](./home%20assistant/packages/).
 2. **Configure the automation either by:**
-     - **Using one of the preconfigurations available [here](./home%20assistant/pre_configurations/README.md)**. [<- Recommended]
+     - **Using one of the pre-configurations available [here](./home%20assistant/pre_configurations/)**. [<- Recommended]
      - Creating the automation in Home Assistant selecting _"**ASM - Monitor the state of an appliance - by leofabri**"_ in the Blueprints section [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/), then configure it manually.
 ---
 
