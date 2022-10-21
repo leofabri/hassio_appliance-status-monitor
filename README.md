@@ -15,32 +15,19 @@
 
 ---
 
-## Table of content
-- [🔌 Detect the state of your appliances based on their power consumption - V3.0.0 ✨](#-detect-the-state-of-your-appliances-based-on-their-power-consumption---v300-)
-    - [Automation Blueprint for Home Assistant](#automation-blueprint-for-home-assistant)
-  - [Table of content](#table-of-content)
-  - [- Q&A - Things you may want to know](#--qa---things-you-may-want-to-know)
+## Table of contents
 - [**Introduction**](#introduction)
   - [Why does this exist?](#why-does-this-exist)
   - [Use-cases](#use-cases)
 - [**Features**](#features)
 - [Installation](#installation)
   - [📋**Requirements:** What do I need to run this blueprint?](#requirements-what-do-i-need-to-run-this-blueprint)
-    - [One more thing:](#one-more-thing)
   - [⚙️ **Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)](#️-setup-lets-make-some-helper-variables-i-styletext-color-redmandatoryi)
-  - [Helpers creation](#helpers-creation)
+  - [**Helpers creation**](#helpers-creation)
   - [➕ **Download & Import**](#-download--import)
   - [🪛 **Tuning the values**](#-tuning-the-values)
   - [**Final results** 🎉](#final-results-)
-    - [You should see the 4 new entities:](#you-should-see-the-4-new-entities)
-    - [During a job cycle:](#during-a-job-cycle)
-  - [Congratulations! Your appliance is now smarter 🧠](#congratulations-your-appliance-is-now-smarter-)
 - [Versions & Changelogs:](#versions--changelogs)
-  - [📯Important notice! 🚨](#important-notice-)
-    - [🆕 The code has been updated](#-the-code-has-been-updated)
-  - [- Version 3.0.0](#--version-300)
-- [**How do I know if there is a new version?**](#how-do-i-know-if-there-is-a-new-version)
-- [<p id="update">**How to update:**</p>](#how-to-update)
 - [Q&A - Things you may want to know](#qa---things-you-may-want-to-know)
 ---
 
