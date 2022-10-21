@@ -21,10 +21,10 @@
 - [**Features**](#features)
 - [**Installation**](#installation)
   - [📋 **Requirements**](#📋requirements-what-do-i-need-to-run-this-blueprint)
-  - [⚙️ **Enabling packages**](#⚙️-enabling-packages)
-  - [🧰 **Helpers creation**](#🧰-helpers-creation)
+  - [⚙️ **Enabling the `packages/`**](#⚙️-enabling-the-packages)
   - [➕ **Download & Import**](#-download--import)
-  - [🪛 **Tuning the values**](#-tuning-the-values)
+  - [🧰 **Finalizing the configuration**](#🧰-finalizing-the-configuration)
+  - [🪛 **Fine-tuning the values**](#🪛-fine-tuning-the-automation)
   - [🎉 **Final results**](#final-results-)
 - [**Versions & Changelogs**](#versions--changelogs)
 - [**Q&A - Things you may want to know**](#qa---things-you-may-want-to-know)
@@ -33,7 +33,7 @@
 
 # **Introduction**
 
-This automation can detect what your appliances are doing, inferring their state from power consumption. All you need is a smart socket with a power monitoring feature.
+This automation can detect what your appliances are doing, inferring their state from power consumption. All you need to get started is a smart socket with a power monitoring feature.
 
 ## Why does this exist?
 
@@ -111,7 +111,7 @@ Mine is a <strong>Meross MSS310EU</strong>, but all the smart sockets with the m
 
 ---
 
-## ⚙️ **Enabling packages**
+## ⚙️ **Enabling the `packages/`**
 
 Creating a package is super easy. Some of you may already have the right configuration in place, but I'll show you how to do that anyway.
 
@@ -148,27 +148,25 @@ Back to us, here are the two steps for creating a package:
     ```
 
 ---
-## 🧰 Helpers creation
-**We'll put all the helpers in a package, organized by appliance**. Now we are ready to create our first package.
 
-<strong>PRESETS</strong> - These are vital if you want to simplify this setup even more, check out one of the already pre-made [packages](./home%20assistant/README.md) I prepared for you (Washing Machine, Dryer, Dishwasher and more are among the already supported ones).
-
----
 
 ## ➕ **Download & Import**
->Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this guide](./docs/Frequent%20Questions%20and%20Answers.md/#how-to-update).
+>Are you **trying to update** to a newer version? [Let's do that in a snap! Follow this guide instead](./docs/Frequent%20Questions%20and%20Answers.md/#how-to-update).
 
-If you have just created your package, please reboot Home Assistant ([at this page](https://my.home-assistant.io/redirect/server_controls/) → Verify & if okay, Reboot)
+Add this blueprint to your Home Assistant [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
 
-1.  Add this blueprint to your Home Assistant [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml)
-2.  Create a New Automation from that blueprint
-3.  Configure the variables as indicated inside the blueprint's UI.
-   
-That's it!
 
 ---
+## 🧰 **Finalizing the configuration**
+**Remember: we will put all the configuration and the helpers in a package, organized by appliance**.
 
-## 🪛 **Tuning the values**
+1. **Copy one of the packages of your choice to your `packages/` folder**: [See the packages section](./home%20assistant/README.md).
+2. **Configure the automation either by:**
+     - Using one of the preconfigurations available [here](./home%20assistant/pre_configurations/README.md) [**Suggested** | Fastest way]
+     - Creating an automation in Home Assistant selecting _"**ASM - Monitor the state of an appliance - by leofabri**"_ in the Blueprints section [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/). 
+---
+
+## 🪛 **Fine-tuning the automation**
 
 Please refer to the guide [here](./docs/How%20to%20find%20the%20right%20Power%20Thresholds.md).
 
