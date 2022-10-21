@@ -1,5 +1,6 @@
 # 🔌 Detect the state of your appliances based on their power consumption - V3.0.0 ✨
-### Automation Blueprint for Home Assistant
+
+### [Go to the official discussion on the Home Assistant Forum](https://community.home-assistant.io/t/detect-and-monitor-the-state-of-an-appliance-based-on-its-power-consumption-v2-1-1-updated/421670)
 
 <br>
 
@@ -17,19 +18,18 @@
 
 ## Table of contents
 - [**Introduction**](#introduction)
-  - [Why does this exist?](#why-does-this-exist)
-  - [Use-cases](#use-cases)
 - [**Features**](#features)
-- [Installation](#installation)
-  - [📋**Requirements:** What do I need to run this blueprint?](#requirements-what-do-i-need-to-run-this-blueprint)
-  - [⚙️ **Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)](#️-setup-lets-make-some-helper-variables-i-styletext-color-redmandatoryi)
-  - [**Helpers creation**](#helpers-creation)
+- [**Installation**](#installation)
+  - [📋 **Requirements**](#📋requirements-what-do-i-need-to-run-this-blueprint)
+  - [⚙️ **Enabling packages**](#⚙️-enabling-packages)
+  - [🧰 **Helpers creation**](#🧰-helpers-creation)
   - [➕ **Download & Import**](#-download--import)
   - [🪛 **Tuning the values**](#-tuning-the-values)
-  - [**Final results** 🎉](#final-results-)
-- [Versions & Changelogs:](#versions--changelogs)
-- [Q&A - Things you may want to know](#qa---things-you-may-want-to-know)
+  - [🎉 **Final results**](#final-results-)
+- [**Versions & Changelogs**](#versions--changelogs)
+- [**Q&A - Things you may want to know**](#qa---things-you-may-want-to-know)
 ---
+<br>
 
 # **Introduction**
 
@@ -97,7 +97,6 @@ For the record: there is more inside. Here's a summary of the most remarkable on
 
 # Installation
 
----
 ## 📋**Requirements:** What do I need to run this blueprint?
 
 To achieve this level of control **the socket has have some basic features**: 
@@ -112,18 +111,11 @@ Mine is a <strong>Meross MSS310EU</strong>, but all the smart sockets with the m
 
 ---
 
-## ⚙️ **Setup:** Let's make some helper variables (<i style="text-color: red">mandatory!</i>)
-There are **two possible ways** of doing this:
-
-- **Setup via the UI [Discouraged but Beginner Friendly]:** newcomers that might be a little into shiny-but-dark UIs 😎 might want to do the set up following [this documentation here](./docs/Alternative%20UI%20Setup.md).
-
-  
-
-- <u>**Setup via the old school YAML [Optimal & Suggested]:**</u> The best way of creating what we need is to create a package (suggestion provided by [@HollyFred](https://github.com/leofabri/hassio_appliance-status-monitor/issues/8#issue-1304478600)) because it allows us to create all the necessary helpers (timers, input_booleans...) in one shot. <i>Continue reading for this one</i> ⬇️
+## ⚙️ **Enabling packages**
 
 Creating a package is super easy. Some of you may already have the right configuration in place, but I'll show you how to do that anyway.
 
-> Note: you need to have the VS Code integration enabled. This will allow you to manually edit the necessary files. Need help with that? [Read this](https://www.home-assistant.io/docs/configuration/).
+> **Note:** you need to have the VS Code integration enabled. This will allow you to manually edit the necessary files. Need help with that? [Read this](https://www.home-assistant.io/docs/configuration/).
 
 Back to us, here are the two steps for creating a package:
 
@@ -155,7 +147,8 @@ Back to us, here are the two steps for creating a package:
       ## Warning! Please pay attention to the indentation!
     ```
 
-## Helpers creation
+---
+## 🧰 Helpers creation
 **We'll put all the helpers in a package, organized by appliance**. Now we are ready to create our first package.
 
 <strong>PRESETS</strong> - These are vital if you want to simplify this setup even more, check out one of the already pre-made [packages](./home%20assistant/README.md) I prepared for you (Washing Machine, Dryer, Dishwasher and more are among the already supported ones).
@@ -181,7 +174,7 @@ Please refer to the guide [here](./docs/How%20to%20find%20the%20right%20Power%20
 
 ---
 
-## **Final results** 🎉
+## 🎉 **Final results**
 ### You should see the 4 new entities:
 
 > <strong>Warning |</strong> always use those entities as indicators, do not change their values manually! Leave that to your automation
@@ -206,40 +199,26 @@ Please refer to the guide [here](./docs/How%20to%20find%20the%20right%20Power%20
 </figure>
 
 
-## Congratulations! Your appliance is now smarter 🧠
-<br>
-<br>
-
-___
-<br>
-<br>
+## Done!
 
 
 # Versions & Changelogs:
-## 📯Important notice! 🚨
-### 🆕 The code has been updated
-
-## - Version 3.0.0
+- ### Version 3.0.0:
+  - Some changes...
 
 > ---
 > The changes related to the **older versions** are <u>[here](./docs/Older%20Versions%20Changelog.md.md)</u>.
-
-<br>
+> 
+> ---
 
 ---
 
-<br>
+## [**How do I know if there is a new version?**](./docs/Frequent%20Questions%20and%20Answers.md/#how-do-i-know-if-there-is-a-new-version)
 
-# **How do I know if there is a new version?**
-[**Read here**](./docs/Frequent%20Questions%20and%20Answers.md/#how-do-i-know-if-there-is-a-new-version)
+---
 
-<br>
+##  [**How to update**](./docs/Frequent%20Questions%20and%20Answers.md/#how-to-update)
+---
 
-#  <p id="update">**How to update:**</p>
-[Learn how](./docs/Frequent%20Questions%20and%20Answers.md/#how-to-update)
-
-<br>
-
-# Q&A - Things you may want to know
-[See the dedicated documentation](./docs/Frequent%20Questions%20and%20Answers.md)
+## [**Q&A - Things you may want to know**](./docs/Frequent%20Questions%20and%20Answers.md)
 
