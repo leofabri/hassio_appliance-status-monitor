@@ -26,7 +26,7 @@
   - [🧰 **Finalizing the configuration**](#🧰-finalizing-the-configuration)
   - [🪛 **Fine-tuning the values**](#🪛-fine-tuning-the-automation)
   - [🎉 **Final results**](#final-results-)
-- [**Versions & Changelogs**](#versions--changelogs)
+- [**Versions & Changelog**](#versions--changelog)
 - [**Q&A - Things you may want to know**](#qa---things-you-may-want-to-know)
 ---
 <br>
@@ -61,7 +61,7 @@ For the record: there is more inside. Here's a summary of the most remarkable on
         * when an overload occurs
         * when the overload situation is solved, now paused
         * when the overload situation is solved, now resuming
-      * #Socket state change (On <-> Off):
+      * #Socket's state change (On <-> Off):
         * when the appliance is plugged back in, now paused
       * #Job-cycle based:
         * when a new job cycle begins
@@ -70,16 +70,18 @@ For the record: there is more inside. Here's a summary of the most remarkable on
 
 *   🥷 **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
     *   Meaning that you can tell if it's in one of the following states:
-    *   
+  
 | States | | |
 | ------ | --- | --- |
 | N°     | Name | Description |
 | 00     | **unplugged** | The appliance is no longer powered. The smart socket is off.  |
 | 01     | **idle** | There is no pending job, the machine is powered but idling. |
 | 02     | **paused** | The appliance has a pending job (cycle still on) but the appliance is not performing it. The state also indicates that the Power absorption is lower than the finishing power threshold, but the previous state indicates that the appliance hasn't completed its job yet. The appliance has to be off (the user may have turned it off manually), or maybe the job needs some time to recover. The automation is now waiting for the appliance to resume. |
-| 03     | **detached_overload** | Entered when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged. The state work only if Appliance Overload State Enabled `appliance_overload_state_enabled: true` and `appliance_suspended_sensor: input_number.some_power_overload_sensor_is_present`  |
+| 03     | **detached_overload** | Entered when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged. The state works only if Appliance Overload State is enabled `appliance_overload_state_enabled: true` and `appliance_suspended_sensor: input_number.some_power_overload_sensor_is_present`  |
 | 04     | **job_ongoing** | Signals that a cycle has to be complete and a new or a previous job is ongoing |
 | 05     | **job_completed** | Entered when the current incomplete job cycle is finished. The appliance uses less power than the **Finishing Power threshold** ( `appliance_finishing_power_threshold`) (with the possibility of selecting for how long). |
+
+Do you want to know more about the automation's structure? [You might find this interesting](./docs/Automation%20Structure.md).
 
 
     Note: Each state's transition is handled automatically, you just have to provide the initial configuration.
@@ -194,7 +196,7 @@ Please refer to the guide [here](./docs/How%20to%20find%20the%20right%20Power%20
 ## Done!
 
 
-# Versions & Changelogs:
+# Versions & Changelog:
 - ### Version 3.0.0:
   - Some changes...
 

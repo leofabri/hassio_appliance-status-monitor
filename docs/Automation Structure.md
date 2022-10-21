@@ -1,3 +1,5 @@
+# Detailed Inputs' list
+
 | Inputs | | | | | |
 | ------ | --- | ---- | -- | -- | -- |
 | N°     | Name | Description | Type | Helper? | Optional / Required |
@@ -16,6 +18,7 @@
 | 12     | **job\_completed\_persistence\_timer** | Job completed - State persistence Timer | timer. | True | OPTIONAL |
 | 13     | **job\_completed\_persistence\_duration** | Job completed - State Persistence Duration | number | True | OPTIONAL |
 
+# Detailed Triggers' list
 
 | Triggers | | |
 | -------- | --- | --- |
@@ -33,6 +36,7 @@
 | 10       | **home\_assistant\_started\_event** | Event - Home Assistant has started |
 | 11       | **automation\_reloaded\_event** | Event - The automation have been reloaded |
 
+# Detailed States's list 
 
 | States | | |
 | ------ | --- | --- |
@@ -40,6 +44,6 @@
 | 00     | **unplugged** | The appliance is no longer powered. The smart socket is off.  |
 | 01     | **idle** | There is no pending job, the machine is powered but idling. |
 | 02     | **paused** | The appliance has a pending job (cycle still on) but the appliance is not performing it. The state also indicates that the Power absorption is lower than the finishing power threshold, but the previous state indicates that the appliance hasn't completed its job yet. The appliance has to be off (the user may have turned it off manually), or maybe the job needs some time to recover. The automation is now waiting for the appliance to resume. |
-| 03     | **detached_overload** | Entered when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged. The state work only if Appliance Overload State Enabled `appliance_overload_state_enabled: true` and `appliance_suspended_sensor: input_number.some_power_overload_sensor_is_present`  |
+| 03     | **detached_overload** | Entered when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged. The state works only if Appliance Overload State is enabled `appliance_overload_state_enabled: true` and `appliance_suspended_sensor: input_number.some_power_overload_sensor_is_present`  |
 | 04     | **job_ongoing** | Signals that a cycle has to be complete and a new or a previous job is ongoing |
 | 05     | **job_completed** | Entered when the current incomplete job cycle is finished. The appliance uses less power than the **Finishing Power threshold** ( `appliance_finishing_power_threshold`) (with the possibility of selecting for how long). |

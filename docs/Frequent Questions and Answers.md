@@ -72,7 +72,7 @@
     <img width="500" height="auto" src="../assets/need-to-update.jpg" alt="Monitor the state of an appliance - by leofabri"/>
     </p>
 
-1. ### **How to update:**
+3. ### **How to update:**
     Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find **"ASM - Monitor the state of an appliance - by leofabri" and delete it** by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few secs, you can leave the automation as it is for now. <br>
 
     Create the missing helpers (entities) as shown in the instructions
@@ -80,6 +80,7 @@
 
     Open your automation and add the previously created helpers (entities)
 
+4. ### **Do you want to know more about this automation's structure?** [You might find this interesting](./Automation%20Structure.md).
 
 ...
 ### Got more questions? [Feel free to ask!](https://community.home-assistant.io/t/detect-and-monitor-the-state-of-an-appliance-based-on-its-power-consumption-v2-1-1-updated/) 🙂
