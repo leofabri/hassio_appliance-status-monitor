@@ -33,18 +33,16 @@
 
 # **Introduction**
 
-This automation can detect what your appliances are doing, inferring their state from power consumption. All you need to get started is a smart socket with a power monitoring feature.
+This automation can detect what your appliances are doing, inferring their state from their power consumption. All you need to get started is a smart socket with a power monitoring feature.
 
 ## Why does this exist?
 
-There aren’t numerous blueprints that do what I need, and I want to automate my machines without wasting money to buy them new. Here’s my cheap and reliable solution that addresses the problem, once and for all.
+There aren’t numerous blueprints that do what I need, and I want to automate my machines without wasting money to buy them new. Here’s my cheap and reliable solution that addresses the problem, once and for all. I believe that controlling appliances should be easy for everyone. I’m sure that you’ll find it useful!
 
 ## Use-cases
 I use this for my dishwasher, my washing machine, the electric bicycle and my desk. The results have been great! The blueprint is very extensible and easy to use.
 
 My family ❤️ this thing! Even if they don’t understand what all the fuss is about.
-
-I’m sharing this with everyone. I’m sure that you’ll find it useful!
 
 ---
 # **Features**
@@ -72,27 +70,19 @@ For the record: there is more inside. Here's a summary of the most remarkable on
 
 *   🥷 **The appliance has its own** [**State Machine**](https://en.wikipedia.org/wiki/Finite-state_machine)
     *   Meaning that you can tell if it's in one of the following states:
-          - <strong><u><ins>unplugged</ins></u></strong> - means that the appliance is no longer powered. 
-            It happens when the user manually turns off the smart socket (from HA or the socket itself).
-            
-          - <strong><u><ins>idle</ins></u></strong> - There is no pending job, the machine is powered but idling.
-            
-          - <strong><u><ins>paused</ins></u></strong> - Indicates that a job is pending (incomplete cycle) but the appliance is not performing it. The inhibitors of these state are the <strong><i>detached_overload</i></strong> and <strong><i>unplugged</i></strong> states. 
-            In this condition, the Power absorption is lower than the finishing power threshold. The appliance must be off (the user may have turned it off manually, or maybe the job needs some time to recover).
-            The blueprint is now waiting for the appliance to resume.
-
-            <strong>Pro Tip!</strong> You could use this state to diagnose and warn if a job is not resumed after x minutes. 
-            
-          - <strong><u><ins>detached_overload</ins></u></strong> - This happens when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged.
-            
-          - <strong><u><ins>job_ongoing</ins></u></strong> - Triggered in two situations:
-              - **when a new job cycle begins**: the previous one is completed and the Starting Power threshold is surpassed (with the possibility of selecting for how long).
-              - **when a job is resumed**.
-              
-          - <strong><u><ins>job_completed</ins></u></strong> - Triggered when the current incomplete job cycle is finished. The appliance uses less power than the Finishing Power threshold (with the possibility of selecting for how long).
+    *   
+| States | | |
+| ------ | --- | --- |
+| N°     | Name | Description |
+| 00     | **unplugged** | The appliance is no longer powered. The smart socket is off.  |
+| 01     | **idle** | There is no pending job, the machine is powered but idling. |
+| 02     | **paused** | The appliance has a pending job (cycle still on) but the appliance is not performing it. The state also indicates that the Power absorption is lower than the finishing power threshold, but the previous state indicates that the appliance hasn't completed its job yet. The appliance has to be off (the user may have turned it off manually), or maybe the job needs some time to recover. The automation is now waiting for the appliance to resume. |
+| 03     | **detached_overload** | Entered when, during a cycle, the appliance used too much power and was therefore suspended. It is also technically unplugged. The state work only if Appliance Overload State Enabled `appliance_overload_state_enabled: true` and `appliance_suspended_sensor: input_number.some_power_overload_sensor_is_present`  |
+| 04     | **job_ongoing** | Signals that a cycle has to be complete and a new or a previous job is ongoing |
+| 05     | **job_completed** | Entered when the current incomplete job cycle is finished. The appliance uses less power than the **Finishing Power threshold** ( `appliance_finishing_power_threshold`) (with the possibility of selecting for how long). |
 
 
-        <strong>Note:</strong> Each state's transition is handled automatically, you just have to provide the initial configuration.
+    Note: Each state's transition is handled automatically, you just have to provide the initial configuration.
 <br>
 
 # Installation
@@ -103,6 +93,10 @@ To achieve this level of control **the socket has have some basic features**:
 - Power monitoring (a polling rate of circa 60 sec. or less for best results)
 - ON/OFF control over Home Assistant
 - State reporting (if it's ON or OFF)
+
+<p align="center">
+  <img width="180" height="auto" src="./assets/meross_smart_plug.jpg" alt="Monitor the state of an appliance - by leofabri"/>
+</p>
 
 Mine is a <strong>Meross MSS310EU</strong>, but all the smart sockets with the mentioned features should be supported.
 
@@ -162,8 +156,8 @@ Add this blueprint to your Home Assistant [![Open your Home Assistant instance a
 
 1. **Copy one of the packages of your choice to your `packages/` folder**: [See the packages section](./home%20assistant/README.md).
 2. **Configure the automation either by:**
-     - Using one of the preconfigurations available [here](./home%20assistant/pre_configurations/README.md) [**Suggested** | Fastest way]
-     - Creating an automation in Home Assistant selecting _"**ASM - Monitor the state of an appliance - by leofabri**"_ in the Blueprints section [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/). 
+     - **Using one of the preconfigurations available [here](./home%20assistant/pre_configurations/README.md)**. [<- Recommended]
+     - Creating the automation in Home Assistant selecting _"**ASM - Monitor the state of an appliance - by leofabri**"_ in the Blueprints section [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/), then configure it manually.
 ---
 
 ## 🪛 **Fine-tuning the automation**
