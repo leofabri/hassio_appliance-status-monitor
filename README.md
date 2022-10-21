@@ -21,7 +21,7 @@
 - [**Features**](#features)
 - [**Installation**](#installation)
   - [📋 **Requirements**](#requirements-what-do-i-need-to-run-this-blueprint)
-  - [⚙️ **Enabling the `packages/`**](#⚙️-enabling-the-packages)
+  - [⚙️ **Enabling the `packages/`**](#%EF%B8%8F-enabling-the-packages)
   - [➕ **Download & Import**](#-download--import)
   - [🧰 **Finalizing the configuration**](#-finalizing-the-configuration)
   - [🪛 **Fine-tuning the values**](#-fine-tuning-the-automation)
