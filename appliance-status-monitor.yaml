@@ -157,7 +157,7 @@ blueprint:
 
         ...
 
-        <i><strong>WARNING:</strong> There is a bug in Home Assistant that ignores update 
+        <i><strong>WARNING:</strong> There is [a bug in Home Assistant](https://community.home-assistant.io/t/blueprint-booleans-not-saving-after-deployment/440382/2) that causes the UI to ignore the update 
         the value of inputs like this. Sometimes, you'll have to go to Edit in YAML and define 
         'appliance_overload_state_enabled: true/false' to solve the issue.
 
