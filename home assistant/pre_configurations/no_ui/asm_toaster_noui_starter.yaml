@@ -1,9 +1,6 @@
 # --- Notes --- 
 # + No UI, yaml edit only: 
 # + + If you use this preset file the UI editor will not be available
-#
-# + If you want UI support:
-# + + Copy and paste this file inside of your automations.yaml (it's located as the same level as the configuration.yaml)
 # -------------
 - alias: Toaster - ASM
   id: 0f5dace6-2375-11ed-861d-0242ac120002 # This id must be unique or an error will be thrown! Need help? Use this https://www.uuidgenerator.net/version1

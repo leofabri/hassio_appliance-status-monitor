@@ -214,19 +214,12 @@ ___
 <br>
 
 # **How do I know if there is a new version?**
->
-> Easy! [Look for the current version number in the title](https://github.com/leofabri/hassio_appliance-status-monitor#-detect-and-monitor-the-status-of-an-appliance-based-on-its-power-consumption). Now, open one of the automations that currently uses this blueprint and notice the version tag:
-> <p align="center">
->  <img src="assets/need-to-update.jpg" alt="Do I need to update?"/>
-</p>
+[**Read here**](./Frequent%20Questions%20and%20Answers.md/#../How%20to%20find%20the%20right%20Power%20Thresholds.md)
 
 <br>
 
 #  <p id="update">**How to update:**</p>
->   * Open this page [![Open your Home Assistant instance and show your blueprints.](https://my.home-assistant.io/badges/blueprints.svg)](https://my.home-assistant.io/redirect/blueprints/) (just click the link, it's magical) and scroll till you find "*Monitor the status of an appliance - by leofabri*" and delete it by clicking on the trash bin 🗑. Don't worry, we'll add it right back in a few secs, you can leave the automation as it is for now.
->   * Create the missing helpers (entities) as shown in the instructions
->   * Add the blueprint again [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fleofabri%2Fhassio_appliance-status-monitor%2Fblob%2Fmain%2Fappliance-status-monitor.yaml), and reload Home Assistant.
->   * Open your automation and add the previously created helpers (entities)
+[Learn how](./Frequent%20Questions%20and%20Answers.md/#how-to-update)
 
 <br>
 
