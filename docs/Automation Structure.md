@@ -18,6 +18,18 @@
 | 12     | **job\_completed\_persistence\_timer** | Job completed - State persistence Timer | timer. | True | OPTIONAL |
 | 13     | **job\_completed\_persistence\_duration** | Job completed - State Persistence Duration | number | True | OPTIONAL |
 
+### The current automation has:
+- 1 `switch`
+- 1 `sensor`
+- 3 `timer`s: theoretically OPTIONAL (but this is untested)
+- 1 `input_number`
+- 1 `input_boolean`
+
+That have to be provided to fully configure the automation.
+The rest are constants, stored in the automation itself. 
+
+
+
 # Detailed Triggers' list
 
 | Triggers | | |
