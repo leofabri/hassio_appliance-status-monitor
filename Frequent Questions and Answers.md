@@ -25,5 +25,8 @@ You might not want to use anything at all! If that's the case, just leave the "A
 
 * **<ins>HA_PowerControl is just in Italian 🍝.. is there no other alternative?</ins>** —  I was unable to find one yet. [I asked](https://github.com/andbad/HA_PowerControl/issues/15) the author if I'm allowed to translate it ad he approves, but it's still too early to talk about a release.
 
+### `#versions`
+* **Why is the Git repo's main branch not the development branch?** — [Read here to see why](/Versioning.md)
+
 
 Got more questions? [Feel free to ask!](https://community.home-assistant.io/t/detect-and-monitor-the-state-of-an-appliance-based-on-its-power-consumption-v2-1-1-updated/) 🙂

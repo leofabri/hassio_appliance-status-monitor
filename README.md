@@ -16,7 +16,7 @@
 
 # **Introduction**
 
-This automation can detect what your appliances are doing, inferring their state from their power consumption. All you need is a smart socket with a power monitoring feature.
+This automation can detect what your appliances are doing, inferring their state from power consumption. All you need is a smart socket with a power monitoring feature.
 
 ## Why does this exist?
 
