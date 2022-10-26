@@ -26,6 +26,7 @@
   - [🧰 **Finalizing the configuration**](#-finalizing-the-configuration)
   - [🪛 **Fine-tuning the values**](#-fine-tuning-the-automation)
   - [🎉 **Final results**](#-final-results)
+  - [✨ **Learn how to use ASM in the UI**](#next-learn-how-to-use-asm-in-the-ui)
 - [**Versions & Changelog**](#versions--changelog)
 - [**Q&A - Things you may want to know**](#qa---things-you-may-want-to-know)
 ---
@@ -81,7 +82,7 @@ For the record: there is more inside. Here's a summary of the most remarkable on
 | 04     | **job_ongoing** | Signals that a cycle has to be complete and a new or a previous job is ongoing |
 | 05     | **job_completed** | Entered when the current incomplete job cycle is finished. The appliance uses less power than the **Finishing Power threshold** ( `appliance_finishing_power_threshold`) (with the possibility of selecting for how long). |
 
-Do you want to know more about the automation's structure? [You might find this interesting](./docs/Automation%20Structure.md).
+**Do you want to know more about the automation's structure?** [You might find this interesting](./docs/Automation%20Structure.md).
 
 
     Note: Each state's transition is handled automatically, you just have to provide the initial configuration.
@@ -192,8 +193,13 @@ Please refer to the guide [here](./docs/How%20to%20find%20the%20right%20Power%20
 </figcaption>
 </figure>
 
+---
 
-## Done!
+## ✨**Next: [Learn how to use ASM in the UI](./docs/How%20to%20use%20the%20automation%20in%20the%20UI.md)**
+
+---
+
+<br>
 
 
 # Versions & Changelog:
@@ -201,9 +207,13 @@ Please refer to the guide [here](./docs/How%20to%20find%20the%20right%20Power%20
   - Some changes...
 
 > ---
-> The changes related to the **older versions** are <u>[here](./docs/Older%20Versions%20Changelog.md.md)</u>.
+> The changes related to the **older versions** are <u>[here](./docs/Older%20Versions%20Changelog.md)</u>.
 > 
 > ---
+
+---
+
+# Other useful links:
 
 ---
 
