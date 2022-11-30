@@ -30,6 +30,8 @@
       appliance_starting_power_threshold: 5 # Watts
       appliance_finishing_power_threshold: 2 # Watts
 
+      # * Extras
+      # appliance_job_completed_when_socket_is_off: true # default is false (disabled)
 
       # _____________________ #
 

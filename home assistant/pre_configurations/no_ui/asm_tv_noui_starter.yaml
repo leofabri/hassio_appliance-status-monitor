@@ -30,7 +30,22 @@
       appliance_starting_power_threshold: 5 # Watts
       appliance_finishing_power_threshold: 2 # Watts
 
-
+      # * Extras
+      appliance_job_completed_when_socket_is_off: true # default is false (disabled)
+      
+      # * Custom Actions
+      actions_new_job_cycle_begins: []
+      actions_job_cycle_resumes: []
+      actions_job_cycle_ends: # SAVE POWER! Turn off the TV when nobody is watching it
+        - service: switch.turn_off
+          data: {}
+          target:
+            entity_id: switch.tv_outlet
+      actions_unplugged_overload: []
+      actions_paused_after_overload: []
+      actions_resuming_after_overload: []
+      actions_paused_after_unplugged: []
+      
       # _____________________ #
 
       ###########

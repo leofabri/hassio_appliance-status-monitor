@@ -164,6 +164,25 @@ blueprint:
       default: false
       selector:
         boolean:
+    appliance_job_completed_when_socket_is_off:
+      name: Consider the 'job_completed' when the socket is off
+      description: >-
+        (*REQUIRED)
+
+
+        Activate this if you want the state machine to transition to the 'job_completed' if the socket is is detected as unplugged.
+        Note: A perfect use case for this option is with TVs and other appliances that may be normally unpowered.
+        This is based on the assumption that: if the appliance is not powered, its job is done.
+
+        ...
+
+        <i><strong>WARNING:</strong> There is [a bug in Home Assistant](https://community.home-assistant.io/t/blueprint-booleans-not-saving-after-deployment/440382/2) that causes the UI to ignore the update 
+        the value of inputs like this. Sometimes, you'll have to go to Edit in YAML and define 
+        'appliance_job_completed_when_socket_is_off: true/false' to solve the issue.
+
+      default: false
+      selector:
+        boolean:
     appliance_suspended_sensor:
       name: Appliance Suspended Overload entity
       description: >-
@@ -401,6 +420,17 @@ variables:
 
   # Blueprint settings
   appliance_overload_state_enabled: !input "appliance_overload_state_enabled"
+  appliance_job_completed_when_socket_is_off: !input "appliance_job_completed_when_socket_is_off"
+
+  LOG_WAIT: "WAIT"
+  LOG_STATE_CHANGE: "STATE CHANGE"
+  LOG_TIMER: "TIMER"
+  LOG_CYCLE_START: "CYCLE START"
+  LOG_CYCLE_END: "CYCLE END"
+  LOG_CUSTOM_ACTIONS: "CUSTOM ACTIONS"
+  LOG_POWER_THRESHOLD: "POWER_THRESHOLD"
+  LOG_LEVEL: debug
+  LOG_LOGGER: homeassistant.components.asm_blueprint
 
 # FLAG: Triggers
 trigger:
@@ -522,9 +552,16 @@ action:
           # ***** LOG SECTION *****
           - service: system_log.write
             data_template:
-              level: debug
-              logger: homeassistant.components.asm_blueprint
-              message: "STATE CHANGE - Entered the detached_overload state."
+              level: "{{ LOG_LEVEL }}"
+              logger: "{{ LOG_LOGGER }}"
+              message: "{{ LOG_STATE_CHANGE }} - Entered the detached_overload state."
+          # ***********************
+          # ***** LOG SECTION *****
+          - service: system_log.write
+            data_template:
+              level: "{{ LOG_LEVEL }}"
+              logger: "{{ LOG_LOGGER }}"
+              message: "{{ LOG_CUSTOM_ACTIONS }} - executing actions_unplugged_overload."
           # ***********************
           - choose: []
             default: !input "actions_unplugged_overload"
@@ -566,9 +603,9 @@ action:
           # ***** LOG SECTION *****
           - service: system_log.write
             data_template:
-              level: debug
-              logger: homeassistant.components.asm_blueprint
-              message: "STATE CHANGE - Entered the paused state."
+              level: "{{ LOG_LEVEL }}"
+              logger: "{{ LOG_LOGGER }}"
+              message: "{{ LOG_STATE_CHANGE }} - Entered the paused state."
           # ***********************
 
         ##################################################
@@ -584,6 +621,12 @@ action:
               - condition: state
                 entity_id: !input "appliance_state_machine"
                 state: detached_overload
+          # Check whether the socket option is enabled or disabled
+          - condition: not
+            conditions:
+              - condition: template
+                value_template: >
+                  {{ appliance_job_completed_when_socket_is_off }}
         sequence:
           - condition: not
             conditions:
@@ -598,9 +641,9 @@ action:
           # ***** LOG SECTION *****
           - service: system_log.write
             data_template:
-              level: debug
-              logger: homeassistant.components.asm_blueprint
-              message: "STATE CHANGE - Entered the unplugged state."
+              level: "{{ LOG_LEVEL }}"
+              logger: "{{ LOG_LOGGER }}"
+              message: "{{ LOG_STATE_CHANGE }} - Entered the unplugged state."
           # ***********************
           - choose:
               - conditions:
@@ -614,26 +657,47 @@ action:
                   # ***** LOG SECTION *****
                   - service: system_log.write
                     data_template:
-                      level: debug
-                      logger: homeassistant.components.asm_blueprint
-                      message: "TIMER - delayed_job_completion_timer canceled and stopped."
+                      level: "{{ LOG_LEVEL }}"
+                      logger: "{{ LOG_LOGGER }}"
+                      message: "{{ LOG_TIMER }} - delayed_job_completion_timer canceled and stopped."
                   # ***********************
       - conditions:
           - condition: trigger
             id: paused_after_overload_event
         sequence:
+          # ***** LOG SECTION *****
+          - service: system_log.write
+            data_template:
+              level: "{{ LOG_LEVEL }}"
+              logger: "{{ LOG_LOGGER }}"
+              message: "{{ LOG_CUSTOM_ACTIONS }} - executing actions_paused_after_overload."
+          # ***********************
           - choose: []
             default: !input "actions_paused_after_overload"
       - conditions:
           - condition: trigger
             id: paused_after_unplugged_event
         sequence:
+          # ***** LOG SECTION *****
+          - service: system_log.write
+            data_template:
+              level: "{{ LOG_LEVEL }}"
+              logger: "{{ LOG_LOGGER }}"
+              message: "{{ LOG_CUSTOM_ACTIONS }} - executing actions_paused_after_unplugged."
+          # ***********************
           - choose: []
             default: !input "actions_paused_after_unplugged"
       - conditions:
           - condition: trigger
             id: resuming_after_paused_overload_event
         sequence:
+          # ***** LOG SECTION *****
+          - service: system_log.write
+            data_template:
+              level: "{{ LOG_LEVEL }}"
+              logger: "{{ LOG_LOGGER }}"
+              message: "{{ LOG_CUSTOM_ACTIONS }} - executing actions_resuming_after_overload."
+          # ***********************
           - choose: []
             default: !input "actions_resuming_after_overload"
     default:
@@ -666,9 +730,9 @@ action:
                       # ***** LOG SECTION *****
                       - service: system_log.write
                         data_template:
-                          level: debug
-                          logger: homeassistant.components.asm_blueprint
-                          message: "TIMER - The starting power threshold was surpassed again => delayed_job_completion_timer canceled and stopped"
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_TIMER }} - The starting power threshold was surpassed again => delayed_job_completion_timer canceled and stopped"
                       # ***********************
               - choose:
                   # IF
@@ -688,6 +752,13 @@ action:
                           - condition: trigger
                             id: job_started_timer_finished
                     sequence:
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_POWER_THRESHOLD }} - The starting power threshold was reached"
+                      # ***********************
                       # Start the timer, start counting backwards
                       - service: timer.start
                         data: {}
@@ -696,9 +767,9 @@ action:
                       # ***** LOG SECTION *****
                       - service: system_log.write
                         data_template:
-                          level: debug
-                          logger: homeassistant.components.asm_blueprint
-                          message: "TIMER - delayed_job_ongoing_timer start invoked. Now it's {{ states(delayed_job_ongoing_timer) }}"
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_TIMER }} - delayed_job_ongoing_timer start invoked. Now it's {{ states(delayed_job_ongoing_timer) }}"
                       # ***********************
               - choose:
                   # if the timer should last for a time that is not 0
@@ -726,9 +797,9 @@ action:
                               # ***** LOG SECTION *****
                               - service: system_log.write
                                 data_template:
-                                  level: debug
-                                  logger: homeassistant.components.asm_blueprint
-                                  message: "WAIT - Waiting {{ delayed_job_ongoing_duration }} seconds, then I will decide if job_ongoing state should be entered."
+                                  level: "{{ LOG_LEVEL }}"
+                                  logger: "{{ LOG_LOGGER }}"
+                                  message: "{{ LOG_WAIT }} - Waiting {{ delayed_job_ongoing_duration }} seconds, then I will decide if job_ongoing state should be entered."
                               # ***********************
                               # try to wait here until the remaining time is elapsed
                               - delay:
@@ -767,9 +838,9 @@ action:
               # ***** LOG SECTION *****
               - service: system_log.write
                 data_template:
-                  level: debug
-                  logger: homeassistant.components.asm_blueprint
-                  message: "STATE CHANGE - Entered the job_ongoing state."
+                  level: "{{ LOG_LEVEL }}"
+                  logger: "{{ LOG_LOGGER }}"
+                  message: "{{ LOG_STATE_CHANGE }} - Entered the job_ongoing state."
               # ***********************
               - choose:
                   - conditions:
@@ -784,9 +855,9 @@ action:
                       # ***** LOG SECTION *****
                       - service: system_log.write
                         data_template:
-                          level: debug
-                          logger: homeassistant.components.asm_blueprint
-                          message: "TIMER - delayed_job_ongoing_timer canceled and stopped."
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_TIMER }} - delayed_job_ongoing_timer canceled and stopped."
                       # ***********************
               - choose:
                   - conditions:
@@ -801,13 +872,27 @@ action:
                       # ***** LOG SECTION *****
                       - service: system_log.write
                         data_template:
-                          level: debug
-                          logger: homeassistant.components.asm_blueprint
-                          message: "CYCLE START - A new Job Cycle started"
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_CYCLE_START }} - A new Job Cycle started"
+                      # ***********************
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_CUSTOM_ACTIONS }} - executing actions_new_job_cycle_begins."
                       # ***********************
                       - choose: []
                         default: !input "actions_new_job_cycle_begins"
                 default:
+                  # ***** LOG SECTION *****
+                  - service: system_log.write
+                    data_template:
+                      level: "{{ LOG_LEVEL }}"
+                      logger: "{{ LOG_LOGGER }}"
+                      message: "{{ LOG_CUSTOM_ACTIONS }} - executing actions_job_cycle_resumes."
+                  # ***********************
                   - choose: []
                     default: !input "actions_job_cycle_resumes"
 
@@ -824,17 +909,49 @@ action:
               - condition: state
                 entity_id: !input "appliance_job_cycle"
                 state: "on"
-              # The socket is on
-              - condition: template
-                value_template: "{{ states(appliance_socket) == 'on' }}"
               # A value below the finishing power threshold is received
               - condition: numeric_state
                 entity_id: !input "appliance_power_sensor"
                 below: !input "appliance_finishing_power_threshold"
+
+              # If the socket is off and the 
+              - condition: or
+                conditions:
+                  # The socket is on
+                  - condition: template
+                    value_template: "{{ states(appliance_socket) == 'on' }}"
+                  - condition: and
+                    conditions:
+                      # The option that forces the state machine to enter idle is on
+                      - condition: template
+                        value_template: "{{ appliance_job_completed_when_socket_is_off }}"
+                      # The socket is off
+                      - condition: template
+                        value_template: "{{ states(appliance_socket) == 'off' }}"
             sequence:
+              # ***** LOG SECTION *****
+              - service: system_log.write
+                data_template:
+                  level: "{{ LOG_LEVEL }}"
+                  logger: "{{ LOG_LOGGER }}"
+                  message: "{{ LOG_POWER_THRESHOLD }} - The finishing power threshold was reached"
+              # ***********************
               - choose:
                   # IF
                   - conditions:
+                      - condition: and
+                        conditions:
+                          - condition: template
+                            value_template: >
+                              {{ appliance_job_completed_when_socket_is_off }}
+                          # The socket is off
+                          - condition: template
+                            value_template: "{{ states(appliance_socket) == 'on' }}"
+                      - condition: not
+                        conditions:
+                          - condition: state
+                            entity_id: !input "appliance_state_machine"
+                            state: job_completed
                       # the timer isn't active
                       - condition: template
                         value_template: "{{ states(delayed_job_completion_timer) != 'active' }}"
@@ -852,13 +969,15 @@ action:
                       # ***** LOG SECTION *****
                       - service: system_log.write
                         data_template:
-                          level: debug
-                          logger: homeassistant.components.asm_blueprint
-                          message: "TIMER - delayed_job_completion_timer start invoked. Now it's {{ states(delayed_job_completion_timer) }}"
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_TIMER }} - delayed_job_completion_timer start invoked. Now it's {{ states(delayed_job_completion_timer) }}"
                       # ***********************
               - choose:
                   # if the timer should last for a time that is not 0
                   - conditions:
+                      - condition: template
+                        value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
                       - condition: template
                         value_template: "{{ delayed_job_completion_duration > 0 }}"
                     sequence:
@@ -882,9 +1001,9 @@ action:
                               # ***** LOG SECTION *****
                               - service: system_log.write
                                 data_template:
-                                  level: debug
-                                  logger: homeassistant.components.asm_blueprint
-                                  message: "WAIT - Waiting {{ delayed_job_completion_duration }} seconds, then I will decide if job_completed state should be entered."
+                                  level: "{{ LOG_LEVEL }}"
+                                  logger: "{{ LOG_LOGGER }}"
+                                  message: "{{ LOG_WAIT }} - Waiting {{ delayed_job_completion_duration }} seconds, then I will decide if job_completed state should be entered."
                               # ***********************
                               - delay:
                                   seconds: |-
@@ -921,23 +1040,22 @@ action:
               # ***** LOG SECTION *****
               - service: system_log.write
                 data_template:
-                  level: debug
-                  logger: homeassistant.components.asm_blueprint
-                  message: "CYCLE END - The Job Cycle is over"
+                  level: "{{ LOG_LEVEL }}"
+                  logger: "{{ LOG_LOGGER }}"
+                  message: "{{ LOG_CYCLE_END }} - The Job Cycle is over"
               # ***********************
               # ***** LOG SECTION *****
               - service: system_log.write
                 data_template:
-                  level: debug
-                  logger: homeassistant.components.asm_blueprint
-                  message: "STATE CHANGE - Entered the job_completed state."
+                  level: "{{ LOG_LEVEL }}"
+                  logger: "{{ LOG_LOGGER }}"
+                  message: "{{ LOG_STATE_CHANGE }} - Entered the job_completed state."
               # ***********************
               - choose:
                   - conditions:
                       - condition: template
                         value_template:
-                          "{{ states(delayed_job_completion_timer) == 'active'
-                          }}"
+                          "{{ states(delayed_job_completion_timer) == 'active' }}"
                     sequence:
                       - service: timer.cancel
                         data: {}
@@ -946,10 +1064,17 @@ action:
                       # ***** LOG SECTION *****
                       - service: system_log.write
                         data_template:
-                          level: debug
-                          logger: homeassistant.components.asm_blueprint
-                          message: "TIMER - delayed_job_completion_timer canceled and stopped."
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_TIMER }} - delayed_job_completion_timer canceled and stopped."
                       # ***********************
+              # ***** LOG SECTION *****
+              - service: system_log.write
+                data_template:
+                  level: "{{ LOG_LEVEL }}"
+                  logger: "{{ LOG_LOGGER }}"
+                  message: "{{ LOG_CUSTOM_ACTIONS }} - executing actions_job_cycle_ends."
+              # ***********************
               - choose: []
                 default: !input "actions_job_cycle_ends"
               - choose:
@@ -960,6 +1085,9 @@ action:
                             id: automation_self_triggered
                           - condition: template
                             value_template: "{{ delayed_job_completion_duration <= 0 }}"
+                          - condition: template
+                            value_template: >
+                              {{ appliance_job_completed_when_socket_is_off }}
                     sequence:
                       # - delay:
                       #     minutes: 1
@@ -1010,9 +1138,9 @@ action:
                           # ***** LOG SECTION *****
                           - service: system_log.write
                             data_template:
-                              level: debug
-                              logger: homeassistant.components.asm_blueprint
-                              message: "TIMER - job_completed_persistence_timer start invoked. Now it's {{ states(job_completed_persistence_timer) }}"
+                              level: "{{ LOG_LEVEL }}"
+                              logger: "{{ LOG_LOGGER }}"
+                              message: "{{ LOG_TIMER }} - job_completed_persistence_timer start invoked. Now it's {{ states(job_completed_persistence_timer) }}"
                           # ***********************
                   - choose:
                       # if the timer should last for a time that is not 0
@@ -1040,9 +1168,9 @@ action:
                                   # ***** LOG SECTION *****
                                   - service: system_log.write
                                     data_template:
-                                      level: debug
-                                      logger: homeassistant.components.asm_blueprint
-                                      message: "WAIT - Waiting {{ job_completed_persistence_duration }} seconds, then I will decide if idle state should be entered."
+                                      level: "{{ LOG_LEVEL }}"
+                                      logger: "{{ LOG_LOGGER }}"
+                                      message: "{{ LOG_WAIT }} - Waiting {{ job_completed_persistence_duration }} seconds, then I will decide if idle state should be entered."
                                   # ***********************
                                   - delay:
                                       seconds: |-
@@ -1076,9 +1204,9 @@ action:
                   # ***** LOG SECTION *****
                   - service: system_log.write
                     data_template:
-                      level: debug
-                      logger: homeassistant.components.asm_blueprint
-                      message: "STATE CHANGE - Entered the idle state."
+                      level: "{{ LOG_LEVEL }}"
+                      logger: "{{ LOG_LOGGER }}"
+                      message: "{{ LOG_STATE_CHANGE }} - Entered the idle state."
                   # ***********************
                   - choose:
                       - conditions:
@@ -1093,9 +1221,9 @@ action:
                           # ***** LOG SECTION *****
                           - service: system_log.write
                             data_template:
-                              level: debug
-                              logger: homeassistant.components.asm_blueprint
-                              message: "TIMER - job_completed_persistence_timer canceled and stopped."
+                              level: "{{ LOG_LEVEL }}"
+                              logger: "{{ LOG_LOGGER }}"
+                              message: "{{ LOG_TIMER }} - job_completed_persistence_timer canceled and stopped."
                           # ***********************
             default:
               - choose:
@@ -1111,9 +1239,9 @@ action:
                     # ***** LOG SECTION *****
                     - service: system_log.write
                       data_template:
-                        level: debug
-                        logger: homeassistant.components.asm_blueprint
-                        message: "TIMER - delayed_job_ongoing_timer canceled and stopped."
+                        level: "{{ LOG_LEVEL }}"
+                        logger: "{{ LOG_LOGGER }}"
+                        message: "{{ LOG_TIMER }} - delayed_job_ongoing_timer canceled and stopped."
 mode: restart
 max_exceeded: silent
 trace:
