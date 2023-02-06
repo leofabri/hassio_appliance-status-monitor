@@ -715,6 +715,22 @@ action:
                 entity_id: !input "appliance_power_sensor"
                 above: !input "appliance_starting_power_threshold"
             sequence:
+              - choose:
+                  - conditions:
+                      - condition: template
+                        value_template: "{{ states(job_completed_persistence_timer) == 'active' }}"
+                    sequence:
+                      - service: timer.cancel
+                        data: {}
+                        target:
+                          entity_id: !input "job_completed_persistence_timer"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_TIMER }} - The starting power threshold was surpassed again => job_completed_persistence_timer canceled and stopped"
+                      # ***********************
               # Delete the delayed_job_completion_timer if it's running
               # If the job completed timer is running, then the power consumption was high enough.
               # The delayed_job_completion_timer timer has to be discarded
@@ -938,14 +954,24 @@ action:
               - choose:
                   # IF
                   - conditions:
-                      - condition: not
+                      - condition: or
                         conditions:
-                          - condition: template
-                            value_template: >
-                              {{ appliance_job_completed_when_socket_is_off }}
-                          # The socket is on
-                          - condition: template
-                            value_template: "{{ states(appliance_socket) == 'off' }}"
+                          - condition: not
+                            conditions:
+                              - condition: template
+                                value_template: >
+                                  {{ appliance_job_completed_when_socket_is_off }}
+
+                          - condition: not
+                            conditions:
+                              - condition: and
+                                conditions:
+                                  - condition: template
+                                    value_template: >
+                                      {{ appliance_job_completed_when_socket_is_off }}
+                                  # The socket is on
+                                  - condition: template
+                                    value_template: "{{ states(appliance_socket) == 'off' }}"
 
                       # If the state machine isn't already in the job_completed state
                       - condition: not
@@ -985,11 +1011,11 @@ action:
                       - choose:
                           # if the elapsed time is less than the wanted delayed_job_completion_duration
                           - conditions:
-                              - condition: not
-                                conditions:
-                                  - condition: template
-                                    value_template: >
-                                      {{ appliance_job_completed_when_socket_is_off }}
+                              # - condition: not
+                              #   conditions:
+                              #     - condition: template
+                              #       value_template: >
+                              #         {{ appliance_job_completed_when_socket_is_off }}
                               - condition: template
                                 value_template: |-
                                   {% if states(delayed_job_completion_timer) == 'active' %}
