@@ -1,3 +1,8 @@
 # VSCode
 .vscode
-installer.sh
+asm-installer.sh
+temp
+bash.sh
+bash2.sh
+packages_enabler.sh
+packages_custom

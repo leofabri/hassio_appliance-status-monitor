@@ -80,6 +80,12 @@
 
     Open your automation and add the previously created helpers (entities)
 
+    If you want to use the command line, you can always issue the following command:
+
+    ```
+    cd /config/blueprints/automation/leofabri && curl -sSL https://raw.githubusercontent.com/leofabri/hassio_appliance-status-monitor/release/v3.0.0-dev/appliance-status-monitor.yaml -O
+    ```
+
 4. ### **Do you want to know more about this automation's structure?** [You might find this interesting](./Automation%20Structure.md).
 
 ...

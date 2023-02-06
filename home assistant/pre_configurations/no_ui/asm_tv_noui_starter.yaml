@@ -34,17 +34,19 @@
       appliance_job_completed_when_socket_is_off: true # default is false (disabled)
       
       # * Custom Actions
-      actions_new_job_cycle_begins: []
-      actions_job_cycle_resumes: []
-      actions_job_cycle_ends: # SAVE POWER! Turn off the TV when nobody is watching it
-        - service: switch.turn_off
-          data: {}
-          target:
-            entity_id: switch.tv_outlet
-      actions_unplugged_overload: []
-      actions_paused_after_overload: []
-      actions_resuming_after_overload: []
-      actions_paused_after_unplugged: []
+      # Uncomment what you need:
+        
+      # actions_new_job_cycle_begins: []
+      # actions_job_cycle_resumes: []
+      # actions_job_cycle_ends: # SAVE POWER! Turn off the TV when nobody is watching it
+      #   - service: switch.turn_off
+      #     data: {}
+      #     target:
+      #       entity_id: switch.tv_outlet # <- Make sure to put the right entity here
+      # actions_unplugged_overload: []
+      # actions_paused_after_overload: []
+      # actions_resuming_after_overload: []
+      # actions_paused_after_unplugged: []
       
       # _____________________ #
 

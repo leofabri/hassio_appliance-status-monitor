@@ -261,7 +261,7 @@ blueprint:
 
 
         This defines for how long the blueprint should "wait" before transitioning from the job_completed -> idle state.
-        Setting this to 0 will disable the option. This means that once the job has been done, if a new power reading is received, the state will immediately transition to 'idle'. 
+        Setting this to 0 will disable the option. This means that once the job has been done, if a new power reading is received, the state will immediately transition to 'idle'.
       default: 300
       selector:
         number:
@@ -300,7 +300,7 @@ blueprint:
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things like scripts.</i>
 
-        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations. 
+        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
@@ -317,7 +317,7 @@ blueprint:
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things like scripts.</i>
 
-        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations. 
+        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
@@ -334,7 +334,7 @@ blueprint:
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things like scripts.</i>
 
-        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations. 
+        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
@@ -350,7 +350,7 @@ blueprint:
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things like scripts.</i>
 
-        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations. 
+        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
@@ -365,7 +365,7 @@ blueprint:
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things like scripts.</i>
 
-        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations. 
+        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
@@ -380,7 +380,7 @@ blueprint:
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things like scripts.</i>
 
-        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations. 
+        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
@@ -395,7 +395,7 @@ blueprint:
         Please consider that the permanence in this state could last for a limited amount of time (seconds, potentially!). 
         This section is meant to be used to trigger other things like scripts.</i>
 
-        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations. 
+        If you need to use it for time-consuming operations, you have two options: dispatch the work by calling other scripts, or use the State Machine entity to wake up other external automations.
       default: []
       selector:
         action:
@@ -717,7 +717,7 @@ action:
             sequence:
               # Delete the delayed_job_completion_timer if it's running
               # If the job completed timer is running, then the power consumption was high enough.
-              # The delayed_job_completion_timer timer has to be discarded     
+              # The delayed_job_completion_timer timer has to be discarded
               - choose:
                   - conditions:
                       - condition: template
@@ -845,8 +845,7 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template:
-                          "{{ states(delayed_job_ongoing_timer) == 'active' }}"
+                        value_template: "{{ states(delayed_job_ongoing_timer) == 'active' }}"
                     sequence:
                       - service: timer.cancel
                         data: {}
@@ -914,7 +913,7 @@ action:
                 entity_id: !input "appliance_power_sensor"
                 below: !input "appliance_finishing_power_threshold"
 
-              # If the socket is off and the 
+              # If the socket is off and the
               - condition: or
                 conditions:
                   # The socket is on
@@ -939,14 +938,16 @@ action:
               - choose:
                   # IF
                   - conditions:
-                      - condition: and
+                      - condition: not
                         conditions:
                           - condition: template
                             value_template: >
                               {{ appliance_job_completed_when_socket_is_off }}
-                          # The socket is off
+                          # The socket is on
                           - condition: template
-                            value_template: "{{ states(appliance_socket) == 'on' }}"
+                            value_template: "{{ states(appliance_socket) == 'off' }}"
+
+                      # If the state machine isn't already in the job_completed state
                       - condition: not
                         conditions:
                           - condition: state
@@ -984,6 +985,11 @@ action:
                       - choose:
                           # if the elapsed time is less than the wanted delayed_job_completion_duration
                           - conditions:
+                              - condition: not
+                                conditions:
+                                  - condition: template
+                                    value_template: >
+                                      {{ appliance_job_completed_when_socket_is_off }}
                               - condition: template
                                 value_template: |-
                                   {% if states(delayed_job_completion_timer) == 'active' %}
@@ -1054,8 +1060,7 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template:
-                          "{{ states(delayed_job_completion_timer) == 'active' }}"
+                        value_template: "{{ states(delayed_job_completion_timer) == 'active' }}"
                     sequence:
                       - service: timer.cancel
                         data: {}
@@ -1116,8 +1121,7 @@ action:
                       - conditions:
                           # the job_completed_persistence_timer isn't active
                           - condition: template
-                            value_template:
-                              "{{ states(job_completed_persistence_timer) != 'active' }}"
+                            value_template: "{{ states(job_completed_persistence_timer) != 'active' }}"
                           # the job_completed_timer didn't trigger this automation this time
                           - condition: not
                             conditions:
@@ -1211,8 +1215,7 @@ action:
                   - choose:
                       - conditions:
                           - condition: template
-                            value_template:
-                              "{{ states(job_completed_persistence_timer) == 'active' }}"
+                            value_template: "{{ states(job_completed_persistence_timer) == 'active' }}"
                         sequence:
                           - service: timer.cancel
                             data: {}
@@ -1227,21 +1230,20 @@ action:
                           # ***********************
             default:
               - choose:
-                - conditions:
-                    - condition: template
-                      value_template:
-                        "{{ states(delayed_job_ongoing_timer) == 'active' }}"
-                  sequence:
-                    - service: timer.cancel
-                      data: {}
-                      target:
-                        entity_id: !input "delayed_job_ongoing_timer"
-                    # ***** LOG SECTION *****
-                    - service: system_log.write
-                      data_template:
-                        level: "{{ LOG_LEVEL }}"
-                        logger: "{{ LOG_LOGGER }}"
-                        message: "{{ LOG_TIMER }} - delayed_job_ongoing_timer canceled and stopped."
+                  - conditions:
+                      - condition: template
+                        value_template: "{{ states(delayed_job_ongoing_timer) == 'active' }}"
+                    sequence:
+                      - service: timer.cancel
+                        data: {}
+                        target:
+                          entity_id: !input "delayed_job_ongoing_timer"
+                      # ***** LOG SECTION *****
+                      - service: system_log.write
+                        data_template:
+                          level: "{{ LOG_LEVEL }}"
+                          logger: "{{ LOG_LOGGER }}"
+                          message: "{{ LOG_TIMER }} - delayed_job_ongoing_timer canceled and stopped."
 mode: restart
 max_exceeded: silent
 trace:
