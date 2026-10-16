@@ -589,8 +589,7 @@ action:
                                 data: {}
                                 target:
                                   entity_id: !input "automation_self_trigger"
-                              - condition: template
-                                value_template: "{{0}}"
+                              - stop: Delayed job completion re-armed
                 default: []
               - service: input_boolean.turn_off
                 data: {}
